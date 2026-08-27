@@ -1,4 +1,5 @@
 import 'package:bdo_event/features/calendar_screen/screen/calendar_screen.dart';
+import 'package:bdo_event/features/create_event_screen/page/create_event_page.dart';
 import 'package:bdo_event/features/event_screen/page/event_screen.dart';
 import 'package:bdo_event/features/profile_screen/pages/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class MainController extends GetxController {
   final List<Widget> screens = [
     const EventPage(),
     const CalendarScreen(),
+    const CreateEventPage(),
     const ProfileScreen(),
   ];
 }

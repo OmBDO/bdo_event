@@ -1,6 +1,7 @@
 // Location: lib/features/event_screen/widget/header_element.dart
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/core/common/dropdown_list/element/locationDropdown.dart';
+import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/auth_screen.dart';
 import 'package:flutter/material.dart';
@@ -21,16 +22,64 @@ class HeaderElement extends StatefulWidget {
 }
 
 class _HeaderElementState extends State<HeaderElement> {
-  String selectedLocation = "Mumbai, India (Zone 1)";
+  Location selectedLocation = const Location(
+    id: 'mumbai-zone-1',
+    name: 'Mumbai',
+    city: 'Mumbai',
+    country: 'India',
+    zone: 'Zone 1',
+  );
 
-  final List<String> locations = [
-    "Mumbai, India (Zone 1)",
-    "Bangalore, India (East)",
-    "Kolkata, India (North)",
-    "Mumbai, India (Zone 2)",
-    "Bangalore, India (West)",
-    "Kolkata, India (South)",
-    "Delhi, India (NCR)",
+  final List<Location> locations = [
+    const Location(
+      id: 'mumbai-zone-1',
+      name: 'Mumbai',
+      city: 'Mumbai',
+      country: 'India',
+      zone: 'Zone 1',
+    ),
+    const Location(
+      id: 'bangalore-east',
+      name: 'Bangalore',
+      city: 'Bangalore',
+      country: 'India',
+      zone: 'East',
+    ),
+    const Location(
+      id: 'kolkata-north',
+      name: 'Kolkata',
+      city: 'Kolkata',
+      country: 'India',
+      zone: 'North',
+    ),
+    const Location(
+      id: 'mumbai-zone-2',
+      name: 'Mumbai',
+      city: 'Mumbai',
+      country: 'India',
+      zone: 'Zone 2',
+    ),
+    const Location(
+      id: 'bangalore-west',
+      name: 'Bangalore',
+      city: 'Bangalore',
+      country: 'India',
+      zone: 'West',
+    ),
+    const Location(
+      id: 'kolkata-south',
+      name: 'Kolkata',
+      city: 'Kolkata',
+      country: 'India',
+      zone: 'South',
+    ),
+    const Location(
+      id: 'delhi-ncr',
+      name: 'Delhi',
+      city: 'Delhi',
+      country: 'India',
+      zone: 'NCR',
+    ),
   ];
 
   void onNotificationClick() {}
@@ -94,7 +143,7 @@ class _HeaderElementState extends State<HeaderElement> {
                           child: LocationDropdown(
                             selectedValue: selectedLocation,
                             items: locations,
-                            onChanged: (String? newValue) {
+                            onChanged: (Location? newValue) {
                               if (newValue != null) {
                                 setState(() {
                                   selectedLocation = newValue;

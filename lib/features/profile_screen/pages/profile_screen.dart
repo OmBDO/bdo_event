@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
+import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -15,6 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = AuthRepository.currentUser;
     const primaryColor = Color(0xFFE96B47);
     const darkText = Color(0xFF2D0C57);
     const greyText = Color(0xFF9586A8);
@@ -63,9 +65,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const Gap(16),
-                  const Text(
-                    "Om Jamnekar",
-                    style: TextStyle(
+                  Text(
+                    user?.displayName ?? 'BDO Events member',
+                    style: const TextStyle(
                       color: darkText,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -73,9 +75,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const Gap(4),
-                  const Text(
-                    "ommanoj.jamnekar@bdo.com",
-                    style: TextStyle(
+                  Text(
+                    user?.email ?? '',
+                    style: const TextStyle(
                       color: greyText,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

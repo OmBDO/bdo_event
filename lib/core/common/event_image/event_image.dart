@@ -1,0 +1,45 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+
+class EventImage extends StatelessWidget {
+  final String path;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+  final Widget Function(BuildContext, Object, StackTrace?)? errorBuilder;
+
+  const EventImage({
+    super.key,
+    required this.path,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.errorBuilder,
+  });
+
+  bool get _isAsset => path.startsWith('assets/');
+
+  @override
+  Widget build(BuildContext context) {
+    if (path.isEmpty) {
+      return errorBuilder?.call(
+            context,
+            'Missing event image',
+            StackTrace.current,
+          ) ??
+          const Icon(Icons.image_outlined, color: Colors.grey, size: 48);
+    }
+
+    final image = _isAsset
+        ? Image.asset(path, width: width, height: height, fit: fit)
+        : Image.file(
+            File(path),
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: errorBuilder,
+          );
+    return image;
+  }
+}

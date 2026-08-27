@@ -1,10 +1,20 @@
 // Location: lib/features/event_screen/screen/event_detail_page.dart
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/common/event_image/event_image.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:gap/gap.dart';
 
-class EventDetailPage extends StatelessWidget {
-  const EventDetailPage({super.key});
+class EventDetailPage extends StatefulWidget {
+  final Event event;
 
+  const EventDetailPage({super.key, required this.event});
+
+  @override
+  State<EventDetailPage> createState() => _EventDetailPageState();
+}
+
+class _EventDetailPageState extends State<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     const primaryDark = Color(0xFF111111);
@@ -21,46 +31,52 @@ class EventDetailPage extends StatelessWidget {
             left: 0,
             right: 0,
             height: MediaQuery.of(context).size.height * 0.45,
-            child: Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage('https://unsplash.com'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Back Circle Button
-                      CircleAvatar(
-                        backgroundColor: Colors.white.withValues(alpha: 0.3),
-                        radius: 20,
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white,
-                          size: 16,
-                        ),
+            child: Hero(
+              tag: widget.event.id,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  EventImage(path: widget.event.imageUrl, fit: BoxFit.cover),
+                  SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                      // More Circle Button
-                      CircleAvatar(
-                        backgroundColor: Colors.white.withValues(alpha: 0.3),
-                        radius: 20,
-                        child: const Icon(
-                          Icons.more_vert_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Back Circle Button
+                          IconButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.3,
+                              ),
+                              foregroundColor: Colors.white,
+                            ),
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 16,
+                            ),
+                          ),
+                          // More Circle Button
+                          IconButton(
+                            onPressed: () {},
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.3,
+                              ),
+                              foregroundColor: Colors.white,
+                            ),
+                            icon: const Icon(Icons.more_vert_rounded, size: 18),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -91,16 +107,16 @@ class EventDetailPage extends StatelessWidget {
                   children: [
                     // Location Meta String Header
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.location_on_rounded,
                           color: Colors.black26,
                           size: 16,
                         ),
-                        Gap(6),
+                        const Gap(6),
                         Text(
-                          "New York, USA",
-                          style: TextStyle(
+                          widget.event.location,
+                          style: const TextStyle(
                             color: textGrey,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -110,9 +126,20 @@ class EventDetailPage extends StatelessWidget {
                     ),
                     const Gap(12),
 
-                    // Main Title Header
                     const Text(
-                      "AI Global Leadership\nFuture Summit",
+                      "UPCOMING EVENT",
+                      style: TextStyle(
+                        color: Colors.deepOrange,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
+                    const Gap(8),
+
+                    // Main Title Header
+                    Text(
+                      widget.event.title,
                       style: TextStyle(
                         color: primaryDark,
                         fontSize: 26,
@@ -240,7 +267,7 @@ class EventDetailPage extends StatelessWidget {
             ),
           ),
 
-          // 5. Bottom Sticky Pricing Purchase Action Deck Row
+          // 5. Bottom Sticky Registration Action Deck Row
           Positioned(
             bottom: 0,
             left: 0,
@@ -263,22 +290,25 @@ class EventDetailPage extends StatelessWidget {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "Starting from",
+                    children: [
+                      const Text(
+                        "STATUS",
                         style: TextStyle(
                           color: textGrey,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
                         ),
                       ),
-                      Gap(4),
+                      const Gap(3),
                       Text(
-                        "\$350.00",
+                        widget.event.isAvailable ? "Available" : "Unavailable",
                         style: TextStyle(
-                          color: primaryDark,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
+                          color: widget.event.isAvailable
+                              ? Colors.green.shade700
+                              : textGrey,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ],
@@ -287,7 +317,21 @@ class EventDetailPage extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 32),
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: widget.event.isAvailable
+                            ? () async {
+                                final error = await AuthRepository.registerEvent(
+                                  widget.event,
+                                );
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      error ?? 'Event registered successfully',
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryDark,
                           foregroundColor: Colors.white,
@@ -298,7 +342,7 @@ class EventDetailPage extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: const Text(
-                          "Buy Ticket",
+                          "Register",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -319,41 +363,46 @@ class EventDetailPage extends StatelessWidget {
 
   // Multi-Avatar Layering GeneratorWidget
   SizedBox _buildAvatarStack() {
-    const urls = ['unsplash.com', 'unsplash.com', 'unsplash.com'];
+    const avatarColors = [Colors.teal, Colors.indigo, Colors.deepOrange];
     return SizedBox(
       width: 76,
       height: 28,
       child: Stack(
-        children: List.generate(urls.length + 1, (index) {
-          if (index == urls.length) {
+        children: [
+          ...List.generate(avatarColors.length, (index) {
             return Positioned(
               left: index * 16.0,
               child: CircleAvatar(
                 radius: 14,
-                backgroundColor: Colors.amber.shade100,
-                child: const Text(
-                  "99+",
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.amber,
+                backgroundColor: Colors.white,
+                child: CircleAvatar(
+                  radius: 13,
+                  backgroundColor: avatarColors[index],
+                  child: const Icon(
+                    Icons.person_rounded,
+                    color: Colors.white,
+                    size: 15,
                   ),
                 ),
               ),
             );
-          }
-          return Positioned(
-            left: index * 16.0,
+          }),
+          Positioned(
+            left: avatarColors.length * 16.0,
             child: CircleAvatar(
               radius: 14,
-              backgroundColor: Colors.white,
-              child: CircleAvatar(
-                radius: 13,
-                backgroundImage: NetworkImage(urls[index]),
+              backgroundColor: Colors.amber.shade100,
+              child: const Text(
+                "99+",
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.amber,
+                ),
               ),
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }

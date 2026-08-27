@@ -1,47 +1,65 @@
+// Location: lib/features/event_screen/controller/event_controller.dart
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
-import 'package:bdo_event/features/event_detail_screen/page/event_detail_screen.dart';
-import 'package:bdo_event/features/event_screen/widget/event_card.dart';
-import 'package:flutter/material.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 class EventController extends GetxController {
   final List<String> tabs = ['Upcoming', 'My Events', 'Past'];
-  final List<String> locations = ['Mumbai', 'Bangalore', 'Gurgaon'];
+  final List<Location> locations = [
+    const Location(
+      id: 'mumbai',
+      name: 'Mumbai',
+      city: 'Mumbai',
+      country: 'India',
+    ),
+    const Location(
+      id: 'bangalore',
+      name: 'Bangalore',
+      city: 'Bangalore',
+      country: 'India',
+    ),
+    const Location(
+      id: 'gurgaon',
+      name: 'Gurgaon',
+      city: 'Gurgaon',
+      country: 'India',
+    ),
+  ];
 
-  String selectedLocation = 'Jombang, East Java';
+  Location selectedLocation = const Location(
+    id: 'mumbai',
+    name: 'Mumbai',
+    city: 'Mumbai',
+    country: 'India',
+  );
   int selectedTab = 0;
 
-  /// Call this function from your UI View when a tab is tapped
   void changeTab(int index) {
-    if (selectedTab == index) return; // Skip if tapping the active tab
-
+    if (selectedTab == index) return;
     selectedTab = index;
-
-    // Reset the global scroll tracker and position instantly
     AppScrollTracker.reset(animate: false);
-
-    update(); // Notifies GetBuilder widgets to redraw the list view
+    update();
   }
 
-  // Your list declarations remain the same
-  final List<EventCard> list = [
-    EventCard(
+  // Pure, clean data declarations optimized for your OpenContainer UI loop
+  final List<Event> list = [
+    Event(
+      id: 'tech-meetup',
       title: 'Tech Meetup',
       date: 'Aug 30, 2026',
       imageUrl: "assets/festivals/1_may.png",
       location: 'Conference Room A',
-      onTap: (context) {
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => EventDetailPage()));
-      },
     ),
-    EventCard(
+    Event(
+      id: 'company-hackathon',
       title: 'Company Hackathon',
       date: 'Sep 02, 2026',
       imageUrl: "assets/festivals/diwali.png",
       location: 'Main Auditorium',
     ),
-    EventCard(
+    Event(
+      id: 'team-building',
       title: 'Team Building Event',
       date: 'Sep 05, 2026',
       imageUrl: "assets/festivals/ganapati.png",
@@ -49,47 +67,32 @@ class EventController extends GetxController {
     ),
   ];
 
-  final List<EventCard> list2 = [
-    EventCard(
+  final List<Event> list2 = [
+    Event(
+      id: 'tech-meetup',
       title: 'Tech Meetup',
       date: 'Aug 30, 2026',
       imageUrl: "assets/festivals/1_may.png",
       location: 'Conference Room A',
     ),
-    EventCard(
+    Event(
+      id: 'company-hackathon',
       title: 'Company Hackathon',
       date: 'Sep 02, 2026',
       imageUrl: "assets/festivals/diwali.png",
       location: 'Main Auditorium',
     ),
-    EventCard(
-      title: 'Team Building Event',
-      date: 'Sep 05, 2026',
-      imageUrl: "assets/festivals/ganapati.png",
-      location: 'Company Campus',
-    ),
   ];
 
-  final List<EventCard> list3 = [
-    EventCard(
+  final List<Event> list3 = [
+    Event(
+      id: 'tech-meetup',
       title: 'Tech Meetup',
       date: 'Aug 30, 2026',
       imageUrl: "assets/festivals/1_may.png",
       location: 'Conference Room A',
     ),
-    EventCard(
-      title: 'Company Hackathon',
-      date: 'Sep 02, 2026',
-      imageUrl: "assets/festivals/diwali.png",
-      location: 'Main Auditorium',
-    ),
-    EventCard(
-      title: 'Team Building Event',
-      date: 'Sep 05, 2026',
-      imageUrl: "assets/festivals/ganapati.png",
-      location: 'Company Campus',
-    ),
   ];
 
-  late final List<List<EventCard>> eventList = [list, list2, list3];
+  late final List<List<Event>> eventList = [list, list2, list3];
 }

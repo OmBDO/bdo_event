@@ -1,6 +1,7 @@
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/signin/signin_screen.dart';
 import 'package:bdo_event/features/auth_screen/signup/signup_screen.dart';
+import 'package:bdo_event/features/loading_screen/page/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/features/zmain_screen/page/main_screen.dart';
 
@@ -35,9 +36,7 @@ class _AuthScreenState extends State<AuthScreen> {
       future: _initialization,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const LoadingScreen();
         }
 
         if (AuthRepository.currentUserName != null) {

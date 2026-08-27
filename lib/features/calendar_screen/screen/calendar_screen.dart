@@ -1,8 +1,12 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
 import 'package:bdo_event/core/common/calender_element/element/calendar_element.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
+import 'package:bdo_event/features/auth_screen/auth_repository.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/calendar_screen/widget/search_bar.dart';
+import 'package:bdo_event/features/registered_screen/page/registered_event_page.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:gap/gap.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -40,38 +44,69 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
               const Gap(16),
 
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  return Material(
-                    color: Colors.transparent,
-                    child: ListTile(
-                      title: const Text(
-                        "Event",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      onTap: () {}, // Ink splashes require an active tap handler trigger to paint
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: Image.network(
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb7HjcEqxqMvO5FJXRu1Mn1c7Kc0eJFd_oOfdtWzUW7g&s=10",
-                            fit: BoxFit.cover,
-                          ),
+              ValueListenableBuilder<List<Event>>(
+                valueListenable: AuthRepository.registrations,
+                builder: (context, registeredEvents, child) {
+                  if (registeredEvents.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.fromLTRB(24, 20, 24, 30),
+                      child: Text(
+                        'No registered events yet',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
+                    itemCount: registeredEvents.length,
+                    itemBuilder: (context, index) {
+                      final event = registeredEvents[index];
+                      return Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    RegisteredEventPage(event: event),
+                              ),
+                            );
+                          },
+                          title: Text(
+                            event.title,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text('${event.date} • ${event.location}'),
+                          trailing: const Icon(
+                            Icons.qr_code_2_rounded,
+                            color: Colors.deepOrange,
+                          ),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: EventImage(
+                                path: event.imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) => const Gap(10),
                   );
                 },
-                separatorBuilder: (context, index) => const Gap(10),
               ),
 
               ValueListenableBuilder<double>(

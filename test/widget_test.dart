@@ -5,26 +5,36 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
+import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bdo_event/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  test('role permissions keep event management scoped', () {
+    final attendee = User(
+      id: 'attendee-1',
+      displayName: 'Attendee',
+      email: 'attendee@example.com',
+      createdAt: DateTime(2026),
+    );
+    final organizer = User(
+      id: 'organizer-1',
+      displayName: 'Organizer',
+      email: 'organizer@example.com',
+      roles: {UserRole.organizer},
+      createdAt: DateTime(2026),
+    );
+    final administrator = User(
+      id: 'admin-1',
+      displayName: 'Admin',
+      email: 'admin@example.com',
+      roles: {UserRole.administrator},
+      createdAt: DateTime(2026),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(attendee.hasPermission(UserPermission.registerForEvents), isTrue);
+    expect(attendee.hasPermission(UserPermission.createEvents), isFalse);
+    expect(organizer.hasPermission(UserPermission.updateOwnEvents), isTrue);
+    expect(organizer.hasPermission(UserPermission.manageAllEvents), isFalse);
+    expect(administrator.hasPermission(UserPermission.manageUsers), isTrue);
   });
 }

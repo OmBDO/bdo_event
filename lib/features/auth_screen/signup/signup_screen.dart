@@ -175,14 +175,19 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            CheckboxListTile(
-                              value: _acceptTerms,
-                              onChanged: (value) =>
-                                  setState(() => _acceptTerms = value ?? false),
-                              contentPadding: EdgeInsets.zero,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              title: const Text(
-                                'I agree to the terms and privacy policy',
+                            Material(
+                              color: Colors.transparent,
+                              child: CheckboxListTile(
+                                value: _acceptTerms,
+                                onChanged: (value) => setState(
+                                  () => _acceptTerms = value ?? false,
+                                ),
+                                contentPadding: EdgeInsets.zero,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                title: const Text(
+                                  'I agree to the terms and privacy policy',
+                                ),
                               ),
                             ),
                             if (_authError != null)

@@ -34,10 +34,8 @@ class _FooterElementState extends State<FooterElement> {
     // 1. Navigation items representing the buttons in your image
     final items = [
       NavItem(icon: Icons.calendar_month, label: 'Event'),
-      NavItem(
-        icon: Icons.app_registration_rounded,
-        label: 'Register',
-      ), // Sparkle icon
+      NavItem(icon: Icons.app_registration_rounded, label: 'Register'),
+      NavItem(icon: Icons.add_circle_outline_rounded, label: 'Create'),
       NavItem(icon: Icons.account_box, label: 'Profile'),
     ];
 

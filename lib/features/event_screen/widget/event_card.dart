@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/common/event_image/event_image.dart';
 
 class EventCard extends StatelessWidget {
-  final String title;
-  final String date;
-  final String location;
-  final String? imageUrl;
+  final Event event;
   final Function(BuildContext)? onTap;
+  final VoidCallback? onUpdate;
+  final VoidCallback? onDelete;
 
   const EventCard({
     super.key,
-    required this.title,
-    required this.date,
-    required this.location,
-    this.imageUrl,
+    required this.event,
     this.onTap,
+    this.onUpdate,
+    this.onDelete,
   });
 
   @override
@@ -35,15 +35,18 @@ class EventCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: imageUrl != null
-                    ? Image.asset(
-                        imageUrl!,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildImagePlaceholder();
-                        },
+                child: event.imageUrl.isNotEmpty
+                    ? Hero(
+                        tag: event.id,
+                        child: EventImage(
+                          path: event.imageUrl,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildImagePlaceholder();
+                          },
+                        ),
                       )
                     : _buildImagePlaceholder(),
               ),
@@ -62,7 +65,7 @@ class EventCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    date,
+                    event.date,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -71,6 +74,28 @@ class EventCard extends StatelessWidget {
                   ),
                 ),
               ),
+
+              if (onUpdate != null && onDelete != null)
+                Positioned(
+                  top: 54,
+                  right: 12,
+                  child: PopupMenuButton<String>(
+                    tooltip: 'Manage event',
+                    onSelected: (value) {
+                      if (value == 'update') onUpdate!();
+                      if (value == 'delete') onDelete!();
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(value: 'update', child: Text('Update')),
+                      PopupMenuItem(value: 'delete', child: Text('Delete')),
+                    ],
+                    child: const CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.white70,
+                      child: Icon(Icons.more_horiz, color: Colors.black87),
+                    ),
+                  ),
+                ),
 
               // Floating Attending Avatars (Bottom Left Overlapping Border)
               Positioned(
@@ -154,7 +179,7 @@ class EventCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        event.title,
                         maxLines: 1, // Restricting to 1 line limits height spillover bugs
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -182,7 +207,7 @@ class EventCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              location,
+                              event.location,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
