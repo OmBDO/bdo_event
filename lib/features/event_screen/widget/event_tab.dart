@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class EventTab extends StatelessWidget {
   final List<String> titles;
-  final bool isSelected;
-  final VoidCallback onTap;
+  final int selectedTab;
+  final Function(int) onTap;
 
   const EventTab({
     super.key,
     required this.titles,
-    required this.isSelected,
     required this.onTap,
+    required this.selectedTab,
   });
 
   @override
@@ -25,17 +25,19 @@ class EventTab extends StatelessWidget {
         itemCount: titles.length,
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
-            onTap: onTap,
+            onTap: () => onTap(index),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.black : Colors.transparent,
+                color: selectedTab == index ? Colors.black : Colors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 titles[index],
                 style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.grey.shade700,
+                  color: selectedTab == index
+                      ? Colors.white
+                      : Colors.grey.shade700,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),

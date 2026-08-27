@@ -3,113 +3,252 @@ import 'package:flutter/material.dart';
 class EventCard extends StatelessWidget {
   final String title;
   final String date;
-  final String time;
   final String location;
   final String? imageUrl;
+  final Function(BuildContext)? onTap;
 
   const EventCard({
     super.key,
     required this.title,
     required this.date,
-    required this.time,
     required this.location,
     this.imageUrl,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 9),
+      width: MediaQuery.sizeOf(context).width,
+      height: 310, // Increased slightly by 10px to accommodate bottom margins beautifully
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Event image
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: imageUrl != null
-                ? Image.network(
-                    imageUrl!,
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    height: 180,
-                    width: double.infinity,
-                    color: const Color(0xFFE8E8F5),
-                    child: const Icon(
-                      Icons.event,
-                      size: 50,
-                      color: Colors.grey,
+          // 1. Top Image section with floating badges
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: imageUrl != null
+                    ? Image.asset(
+                        imageUrl!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildImagePlaceholder();
+                        },
+                      )
+                    : _buildImagePlaceholder(),
+              ),
+
+              // Floating Date Badge (Top Right)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    date,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                ),
+              ),
+
+              // Floating Attending Avatars (Bottom Left Overlapping Border)
+              Positioned(
+                bottom: -16,
+                left: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 22,
+                        width: (3 * 16.0) + 6.0,
+                        child: Stack(
+                          children: [
+                            // 🚀 FIXED: Added valid endpoint URL paths instead of 'https://pravatar.cc'
+                            Positioned(
+                              left: 0,
+                              child: _buildAvatar(
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqIGGrBSRv1I4gAHcESlYGtuN8r3SchvJZeoOMK6yDW23iC7BRAEfK0RE&s=10',
+                              ),
+                            ),
+                            Positioned(
+                              left: 16,
+                              child: _buildAvatar(
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAfNQXtUUS81yEEeZXXvY4Ux-48HfUCGQq_E1x6PISTyzhVfeGMLtMWjYy&s=10',
+                              ),
+                            ),
+                            Positioned(
+                              left: 32,
+                              child: _buildAvatar(
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMHIN_pWELurJc6QlHWpwVAQ47ADzg3MqBLRupl9r43wzqyIgbF0YeoSfj&s=10',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '99+',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
 
+          // 2. Bottom Text Content Section
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.only(
+              top: 28.0,
+              left: 16,
+              right: 16,
+              bottom: 12,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1, // Restricting to 1 line limits height spillover bugs
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.black,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.language,
+                              size: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              location,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(width: 16),
 
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.calendar_today_outlined,
-                      size: 16,
-                      color: Colors.grey,
+                // Diagonal Arrow Circular Button
+                GestureDetector(
+                  onTap: () => onTap?.call(context),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(width: 6),
-                    Text(date, style: const TextStyle(color: Colors.grey)),
-
-                    const SizedBox(width: 16),
-
-                    const Icon(
-                      Icons.access_time_outlined,
-                      size: 16,
-                      color: Colors.grey,
+                    child: const Icon(
+                      Icons.north_east,
+                      color: Colors.white,
+                      size: 18,
                     ),
-                    const SizedBox(width: 6),
-                    Text(time, style: const TextStyle(color: Colors.grey)),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 17,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(location, style: const TextStyle(color: Colors.grey)),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Helper widget to cleanly format fallback images
+  Widget _buildImagePlaceholder() {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      color: const Color(0xFFE8E8F5),
+      child: const Icon(Icons.image, size: 50, color: Colors.grey),
+    );
+  }
+
+  // 🚀 FIXED: Completed the broken method implementation at the end of your snippet
+  Widget _buildAvatar(String url) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 1.5),
+      ),
+      child: CircleAvatar(
+        radius: 11,
+        backgroundColor: Colors.grey[300],
+        backgroundImage: NetworkImage(url),
+        onBackgroundImageError: (exception, stackTrace) {
+          // Silent catch for network dropping
+        },
       ),
     );
   }

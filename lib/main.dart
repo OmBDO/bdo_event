@@ -1,4 +1,4 @@
-import 'package:bdo_event/features/event_screen/page/event_page.dart';
+import 'package:bdo_event/features/auth_screen/auth_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       debugShowCheckedModeBanner: false,
-      home: EventPage(),
+      home: const AuthScreen(),
     );
   }
 }
