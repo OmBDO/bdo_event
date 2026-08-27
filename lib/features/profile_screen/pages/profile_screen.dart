@@ -15,18 +15,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(
-      0xFFE96B47,
-    ); // Matches your app's core indigo accent
-    const darkText = Color(0xFF2D0C57); // Deep plum dark text palette
-    const greyText = Color(0xFF9586A8); // Soft neutral text color
+    const primaryColor = Color(0xFFE96B47);
+    const darkText = Color(0xFF2D0C57);
+    const greyText = Color(0xFF9586A8);
 
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Gap(30),
+            const Gap(30),
 
             // 1. Premium Header Section
             Container(
@@ -53,10 +51,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 18,
                         backgroundColor: primaryColor,
-                        child: const Icon(
+                        child: Icon(
                           Icons.edit_rounded,
                           color: Colors.white,
                           size: 16,
@@ -181,7 +179,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  backgroundColor: Color(0xFFB1D4FA).withValues(alpha: 0.6),
+                  backgroundColor: const Color(0xFFB1D4FA)
+                      .withValues(alpha: 0.6),
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 icon: const Icon(Icons.logout_rounded, size: 20),
@@ -192,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            // 4. Secure Matrix Padding Buffer for Footer Navigation Systems
+            // 4. Padding Buffer for Footer Navigation Systems
             ValueListenableBuilder<double>(
               valueListenable: FooterHeightTracker.heightNotifier,
               builder: (context, dynamicHeight, child) {
@@ -209,7 +208,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildSectionHeader(String title) {
     return Container(
       padding: const EdgeInsets.only(left: 24, bottom: 8, top: 8),
-
       child: Text(
         title,
         style: const TextStyle(
@@ -222,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Component Helper: Grouped Card Outer Layout Wrapper
+  // Component Helper: FIXED Grouped Card Outer Layout Wrapper
   Widget _buildSettingsGroup(List<Widget> children) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -237,7 +235,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      child: Column(children: children),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        // 🚀 THE FIX: Enforcing Material behavior context globally across list nodes
+        child: Material(
+          color: Colors.transparent,
+          child: Column(children: children),
+        ),
+      ),
     );
   }
 
@@ -252,7 +257,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListTile(
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: _buildTileIcon(icon, color),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
       title: Text(
         title,
         style: const TextStyle(
@@ -288,11 +300,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: _buildTileIcon(icon, color),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
       title: Text(
         title,
         style: const TextStyle(
-          color: Color.fromARGB(255, 51, 0, 0),
+          color: Color(0xFF2D0C57),
           fontWeight: FontWeight.w600,
           fontSize: 15,
         ),
@@ -309,20 +329,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         value: value,
         onChanged: onChanged,
         // ignore: deprecated_member_use
-        activeColor: Color(0xFFB1D4FA),
+        activeColor: const Color(0xFFE96B47),
       ),
-    );
-  }
-
-  // Helper Utility: Builds standard rounded setting tile icon badge asset
-  Widget _buildTileIcon(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, color: color, size: 20),
     );
   }
 }
