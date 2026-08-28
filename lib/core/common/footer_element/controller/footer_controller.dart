@@ -1,9 +1,8 @@
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 
-class FooterController extends GetxController {
+class FooterController {
   final GlobalKey footerKey = GlobalKey();
 
   void calculateFooterHeight() {

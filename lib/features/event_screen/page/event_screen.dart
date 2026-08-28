@@ -113,7 +113,7 @@ class _EventPageState extends State<EventPage> {
                         onTap: openContainer,
                         child: EventCard(
                           event: cardData,
-                          onUpdate: AuthRepository.canManage(cardData)
+                          onUpdate: AuthRepository.canUpdate(cardData)
                               ? () => Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) =>
@@ -121,7 +121,7 @@ class _EventPageState extends State<EventPage> {
                                   ),
                                 )
                               : null,
-                          onDelete: AuthRepository.canManage(cardData)
+                          onDelete: AuthRepository.canDelete(cardData)
                               ? () => _confirmDelete(cardData)
                               : null,
                         ),
