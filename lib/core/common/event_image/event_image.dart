@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 
 class EventImage extends StatelessWidget {
   final String path;
@@ -17,14 +18,14 @@ class EventImage extends StatelessWidget {
     this.errorBuilder,
   });
 
-  bool get _isAsset => path.startsWith('assets/');
+  bool get _isAsset => path.startsWith(AppAssets.assetPathPrefix);
 
   @override
   Widget build(BuildContext context) {
     if (path.isEmpty) {
       return errorBuilder?.call(
             context,
-            'Missing event image',
+            AppText.missingEventImage,
             StackTrace.current,
           ) ??
           const Icon(Icons.image_outlined, color: Colors.grey, size: 48);

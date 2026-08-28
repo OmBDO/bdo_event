@@ -1,0 +1,120 @@
+import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/features/auth_screen/data/datasource/auth_remote_data_source.dart';
+import 'package:bdo_event/features/auth_screen/data/model/auth_user_dto.dart';
+import 'package:bdo_event/features/auth_screen/data/auth_error_mapper.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+
+class AuthRepository {
+  AuthRepository({
+    required SupabaseStore store,
+    required AuthRemoteDataSource authDataSource,
+  })  : _store = store,
+        _authDataSource = authDataSource;
+
+  final SupabaseStore _store;
+  final AuthRemoteDataSource _authDataSource;
+  User? _currentUser;
+
+  User? get currentUser => _currentUser;
+  String? get currentUserName => _currentUser?.displayName;
+  bool can(UserPermission permission) =>
+      _currentUser?.hasPermission(permission) ?? false;
+  bool canUpdate(Event event) =>
+      can(UserPermission.manageAllEvents) ||
+      (event.creatorId == _currentUser?.id &&
+          can(UserPermission.updateOwnEvents));
+  bool canDelete(Event event) =>
+      can(UserPermission.manageAllEvents) ||
+      (event.creatorId == _currentUser?.id &&
+          can(UserPermission.deleteOwnEvents));
+  bool canManage(Event event) => canUpdate(event);
+
+  Future<void> initialize() async {
+    final authUser = _authDataSource.currentUser;
+    if (authUser == null) return;
+    _currentUser = await _mapUser(authUser);
+  }
+
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _authDataSource.signUp(
+        email: email.trim().toLowerCase(),
+        password: password,
+        data: {'display_name': name.trim()},
+      );
+    } on supabase.AuthException catch (error) {
+      return mapAuthError(error, signingUp: true);
+    } on Object {
+      return AppText.unableToCreateAccount;
+    }
+    return null;
+  }
+
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+        final response = await _authDataSource.signIn(
+          email: email.trim().toLowerCase(),
+          password: password,
+        );
+      final user = response.user;
+      if (user == null) return AppText.emailOrPasswordIncorrect;
+      _currentUser = await _mapUser(user);
+    } on supabase.AuthException catch (error) {
+      return mapAuthError(error, signingUp: false);
+    } on Object {
+      return AppText.unableToSignIn;
+    }
+    return null;
+  }
+
+  Future<void> logout() async {
+    _currentUser = null;
+    await _authDataSource.signOut();
+  }
+
+  /// Role changes are intentionally restricted to administrators. A future
+  /// admin screen or backend sync can call this without changing the UI rules.
+  Future<String?> updateUserRoles({
+    required String userId,
+    required Set<UserRole> roles,
+  }) async {
+    if (!can(UserPermission.manageUsers)) {
+      return AppText.administratorAccessRequired;
+    }
+    if (roles.isEmpty) return AppText.roleRequired;
+
+    return AppText.roleManagementTrustedServer;
+  }
+
+  Future<String?> updateNotificationPreference(bool enabled) async {
+    final current = _currentUser;
+    if (current == null) return AppText.pleaseSignInToUpdatePreferences;
+
+    try {
+      await _store.writeNotificationPreference(current.id, enabled);
+    } on LocalStorageException {
+      return AppText.unableToSaveNotificationPreference;
+    }
+    _currentUser = current.copyWith(notificationsEnabled: enabled);
+    return null;
+  }
+
+  Future<User> _mapUser(supabase.User authUser) async {
+    final notificationsEnabled =
+        await _store.readNotificationPreference(authUser.id);
+    return AuthUserDto(
+      user: authUser,
+      notificationsEnabled: notificationsEnabled,
+    ).toEntity();
+  }
+}

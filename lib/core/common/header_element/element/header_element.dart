@@ -2,19 +2,20 @@
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/core/common/dropdown_list/element/location_dropdown.dart';
 import 'package:bdo_event/core/model/location_model/location_model.dart';
-import 'package:bdo_event/features/auth_screen/auth_repository.dart';
-import 'package:bdo_event/features/auth_screen/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 
 class HeaderElement extends StatefulWidget {
   final int currentScreenIndex;
   final VoidCallback onProfileSelected;
+  final VoidCallback onLogoutSelected;
 
   const HeaderElement({
     super.key,
     required this.currentScreenIndex,
     required this.onProfileSelected,
+    required this.onLogoutSelected,
   });
 
   @override
@@ -23,68 +24,68 @@ class HeaderElement extends StatefulWidget {
 
 class _HeaderElementState extends State<HeaderElement> {
   Location selectedLocation = const Location(
-    id: 'mumbai-zone-1',
-    name: 'Mumbai',
-    city: 'Mumbai',
-    country: 'India',
-    zone: 'Zone 1',
+    id: AppLocations.mumbaiZoneOneId,
+    name: AppLocations.mumbai,
+    city: AppLocations.mumbai,
+    country: AppLocations.india,
+    zone: AppLocations.zoneOne,
   );
 
   final List<Location> locations = [
     const Location(
-      id: 'mumbai-zone-1',
-      name: 'Mumbai',
-      city: 'Mumbai',
-      country: 'India',
-      zone: 'Zone 1',
+      id: AppLocations.mumbaiZoneOneId,
+      name: AppLocations.mumbai,
+      city: AppLocations.mumbai,
+      country: AppLocations.india,
+      zone: AppLocations.zoneOne,
     ),
     const Location(
-      id: 'bangalore-east',
-      name: 'Bangalore',
-      city: 'Bangalore',
-      country: 'India',
-      zone: 'East',
+      id: AppLocations.bangaloreEastId,
+      name: AppLocations.bangalore,
+      city: AppLocations.bangalore,
+      country: AppLocations.india,
+      zone: AppLocations.east,
     ),
     const Location(
-      id: 'kolkata-north',
-      name: 'Kolkata',
-      city: 'Kolkata',
-      country: 'India',
-      zone: 'North',
+      id: AppLocations.kolkataNorthId,
+      name: AppLocations.kolkata,
+      city: AppLocations.kolkata,
+      country: AppLocations.india,
+      zone: AppLocations.north,
     ),
     const Location(
-      id: 'mumbai-zone-2',
-      name: 'Mumbai',
-      city: 'Mumbai',
-      country: 'India',
-      zone: 'Zone 2',
+      id: AppLocations.mumbaiZoneTwoId,
+      name: AppLocations.mumbai,
+      city: AppLocations.mumbai,
+      country: AppLocations.india,
+      zone: AppLocations.zoneTwo,
     ),
     const Location(
-      id: 'bangalore-west',
-      name: 'Bangalore',
-      city: 'Bangalore',
-      country: 'India',
-      zone: 'West',
+      id: AppLocations.bangaloreWestId,
+      name: AppLocations.bangalore,
+      city: AppLocations.bangalore,
+      country: AppLocations.india,
+      zone: AppLocations.west,
     ),
     const Location(
-      id: 'kolkata-south',
-      name: 'Kolkata',
-      city: 'Kolkata',
-      country: 'India',
-      zone: 'South',
+      id: AppLocations.kolkataSouthId,
+      name: AppLocations.kolkata,
+      city: AppLocations.kolkata,
+      country: AppLocations.india,
+      zone: AppLocations.south,
     ),
     const Location(
-      id: 'delhi-ncr',
-      name: 'Delhi',
-      city: 'Delhi',
-      country: 'India',
-      zone: 'NCR',
+      id: AppLocations.delhiNcrId,
+      name: AppLocations.delhi,
+      city: AppLocations.delhi,
+      country: AppLocations.india,
+      zone: AppLocations.ncr,
     ),
   ];
 
   void onNotificationClick() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('No new notifications')),
+      const SnackBar(content: Text(AppText.noNewNotifications)),
     );
   }
 
@@ -192,7 +193,7 @@ class _HeaderElementState extends State<HeaderElement> {
 
               // 3. User Avatar Block (Right Side)
               PopupMenuButton<String>(
-                tooltip: 'Account menu',
+                tooltip: AppText.accountMenu,
                 position: PopupMenuPosition.under,
                 offset: const Offset(0, 8),
                 padding: EdgeInsets.zero,
@@ -205,41 +206,36 @@ class _HeaderElementState extends State<HeaderElement> {
                   borderRadius: BorderRadius.circular(18),
                 ),
                 onSelected: (value) async {
-                  if (value == 'profile') {
+                  if (value == AppIdentifiers.profileMenuValue) {
                     widget.onProfileSelected();
-                  } else if (value == 'logout') {
-                    await AuthRepository.logout();
-                    if (!context.mounted) return;
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const AuthScreen()),
-                      (route) => false,
-                    );
+                  } else if (value == AppIdentifiers.logoutMenuValue) {
+                    widget.onLogoutSelected();
                   }
                 },
                 itemBuilder: (context) => const [
                   PopupMenuItem(
-                    value: 'profile',
+                    value: AppIdentifiers.profileMenuValue,
                     height: 52,
                     child: Row(
                       children: [
                         Icon(Icons.person_outline_rounded, size: 21),
                         SizedBox(width: 12),
                         Text(
-                          'Profile',
+                          AppText.profile,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
                   ),
                   PopupMenuItem(
-                    value: 'logout',
+                    value: AppIdentifiers.logoutMenuValue,
                     height: 52,
                     child: Row(
                       children: [
                         Icon(Icons.logout_rounded, size: 21),
                         SizedBox(width: 12),
                         Text(
-                          'Log out',
+                          AppText.logOut,
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ],
@@ -264,7 +260,7 @@ class _HeaderElementState extends State<HeaderElement> {
                     radius: 22,
                     backgroundColor: Colors.grey,
                     backgroundImage: NetworkImage(
-                      'https://yt3.ggpht.com/yti/ANjgQV_bOKivh_MVo0VJcxLjy_iAfiAyY4wThz34mHihfEe6ow=s88-c-k-c0x00ffffff-no-rj',
+                      AppAssets.defaultAvatarUrl,
                     ),
                   ),
                 ),

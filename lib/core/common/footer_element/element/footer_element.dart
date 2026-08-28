@@ -1,16 +1,17 @@
 import 'dart:ui';
 
 import 'package:bdo_event/core/common/footer_element/controller/footer_controller.dart';
-import 'package:bdo_event/core/model/nav_item_model/nav_item_model.dart';
 import 'package:flutter/material.dart';
 
 class FooterElement extends StatefulWidget {
   final int currentIndex;
+  final List<FooterItem> items;
   final ValueChanged<int> onTap;
 
   const FooterElement({
     super.key,
     required this.currentIndex,
+    required this.items,
     required this.onTap,
   });
 
@@ -31,13 +32,7 @@ class _FooterElementState extends State<FooterElement> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Navigation items representing the buttons in your image
-    final items = [
-      NavItem(icon: Icons.calendar_month, label: 'Event'),
-      NavItem(icon: Icons.app_registration_rounded, label: 'Register'),
-      NavItem(icon: Icons.add_circle_outline_rounded, label: 'Create'),
-      NavItem(icon: Icons.account_box, label: 'Profile'),
-    ];
+    final items = widget.items;
 
     return Container(
       key: _footerController.footerKey,
@@ -123,4 +118,11 @@ class _FooterElementState extends State<FooterElement> {
       ),
     );
   }
+}
+
+class FooterItem {
+  final IconData icon;
+  final String label;
+
+  const FooterItem({required this.icon, required this.label});
 }
