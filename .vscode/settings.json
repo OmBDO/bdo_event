@@ -1,0 +1,7 @@
+{
+  "telemetry.editStats.showDecorations": false,
+  "workbench.editor.showIcons": true,
+  "diffEditor.experimental.showEmptyDecorations": true,
+  "dart.previewFlutterUiGuides": false,
+  "dart.previewFlutterUiGuidesCustomTracking": false
+}

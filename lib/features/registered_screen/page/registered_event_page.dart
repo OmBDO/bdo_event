@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/features/event_screen/repo/event_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -42,7 +43,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
 
     if (shouldCancel != true || !mounted) return;
     setState(() => _isCancelling = true);
-    await AuthRepository.cancelEvent(widget.event);
+    await EventRepository.cancelEvent(widget.event);
     if (!mounted) return;
     Navigator.of(context).pop();
   }

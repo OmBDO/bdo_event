@@ -3,9 +3,10 @@ import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
-import 'package:bdo_event/features/create_event_screen/page/create_event_page.dart';
+import 'package:bdo_event/features/event_screen/my_event_screen/page/create_event_page.dart';
 import 'package:bdo_event/features/event_detail_screen/page/event_detail_screen.dart';
 import 'package:bdo_event/features/event_screen/controller/event_controller.dart';
+import 'package:bdo_event/features/event_screen/repo/event_repository.dart';
 import 'package:bdo_event/features/event_screen/widget/event_card.dart';
 import 'package:bdo_event/features/event_screen/widget/event_tab.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class _EventPageState extends State<EventPage> {
       ),
     );
     if (shouldDelete != true || !mounted) return;
-    final error = await AuthRepository.deleteEvent(event);
+    final error = await EventRepository.deleteEvent(event);
     if (!mounted || error == null) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
   }
@@ -113,7 +114,7 @@ class _EventPageState extends State<EventPage> {
                         onTap: openContainer,
                         child: EventCard(
                           event: cardData,
-                          onUpdate: AuthRepository.canManage(cardData)
+                          onUpdate: AuthRepository.canUpdate(cardData)
                               ? () => Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) =>
@@ -121,7 +122,7 @@ class _EventPageState extends State<EventPage> {
                                   ),
                                 )
                               : null,
-                          onDelete: AuthRepository.canManage(cardData)
+                          onDelete: AuthRepository.canDelete(cardData)
                               ? () => _confirmDelete(cardData)
                               : null,
                         ),

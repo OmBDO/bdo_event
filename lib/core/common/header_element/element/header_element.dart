@@ -1,6 +1,6 @@
 // Location: lib/features/event_screen/widget/header_element.dart
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
-import 'package:bdo_event/core/common/dropdown_list/element/locationDropdown.dart';
+import 'package:bdo_event/core/common/dropdown_list/element/location_dropdown.dart';
 import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/auth_screen.dart';
@@ -82,7 +82,11 @@ class _HeaderElementState extends State<HeaderElement> {
     ),
   ];
 
-  void onNotificationClick() {}
+  void onNotificationClick() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('No new notifications')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

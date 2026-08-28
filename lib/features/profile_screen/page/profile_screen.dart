@@ -1,7 +1,9 @@
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
+import 'package:bdo_event/features/calendar_screen/page/calendar_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:bdo_event/features/auth_screen/auth_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,7 +13,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isNotificationEnabled = true;
+  bool _isNotificationEnabled =
+      AuthRepository.currentUser?.notificationsEnabled ?? true;
   bool _isDarkModeEnabled = false;
 
   @override
@@ -97,21 +100,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.blue,
                 title: "Edit Profile",
                 subtitle: "Change name, email, and bio details",
-                onTap: () {},
+                onTap: () => _showInfoDialog(
+                  title: 'Profile details',
+                  message:
+                      'Your profile is currently managed by your local account. '
+                      'The signed-in name is ${user?.displayName ?? 'not available'} '
+                      'and the email is ${user?.email ?? 'not available'}.',
+                ),
               ),
               _buildSettingsTile(
                 icon: Icons.calendar_month_outlined,
                 color: Colors.orange,
                 title: "My Event Registrations",
                 subtitle: "View tickets and saved festivals",
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const CalendarScreen()),
+                ),
               ),
               _buildSettingsTile(
                 icon: Icons.payment_rounded,
                 color: Colors.green,
                 title: "Payment Methods",
                 subtitle: "Linked cards and digital wallets",
-                onTap: () {},
+                onTap: () => _showInfoDialog(
+                  title: 'Payment methods',
+                  message:
+                      'Payment methods are not required for free event registration '
+                      'in this version of BDO Events.',
+                ),
               ),
             ]),
 
@@ -125,8 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: "Push Notifications",
                 subtitle: "Alerts for upcoming festival updates",
                 value: _isNotificationEnabled,
-                onChanged: (val) =>
-                    setState(() => _isNotificationEnabled = val),
+                onChanged: _updateNotificationPreference,
               ),
               _buildSettingsToggle(
                 icon: Icons.dark_mode_outlined,
@@ -141,7 +156,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.teal,
                 title: "App Language",
                 subtitle: "English (IN)",
-                onTap: () {},
+                onTap: () => _showInfoDialog(
+                  title: 'App language',
+                  message: 'English (IN) is the only available language.',
+                ),
               ),
             ]),
 
@@ -154,14 +172,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.indigo,
                 title: "Help Center & FAQ",
                 subtitle: "Troubleshooting and event booking help",
-                onTap: () {},
+                onTap: () => _showInfoDialog(
+                  title: 'Help Center & FAQ',
+                  message:
+                      'For event help, open the event details and use the registration '
+                      'action. Your registered events are available under My Event Registrations.',
+                ),
               ),
               _buildSettingsTile(
                 icon: Icons.shield_outlined,
                 color: Colors.amber,
                 title: "Privacy Policy",
                 subtitle: "Terms of service and data security rules",
-                onTap: () {},
+                onTap: () => _showInfoDialog(
+                  title: 'Privacy Policy',
+                  message:
+                      'BDO Events stores account, event, and registration data locally '
+                      'on this device. No network service is configured in this version.',
+                ),
               ),
             ]),
 
@@ -171,7 +199,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  await AuthRepository.logout();
+                  if (!context.mounted) return;
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const AuthScreen()),
+                    (route) => false,
+                  );
+                },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.black54,
                   padding: const EdgeInsets.symmetric(
@@ -204,6 +239,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  void _showInfoDialog({required String title, required String message}) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _updateNotificationPreference(bool enabled) async {
+    setState(() => _isNotificationEnabled = enabled);
+    final error = await AuthRepository.updateNotificationPreference(enabled);
+    if (!mounted || error == null) return;
+    setState(() => _isNotificationEnabled = !enabled);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
   }
 
   // Component Helper: Section Title Header

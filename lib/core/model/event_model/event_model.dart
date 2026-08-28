@@ -1,3 +1,5 @@
+import 'package:bdo_event/core/model/event_model/event_catagory.dart';
+
 class Event {
   final String id;
   final String title;
@@ -11,6 +13,7 @@ class Event {
   final String? organizerName;
   final String? creatorId;
   final DateTime? createdAt;
+  final EventCategory? catagory;
 
   const Event({
     required this.id,
@@ -25,6 +28,7 @@ class Event {
     this.organizerName,
     this.creatorId,
     this.createdAt,
+    this.catagory,
   });
 
   Event copyWith({
@@ -40,6 +44,7 @@ class Event {
     String? organizerName,
     String? creatorId,
     DateTime? createdAt,
+    EventCategory? catagory,
   }) {
     return Event(
       id: id ?? this.id,
@@ -54,6 +59,7 @@ class Event {
       organizerName: organizerName ?? this.organizerName,
       creatorId: creatorId ?? this.creatorId,
       createdAt: createdAt ?? this.createdAt,
+      catagory: catagory ?? this.catagory,
     );
   }
 
@@ -73,6 +79,8 @@ class Event {
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.tryParse(json['createdAt'] as String),
+
+      catagory: EventCategory.fromJson(json['catagory']),
     );
   }
 
@@ -89,6 +97,7 @@ class Event {
     'organizerName': organizerName,
     'creatorId': creatorId,
     'createdAt': createdAt?.toIso8601String(),
+    'catagory': catagory?.toJson() ?? {},
   };
 
   static String _fallbackId(String title) {
