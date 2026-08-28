@@ -1,11 +1,10 @@
-import 'package:bdo_event/features/calendar_screen/screen/calendar_screen.dart';
+import 'package:bdo_event/features/calendar_screen/page/calendar_screen.dart';
 import 'package:bdo_event/features/create_event_screen/page/create_event_page.dart';
 import 'package:bdo_event/features/event_screen/page/event_screen.dart';
-import 'package:bdo_event/features/profile_screen/pages/profile_screen.dart';
+import 'package:bdo_event/features/profile_screen/page/profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 
-class MainController extends GetxController {
+class MainController {
   final GlobalKey footerKey = GlobalKey();
   int currentIndex = 0;
   late Future<void> loadingFuture;

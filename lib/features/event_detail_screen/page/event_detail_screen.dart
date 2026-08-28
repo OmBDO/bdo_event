@@ -1,5 +1,6 @@
 // Location: lib/features/event_screen/screen/event_detail_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
@@ -63,7 +64,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           ),
                           // More Circle Button
                           IconButton(
-                            onPressed: () {},
+                            onPressed: _showEventActions,
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.white.withValues(
                                 alpha: 0.3,
@@ -358,6 +359,31 @@ class _EventDetailPageState extends State<EventDetailPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showEventActions() async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: ListTile(
+          leading: const Icon(Icons.copy_rounded),
+          title: const Text('Copy event details'),
+          onTap: () => Navigator.of(context).pop('copy'),
+        ),
+      ),
+    );
+
+    if (!mounted || action != 'copy') return;
+    await Clipboard.setData(
+      ClipboardData(
+        text:
+            '${widget.event.title}\n${widget.event.date}\n${widget.event.location}',
+      ),
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Event details copied')),
     );
   }
 

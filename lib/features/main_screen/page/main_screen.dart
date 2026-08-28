@@ -3,7 +3,7 @@ import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart
 import 'package:bdo_event/core/common/footer_element/element/footer_element.dart';
 import 'package:bdo_event/core/common/header_element/element/header_element.dart';
 import 'package:bdo_event/features/loading_screen/page/loading_screen.dart';
-import 'package:bdo_event/features/zmain_screen/controller/main_controller.dart';
+import 'package:bdo_event/features/main_screen/controller/main_controller.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -91,7 +91,7 @@ class _MainScreenState extends State<MainScreen> {
                             currentScreenIndex: _mainController.currentIndex,
                             onProfileSelected: () {
                               setState(() {
-                                _mainController.currentIndex = 2;
+                                _mainController.currentIndex = 3;
                               });
                             },
                           ),

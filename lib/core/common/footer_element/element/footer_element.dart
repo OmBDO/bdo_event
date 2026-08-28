@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:bdo_event/core/common/footer_element/controller/footer_controller.dart';
-import 'package:bdo_event/core/model/navItem_model/navItem_model.dart';
+import 'package:bdo_event/core/model/nav_item_model/nav_item_model.dart';
 import 'package:flutter/material.dart';
 
 class FooterElement extends StatefulWidget {
@@ -19,13 +19,13 @@ class FooterElement extends StatefulWidget {
 }
 
 class _FooterElementState extends State<FooterElement> {
-  final _footerControlller = FooterController();
+  final _footerController = FooterController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => _footerControlller.calculateFooterHeight(),
+      (_) => _footerController.calculateFooterHeight(),
     );
   }
 
@@ -40,7 +40,7 @@ class _FooterElementState extends State<FooterElement> {
     ];
 
     return Container(
-      key: _footerControlller.footerKey,
+      key: _footerController.footerKey,
       padding: const EdgeInsets.only(bottom: 24.0, left: 24.0, right: 24.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(40),
@@ -70,7 +70,7 @@ class _FooterElementState extends State<FooterElement> {
                 return GestureDetector(
                   onTap: () {
                     widget.onTap(index);
-                    _footerControlller.resetAppScrollTracker();
+                    _footerController.resetAppScrollTracker();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
