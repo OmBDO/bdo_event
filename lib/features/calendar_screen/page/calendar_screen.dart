@@ -1,9 +1,9 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
-import 'package:bdo_event/core/common/calender_element/element/calendar_element.dart';
+import 'package:bdo_event/core/common/calendar_element/element/calendar_element.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/features/calendar_screen/widget/search_bar.dart';
+import 'package:bdo_event/features/calendar_screen/widget/search_bar_widget.dart';
 import 'package:bdo_event/features/registered_screen/page/registered_event_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
@@ -18,6 +18,8 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+  String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -27,7 +29,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SearchBarWidget(),
+              SearchBarWidget(
+                onChanged: (value) {
+                  setState(() => _searchQuery = value.trim().toLowerCase());
+                },
+              ),
 
               ValueListenableBuilder<bool>(
                 valueListenable: AppKeyboardTracker.isKeyboardVisible,
@@ -47,11 +53,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
               ValueListenableBuilder<List<Event>>(
                 valueListenable: AuthRepository.registrations,
                 builder: (context, registeredEvents, child) {
-                  if (registeredEvents.isEmpty) {
-                    return const Padding(
+                  final visibleEvents = registeredEvents.where((event) {
+                    if (_searchQuery.isEmpty) return true;
+                    return event.title.toLowerCase().contains(_searchQuery) ||
+                        event.location.toLowerCase().contains(_searchQuery);
+                  }).toList();
+
+                  if (visibleEvents.isEmpty) {
+                    return Padding(
                       padding: EdgeInsets.fromLTRB(24, 20, 24, 30),
                       child: Text(
-                        'No registered events yet',
+                        registeredEvents.isEmpty
+                            ? 'No registered events yet'
+                            : 'No matching events found',
                         style: TextStyle(
                           color: Colors.black54,
                           fontWeight: FontWeight.w600,
@@ -67,9 +81,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       horizontal: 16,
                       vertical: 10,
                     ),
-                    itemCount: registeredEvents.length,
+                    itemCount: visibleEvents.length,
                     itemBuilder: (context, index) {
-                      final event = registeredEvents[index];
+                      final event = visibleEvents[index];
                       return Material(
                         color: Colors.transparent,
                         child: ListTile(

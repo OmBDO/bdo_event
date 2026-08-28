@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
+import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/auth_screen/auth_repository.dart';
 
@@ -58,11 +56,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
     if (image == null) return;
 
-    final documentsDirectory = await getApplicationDocumentsDirectory();
-    final storedImage = await File(image.path).copy(
-      '${documentsDirectory.path}/event_${DateTime.now().microsecondsSinceEpoch}.jpg',
-    );
-    if (mounted) setState(() => _selectedImagePath = storedImage.path);
+    final storedImagePath = await storePickedImage(image);
+    if (mounted) setState(() => _selectedImagePath = storedImagePath);
   }
 
   Future<void> _submit() async {

@@ -3,7 +3,7 @@ import 'package:bdo_event/features/auth_screen/signin/signin_screen.dart';
 import 'package:bdo_event/features/auth_screen/signup/signup_screen.dart';
 import 'package:bdo_event/features/loading_screen/page/loading_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/features/zmain_screen/page/main_screen.dart';
+import 'package:bdo_event/features/main_screen/page/main_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});

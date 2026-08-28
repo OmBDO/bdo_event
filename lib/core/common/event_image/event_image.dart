@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 
 class EventImage extends StatelessWidget {
   final String path;
@@ -32,14 +31,14 @@ class EventImage extends StatelessWidget {
     }
 
     final image = _isAsset
-        ? Image.asset(path, width: width, height: height, fit: fit)
-        : Image.file(
-            File(path),
-            width: width,
-            height: height,
-            fit: fit,
-            errorBuilder: errorBuilder,
-          );
+      ? Image.asset(path, width: width, height: height, fit: fit)
+      : buildStoredImage(
+        path: path,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: errorBuilder,
+        );
     return image;
   }
 }
