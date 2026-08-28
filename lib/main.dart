@@ -10,6 +10,7 @@ import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
+import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:bdo_event/core/common/configuration_error_app/configuration_error_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         BlocProvider.value(value: getIt<MainScreenCubit>()),
         BlocProvider.value(value: getIt<ProfileScreenCubit>()),
         BlocProvider.value(value: getIt<RegisteredEventCubit>()),
+        BlocProvider.value(value: getIt<WatcherScanCubit>()),
       ],
       child: MaterialApp(
         title: AppText.appName,

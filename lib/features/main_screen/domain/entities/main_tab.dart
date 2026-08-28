@@ -1,1 +1,1 @@
-enum MainTab { events, registrations, createEvent, profile }
+enum MainTab { events, registrations, createEvent, watcher, profile }

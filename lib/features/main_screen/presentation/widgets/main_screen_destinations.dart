@@ -4,10 +4,14 @@ import 'package:bdo_event/features/event_screen/presentation/pages/event_screen.
 import 'package:bdo_event/features/main_screen/domain/entities/main_tab.dart';
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_destination.dart';
 import 'package:bdo_event/features/profile_screen/presentation/pages/profile_screen.dart';
+import 'package:bdo_event/features/watcher_screen/presentation/pages/watcher_scan_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
-const mainScreenDestinations = <MainScreenDestination>[
+List<MainScreenDestination> mainScreenDestinations({
+  required bool canScan,
+  required bool canCreateEvents,
+}) => [
   MainScreenDestination(
     tab: MainTab.events,
     label: AppText.event,
@@ -20,12 +24,20 @@ const mainScreenDestinations = <MainScreenDestination>[
     icon: Icons.app_registration_rounded,
     page: CalendarScreen(),
   ),
-  MainScreenDestination(
-    tab: MainTab.createEvent,
-    label: AppText.create,
-    icon: Icons.add_circle_outline_rounded,
-    page: MyEventScreen(),
-  ),
+  if (canCreateEvents)
+    MainScreenDestination(
+      tab: MainTab.createEvent,
+      label: AppText.create,
+      icon: Icons.add_circle_outline_rounded,
+      page: MyEventScreen(),
+    ),
+  if (canScan)
+    const MainScreenDestination(
+      tab: MainTab.watcher,
+      label: AppText.scanRegistration,
+      icon: Icons.qr_code_scanner,
+      page: WatcherScanScreen(),
+    ),
   MainScreenDestination(
     tab: MainTab.profile,
     label: AppText.profile,

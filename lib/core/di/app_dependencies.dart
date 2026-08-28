@@ -22,6 +22,7 @@ import 'package:bdo_event/features/registered_screen/data/repositories/registere
 import 'package:bdo_event/features/registered_screen/data/datasource/registered_event_remote_data_source.dart';
 import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_registered_event.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
+import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
@@ -97,6 +98,8 @@ void configureDependencies() {
     EventDetailCubit(
       registerForEvent: getIt(),
       cancelEventRegistration: getIt(),
+      eventStore: getIt(),
+      authRepository: getIt(),
     ),
   );
   getIt.registerSingleton<EventScreenCubit>(
@@ -113,6 +116,13 @@ void configureDependencies() {
     ProfileScreenCubit(authRepository: getIt()),
   );
   getIt.registerSingleton<RegisteredEventCubit>(
-    RegisteredEventCubit(cancelRegisteredEvent: getIt()),
+    RegisteredEventCubit(
+      cancelRegisteredEvent: getIt(),
+      authRepository: getIt(),
+      eventStore: getIt(),
+    ),
+  );
+  getIt.registerSingleton<WatcherScanCubit>(
+    WatcherScanCubit(eventStore: getIt(), authRepository: getIt()),
   );
 }

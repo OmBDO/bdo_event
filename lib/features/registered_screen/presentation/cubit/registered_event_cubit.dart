@@ -1,14 +1,41 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
 import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_registered_event.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_state.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisteredEventCubit extends Cubit<RegisteredEventState> {
-  RegisteredEventCubit({required CancelRegisteredEvent cancelRegisteredEvent})
+  RegisteredEventCubit({
+    required CancelRegisteredEvent cancelRegisteredEvent,
+    required AuthRepository authRepository,
+    required EventStore eventStore,
+  })
       : _cancelRegisteredEvent = cancelRegisteredEvent,
+        _authRepository = authRepository,
+        _eventStore = eventStore,
         super(const RegisteredEventState());
 
   final CancelRegisteredEvent _cancelRegisteredEvent;
+  final AuthRepository _authRepository;
+  final EventStore _eventStore;
+
+  Future<void> loadToken(String eventId) async {
+    final userId = _authRepository.currentUser?.id;
+    if (userId == null) return;
+    emit(state.copyWith(isLoadingToken: true, clearError: true));
+    try {
+      final token = await _eventStore.loadRegistrationToken(userId, eventId);
+      if (!isClosed) {
+        emit(state.copyWith(isLoadingToken: false, registrationToken: token));
+      }
+    } on Object {
+      if (!isClosed) {
+        emit(state.copyWith(isLoadingToken: false, error: AppText.unableToLoadTicket));
+      }
+    }
+  }
 
   void clearState() {
     emit(const RegisteredEventState());

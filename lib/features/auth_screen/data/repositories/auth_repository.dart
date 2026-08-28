@@ -42,12 +42,14 @@ class AuthRepository {
     required String name,
     required String email,
     required String password,
+    required UserRole requestedRole,
   }) async {
     try {
       await _authDataSource.signUp(
         email: email.trim().toLowerCase(),
         password: password,
-        data: {'display_name': name.trim()},
+        displayName: name.trim(),
+        requestedRole: requestedRole.storageValue,
       );
     } on supabase.AuthException catch (error) {
       return mapAuthError(error, signingUp: true);

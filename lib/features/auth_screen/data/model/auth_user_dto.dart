@@ -12,7 +12,7 @@ class AuthUserDto {
     final roles = (user.appMetadata['roles'] as List<dynamic>?)
             ?.map(UserRole.fromStorage)
             .toSet() ??
-        {UserRole.attendee};
+        {UserRole.user};
     return User(
       id: user.id,
       displayName: metadata['display_name'] as String? ??

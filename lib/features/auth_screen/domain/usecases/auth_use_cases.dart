@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 
 class InitializeAuth {
@@ -26,7 +27,13 @@ class SignUp {
     required String name,
     required String email,
     required String password,
-  }) => _repository.register(name: name, email: email, password: password);
+    required UserRole requestedRole,
+  }) => _repository.register(
+        name: name,
+        email: email,
+        password: password,
+        requestedRole: requestedRole,
+      );
 }
 
 class SignOut {

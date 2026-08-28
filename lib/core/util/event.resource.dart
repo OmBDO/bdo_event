@@ -28,6 +28,12 @@ abstract final class AppText {
 			'Save events, manage registrations, and never miss a moment.';
 	static const fullName = 'Full name';
 	static const confirmPassword = 'Confirm password';
+	static const role = 'Role';
+	static const roleUser = 'User';
+	static const roleAdmin = 'Admin';
+	static const roleWatcher = 'Watcher';
+	static const roleRequestNote =
+			'Admin and watcher access must be approved by an administrator.';
 	static const termsAgreement = 'I agree to the terms and privacy policy';
 	static const newToApp = 'New to BDO Events? ';
 	static const alreadyHaveAccount = 'Already have an account? ';
@@ -168,6 +174,20 @@ abstract final class AppText {
 			'This event is no longer available for registration';
 	static const eventAtCapacity = 'This event has reached its capacity';
 	static const alreadyRegistered = 'You are already registered for this event';
+	static const registrationRevoked =
+			'This registration was cancelled and cannot be reactivated';
+	static const unableToLoadTicket = 'Unable to load ticket';
+	static const watcherAccessRequired = 'Watcher access is required';
+	static const invalidRegistrationQr = 'This QR code is not valid for this event';
+	static const registrationValid = 'Registration is valid';
+		static const checkIn = 'Check in attendee';
+		static const checkedIn = 'Attendee checked in';
+		static const alreadyCheckedIn = 'Attendee is already checked in';
+		static const unableToCheckIn = 'Unable to record attendance';
+		static const checkInUnavailable = 'This registration cannot be checked in';
+	static const scanRegistration = 'Scan registration';
+	static const scanRegistrationPrompt = 'Scan a registration QR code';
+	static const scanAgain = 'Scan again';
 	static const notRegistered = 'You are not registered for this event';
 	static const registrationCancelled =
 			'Your registration was cancelled successfully.';
@@ -175,6 +195,7 @@ abstract final class AppText {
 	static const status = 'STATUS';
 	static const upcomingEvent = 'UPCOMING EVENT';
 	static const attend100Plus = 'Attend 100+';
+	static const attendees = 'attendees';
 	static const eventDetailDescription =
 			'AI Global Leadership Future Summit unites global leaders to explore innovation, share insights, and shape the future of technology worldwide...';
 	static const unableToSaveRegistration = 'Unable to save the registration';
@@ -186,8 +207,12 @@ abstract final class AppText {
 	static const unableToUpdateEvent = 'Unable to update the event';
 	static const unableToDeleteEvent = 'Unable to delete the event';
 	static const eventNotFound = 'Event could not be found';
-	static const organizerAccessRequired =
-			'Organizer access is required to create events';
+	static const adminAccessRequiredForEvents =
+			'Admin access is required to create events';
+	static const cannotUpdateEvent =
+			'You do not have permission to update this event';
+	static const cannotDeleteEvent =
+			'You do not have permission to delete this event';
 	static const noEventsCreated = 'No events created yet';
 	static const noRegisteredEvents = 'No registered events yet';
 	static const noMatchingEvents = 'No matching events found';
@@ -220,6 +245,14 @@ abstract final class AppDatabase {
 	static const creatorId = 'creator_id';
 	static const createdAt = 'created_at';
 	static const registeredAt = 'registered_at';
+	static const registrationStatus = 'status';
+	static const cancelledAt = 'cancelled_at';
+	static const registrationToken = 'registration_token';
+		static const checkInsTable = 'event_check_ins';
+		static const checkedInAt = 'checked_in_at';
+		static const checkedInBy = 'checked_in_by';
+	static const activeRegistration = 'active';
+	static const revokedRegistration = 'revoked';
 	static const payload = 'payload';
 	static const isCheckedIn = 'is_checked_in';
 }

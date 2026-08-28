@@ -19,6 +19,12 @@ class RegisteredEventPage extends StatefulWidget {
 }
 
 class _RegisteredEventPageState extends State<RegisteredEventPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<RegisteredEventCubit>().loadToken(widget.event.id);
+  }
+
   Future<void> _confirmCancellation() async {
     final shouldCancel = await showDialog<bool>(
       context: context,
@@ -49,8 +55,10 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
     if (cancelled) Navigator.of(context).pop();
   }
 
-  String get _qrData => jsonEncode({
+  String _qrData(String token) => jsonEncode({
     'type': AppIdentifiers.qrRegistrationType,
+    'eventId': widget.event.id,
+    'token': token,
     'event': widget.event.title,
     'date': widget.event.date,
     'location': widget.event.location,
@@ -156,8 +164,14 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: const Color(0xFFE8E1E1)),
                     ),
-                    child: QrImageView(
-                      data: _qrData,
+                    child: state.registrationToken == null
+                        ? const SizedBox(
+                            width: 220,
+                            height: 220,
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : QrImageView(
+                      data: _qrData(state.registrationToken!),
                       version: QrVersions.auto,
                       size: 220,
                       eyeStyle: const QrEyeStyle(

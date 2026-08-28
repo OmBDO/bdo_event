@@ -46,9 +46,8 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
       return AppText.alreadyRegistered;
     }
 
-    events.add(event);
     try {
-      await _dataSource.save(user.id, events);
+      await _dataSource.activate(user.id, event);
     } on LocalStorageException {
       return AppText.unableToSaveRegistration;
     }
@@ -65,10 +64,8 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
       return AppText.notRegistered;
     }
 
-    final events = await _dataSource.load(user.id);
-    events.removeWhere((registered) => registered.id == event.id);
     try {
-      await _dataSource.save(user.id, events);
+      await _dataSource.revoke(user.id, event.id);
     } on LocalStorageException {
       return AppText.unableToCancelRegistration;
     }

@@ -3,7 +3,10 @@ import 'package:bdo_event/features/event_detail_screen/presentation/widgets/bott
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -19,6 +22,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
   void initState() {
     super.initState();
     context.read<EventDetailCubit>().checkRegistration(widget.event);
+    context.read<EventDetailCubit>().loadAttendanceCount(widget.event);
   }
 
   @override
@@ -46,11 +50,14 @@ class _EventDetailPageState extends State<EventDetailPage> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: OverlayCurveSection(
-              widget: widget,
-              textGrey: textGrey,
-              primaryDark: primaryDark,
-              mapBgColor: mapBgColor,
+            child: BlocBuilder<EventDetailCubit, EventDetailState>(
+              builder: (context, state) => OverlayCurveSection(
+                widget: widget,
+                textGrey: textGrey,
+                primaryDark: primaryDark,
+                mapBgColor: mapBgColor,
+                attendanceCount: state.attendanceCount,
+              ),
             ),
           ),
 

@@ -10,14 +10,29 @@ flutter run --dart-define=SUPABASE_URL=https://your-project.supabase.co --dart-d
 ```
 
 The sign-up flow stores the display name in Supabase user metadata. Roles are
-read from Supabase `app_metadata` and must be assigned by a trusted backend;
-they are never accepted from client-editable user metadata. Enable the
+requested during sign-up as `requested_role` in client-editable user metadata,
+but effective roles (`user`, `admin`, or `watcher`) are read from Supabase
+`app_metadata` and must be assigned by a trusted backend; they are never
+granted from client-editable user metadata. The default effective role is
+`user`. Enable the
 email/password provider in the Supabase dashboard. If email confirmation is
 enabled, users must confirm their address before signing in.
+
+The schema creates a `role_requests` record from the signup metadata. An
+administrator or trusted backend must review that request and assign the
+effective role in Supabase `app_metadata`; approving a request must never be
+implemented by the client.
 
 Run [supabase/schema.sql](supabase/schema.sql) in the Supabase SQL editor before
 using event creation or registration. Row-level security policies restrict
 event mutations to their creator and registrations to their owner.
+
+Registration cancellation is persisted as a server-side `revoked` status.
+Revoked registrations are excluded from active registration queries, direct
+client inserts are blocked, and the registration activation RPC refuses to
+reactivate them. The cancelled registration QR therefore cannot be accepted
+as an active registration. Re-registration with a new per-registration QR
+token is reserved for the watcher validation slice.
 
 A new Flutter project.
 

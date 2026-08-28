@@ -4,6 +4,8 @@ import 'package:bdo_event/core/prefs/supabase_store.dart';
 abstract interface class RegistrationDataSource {
   Future<List<Event>> load(String userId);
   Future<void> save(String userId, List<Event> events);
+  Future<void> activate(String userId, Event event);
+  Future<void> revoke(String userId, String eventId);
 }
 
 class RegistrationRemoteDataSource implements RegistrationDataSource {
@@ -17,4 +19,12 @@ class RegistrationRemoteDataSource implements RegistrationDataSource {
   @override
   Future<void> save(String userId, List<Event> events) =>
       _store.writeRegistrations(userId, events);
+
+    @override
+    Future<void> activate(String userId, Event event) =>
+      _store.activateRegistration(userId, event);
+
+    @override
+    Future<void> revoke(String userId, String eventId) =>
+      _store.revokeRegistration(userId, eventId);
 }

@@ -3,6 +3,7 @@ import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
 import 'package:bdo_event/features/event_screen/domain/repositories/event_repository.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 
 class EventRepository implements EventRepositoryContract {
   EventRepository({
@@ -26,7 +27,7 @@ class EventRepository implements EventRepositoryContract {
     if (!user.hasPermission(UserPermission.createEvents)) {
       return const EventOperationResult(
         [],
-        'Organizer access is required to create events',
+        AppText.adminAccessRequiredForEvents,
       );
     }
     final result = await _eventDataSource.create(event, user);
@@ -38,7 +39,7 @@ class EventRepository implements EventRepositoryContract {
     if (!canUpdate(event)) {
       return const EventOperationResult(
         [],
-        'You do not have permission to update this event',
+        AppText.cannotUpdateEvent,
       );
     }
     final result = await _eventDataSource.update(event);
@@ -50,7 +51,7 @@ class EventRepository implements EventRepositoryContract {
     if (!canDelete(event)) {
       return const EventOperationResult(
         [],
-        'You do not have permission to delete this event',
+        AppText.cannotDeleteEvent,
       );
     }
     final result = await _eventDataSource.delete(event);

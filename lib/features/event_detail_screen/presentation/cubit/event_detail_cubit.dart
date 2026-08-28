@@ -3,21 +3,47 @@ import 'package:bdo_event/features/event_detail_screen/domain/usecases/registrat
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
 
 class EventDetailCubit extends Cubit<EventDetailState> {
   EventDetailCubit({
     required RegisterForEvent registerForEvent,
     required CancelEventRegistration cancelEventRegistration,
+    required EventStore eventStore,
+    required AuthRepository authRepository,
   })  : _registerForEvent = registerForEvent,
         _cancelEventRegistration = cancelEventRegistration,
+        _eventStore = eventStore,
+        _authRepository = authRepository,
         super(const EventDetailState());
 
   final RegisterForEvent _registerForEvent;
   final CancelEventRegistration _cancelEventRegistration;
+  final EventStore _eventStore;
+  final AuthRepository _authRepository;
 
   Future<void> checkRegistration(Event event) async {
     final registered = await _registerForEvent.isUserRegistered(event.id);
     if (!isClosed) emit(state.copyWith(isRegistered: registered));
+  }
+
+  Future<void> loadAttendanceCount(Event event) async {
+    if (!_authRepository.can(UserPermission.viewEventAttendees) ||
+        event.creatorId != _authRepository.currentUser?.id) {
+      return;
+    }
+    emit(state.copyWith(isLoadingAttendance: true));
+    try {
+      final count = await _eventStore.loadAttendanceCount(event.id);
+      if (!isClosed) {
+        emit(state.copyWith(
+          attendanceCount: count,
+          isLoadingAttendance: false,
+        ));
+      }
+    } on Object {
+      if (!isClosed) emit(state.copyWith(isLoadingAttendance: false));
+    }
   }
 
   Future<String?> register(Event event) => _submit(

@@ -14,6 +14,24 @@ abstract interface class EventStore {
   Future<List<Event>> loadRegistrations(String userId);
 
   Future<void> writeRegistrations(String userId, List<Event> events);
+
+  Future<void> activateRegistration(String userId, Event event);
+
+  Future<void> revokeRegistration(String userId, String eventId);
+
+  Future<String?> loadRegistrationToken(String userId, String eventId);
+
+  Future<Map<String, dynamic>?> validateRegistration({
+    required String token,
+    required String eventId,
+  });
+
+  Future<String> checkInRegistration({
+    required String token,
+    required String eventId,
+  });
+
+  Future<int> loadAttendanceCount(String eventId);
 }
 
 class SupabaseStore implements EventStore {
@@ -91,8 +109,9 @@ class SupabaseStore implements EventStore {
     try {
       final rows = await _client
           .from(AppDatabase.eventRegistrationsTable)
-            .select(AppDatabase.payload)
-          .eq(AppDatabase.userId, userId);
+          .select(AppDatabase.payload)
+          .eq(AppDatabase.userId, userId)
+          .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration);
       return rows
             .map((row) => Event.fromJson(_payload(row[AppDatabase.payload])))
           .toList();
@@ -117,6 +136,99 @@ class SupabaseStore implements EventStore {
             AppDatabase.payload: event.toJson(),
           },
       ]);
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<void> activateRegistration(String userId, Event event) async {
+    try {
+      await _client.rpc('activate_event_registration', params: {
+        'requested_event_id': event.id,
+        'event_payload': event.toJson(),
+      });
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<void> revokeRegistration(String userId, String eventId) async {
+    try {
+      await _client.rpc('revoke_event_registration', params: {
+        'requested_event_id': eventId,
+      });
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<String?> loadRegistrationToken(String userId, String eventId) async {
+    try {
+      final row = await _client
+          .from(AppDatabase.eventRegistrationsTable)
+          .select(AppDatabase.registrationToken)
+          .eq(AppDatabase.userId, userId)
+          .eq(AppDatabase.eventId, eventId)
+          .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration)
+          .maybeSingle();
+      return row?[AppDatabase.registrationToken] as String?;
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> validateRegistration({
+    required String token,
+    required String eventId,
+  }) async {
+    try {
+      final result = await _client.rpc(
+        'validate_event_registration',
+        params: {
+          'requested_token': token,
+          'requested_event_id': eventId,
+        },
+      );
+      if (result is List && result.isNotEmpty && result.first is Map) {
+        return Map<String, dynamic>.from(result.first as Map);
+      }
+      return null;
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<String> checkInRegistration({
+    required String token,
+    required String eventId,
+  }) async {
+    try {
+      final result = await _client.rpc(
+        'check_in_event_registration',
+        params: {
+          'requested_token': token,
+          'requested_event_id': eventId,
+        },
+      );
+      return result as String? ?? 'invalid';
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<int> loadAttendanceCount(String eventId) async {
+    try {
+      final result = await _client.rpc(
+        'load_event_attendance_count',
+        params: {'requested_event_id': eventId},
+      );
+      return (result as num).toInt();
     } on Object {
       throw const LocalStorageException();
     }

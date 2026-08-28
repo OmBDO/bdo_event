@@ -89,6 +89,55 @@ Migrated surfaces include authentication, calendar, event detail, event manageme
 - Reused the centralized catalog for category titles, event actions, event-detail feedback, and repository errors.
 - The remaining calendar subtitle is dynamic event data, not fixed application copy.
 
+### Signup role request
+
+- Added `user`, `admin`, and `watcher` role selection to signup.
+- Signup stores the selection as an untrusted `requested_role` metadata value.
+- Effective elevated roles must be assigned through trusted Supabase `app_metadata`.
+- Event creation and mutation RLS policies require the trusted `admin` role.
+- QR revocation, watcher scanning, and attendance audit data remain a separate backend-enforced slice.
+
+### Role provisioning boundary
+
+- Added a Supabase `role_requests` table and auth-user trigger for requested roles.
+- Role requests are reviewable by admins, but client-editable metadata never grants elevated access.
+- A cancelled registration must be blacklisted by its server-side status so its QR is rejected from every validation path.
+
+### Registration revocation slice
+
+- Added `active` and `revoked` registration states with `cancelled_at` audit time.
+- Active registration queries exclude revoked rows.
+- Registration activation and revocation use authenticated Supabase RPC functions.
+- Direct client registration inserts are blocked; revoked rows cannot be reactivated.
+- The current event QR is therefore removed from the valid registration set after cancellation.
+- Per-registration signed QR tokens and watcher validation were added in the next slices.
+
+### Per-registration QR token slice
+
+- Added a server-generated UUID token for every registration.
+- QR payloads now contain the event ID and registration token rather than event details alone.
+- Revoked registrations remain in history but are excluded from token lookup and active registration queries.
+- Re-registration creates a new active row and a new token after cancellation.
+- Watcher scanning and server-side token validation were added in the next slice.
+
+### Watcher QR validation slice
+
+- Added a Supabase RPC that validates an active registration token and event ID.
+- Validation is restricted to trusted `watcher` and `admin` roles.
+- Added a role-gated watcher scanner screen using `mobile_scanner`.
+- Added Android and iOS camera permission declarations.
+- Revoked, mismatched, malformed, and unauthorized QR values are rejected.
+
+### Attendance and owner count slice
+
+- Added the `event_check_ins` table keyed by registration token so each active registration can be checked in once.
+- Added a server-enforced check-in RPC restricted to trusted `watcher` and `admin` roles.
+- Duplicate scans return `already_checked_in`; revoked, mismatched, or malformed registrations cannot create check-ins.
+- Added an owner-scoped attendance count RPC restricted to admins who own the event.
+- Event detail now displays the persisted attendance count for eligible event owners.
+- The event detail view now displays the owner-scoped persisted attendance count.
+- An attendee-level admin dashboard with individual registration status remains a later task.
+
 ## Confirmed Findings
 
 ### Finding 1: Static authentication repository bypasses GetIt (resolved)

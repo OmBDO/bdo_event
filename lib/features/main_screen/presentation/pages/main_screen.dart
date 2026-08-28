@@ -9,6 +9,7 @@ import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_shell.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
+import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,7 +53,17 @@ class _MainScreenView extends StatelessWidget {
             ? const LoadingScreen(key: ValueKey('loading-screen'))
             : MainScreenShell(
                 key: const ValueKey('main-screen'),
-                destinations: mainScreenDestinations,
+                destinations: mainScreenDestinations(
+                  canScan: context.read<ProfileScreenCubit>().state.user
+                          ?.hasPermission(UserPermission.scanRegistrations) ??
+                      false,
+                  canCreateEvents: context
+                          .read<ProfileScreenCubit>()
+                          .state
+                          .user
+                          ?.hasPermission(UserPermission.createEvents) ??
+                      false,
+                ),
                 currentTab: state.currentTab,
                 onLogoutSelected: () => _logout(context),
               ),

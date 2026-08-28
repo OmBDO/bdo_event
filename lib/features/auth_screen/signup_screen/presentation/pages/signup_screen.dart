@@ -4,6 +4,7 @@ import 'package:bdo_event/core/common/form_elements/auth_switch.dart';
 import 'package:bdo_event/core/common/form_elements/section_header.dart';
 import 'package:bdo_event/core/util/helpers/validation_email.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/signup_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/signup_state.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _showPassword = false;
   bool _showConfirmPassword = false;
   bool _acceptTerms = false;
+  UserRole _requestedRole = UserRole.user;
 
   @override
   void dispose() {
@@ -63,6 +65,7 @@ class _SignupScreenState extends State<SignupScreen> {
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text,
+        requestedRole: _requestedRole,
       );
 
       if (!mounted) return;
@@ -93,6 +96,33 @@ class _SignupScreenState extends State<SignupScreen> {
               validator: (value) => value == null || value.trim().length < 2
                   ? AppText.enterFullName
                   : null,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<UserRole>(
+              value: _requestedRole,
+              decoration: const InputDecoration(labelText: AppText.role),
+              items: UserRole.values
+                  .map(
+                    (role) => DropdownMenuItem(
+                      value: role,
+                      child: Text(switch (role) {
+                        UserRole.user => AppText.roleUser,
+                        UserRole.admin => AppText.roleAdmin,
+                        UserRole.watcher => AppText.roleWatcher,
+                      }),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (role) {
+                if (role != null) setState(() => _requestedRole = role);
+              },
+            ),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(AppText.roleRequestNote),
+              ),
             ),
             const SizedBox(height: 16),
             AppTextField(

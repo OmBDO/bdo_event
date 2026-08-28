@@ -9,6 +9,7 @@ abstract interface class AuthRepositoryContract {
     required String name,
     required String email,
     required String password,
+    required UserRole requestedRole,
   });
 
   Future<String?> login({

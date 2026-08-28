@@ -12,10 +12,14 @@ class AuthRemoteDataSource {
     required String email,
     required String password,
     required String displayName,
+    required String requestedRole,
   }) => _client.auth.signUp(
         email: email,
         password: password,
-        data: {'display_name': displayName},
+        data: {
+          'display_name': displayName,
+          'requested_role': requestedRole,
+        },
       );
 
   Future<supabase.AuthResponse> signIn({

@@ -11,12 +11,14 @@ class OverlayCurveSection extends StatelessWidget {
     required this.textGrey,
     required this.primaryDark,
     required this.mapBgColor,
+    this.attendanceCount,
   });
 
   final EventDetailPage widget;
   final Color textGrey;
   final Color primaryDark;
   final Color mapBgColor;
+  final int? attendanceCount;
 
   // Multi-Avatar Layering GeneratorWidget
   SizedBox _buildAvatarStack() {
@@ -153,7 +155,9 @@ class OverlayCurveSection extends StatelessWidget {
                   _buildAvatarStack(),
                   const Gap(12),
                   Text(
-                    AppText.attend100Plus,
+                    attendanceCount == null
+                      ? AppText.attend100Plus
+                      : '$attendanceCount ${AppText.attendees}',
                     style: TextStyle(
                       color: primaryDark,
                       fontSize: 14,
