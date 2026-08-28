@@ -5,6 +5,8 @@ import 'package:bdo_event/features/loading_screen/page/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/features/main_screen/page/main_screen.dart';
 
+enum AuthStep { loading, signIn, signUp, authenticated }
+
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
@@ -13,48 +15,72 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  late final Future<void> _initialization;
-  bool isSignup = false;
-  String? emailAfterSignup;
+  // Clear single-source-of-truth runtime engine pointer
+  AuthStep _currentStep = AuthStep.loading;
+  String? _preFilledEmail;
 
   @override
   void initState() {
     super.initState();
-    _initialization = AuthRepository.initialize();
+    _checkActiveSession();
   }
 
-  void _showSignin(String email) {
+  /// 1. Heavy session loading is performed entirely in the repository layer
+  Future<void> _checkActiveSession() async {
+    try {
+      await AuthRepository.initialize();
+
+      setState(() {
+        _currentStep = AuthRepository.currentUser != null
+            ? AuthStep.authenticated
+            : AuthStep.signIn;
+      });
+    } catch (e) {
+      setState(() => _currentStep = AuthStep.signIn);
+    }
+  }
+
+  /// 2. Clean explicit screen transition route callbacks
+  void _navigateToSignUp() {
+    setState(() => _currentStep = AuthStep.signUp);
+  }
+
+  void _navigateToSignIn([String? email]) {
     setState(() {
-      isSignup = false;
-      emailAfterSignup = email.isEmpty ? null : email;
+      _currentStep = AuthStep.signIn;
+      _preFilledEmail = email;
     });
+  }
+
+  void _onAuthenticationSuccess() {
+    setState(() => _currentStep = AuthStep.authenticated);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initialization,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const LoadingScreen();
-        }
+    // 3. Clear architectural branch tracking with zero nested layout futures
+    switch (_currentStep) {
+      case AuthStep.loading:
+        return const LoadingScreen();
 
-        if (AuthRepository.currentUserName != null) {
-          return const MainScreen();
-        }
+      case AuthStep.signIn:
+        return SigninScreen(
+          initialEmail: _preFilledEmail,
+          onShowSignup: _navigateToSignUp,
+          onAuthenticated: _onAuthenticationSuccess,
+        );
 
-        return isSignup
-            ? SignupScreen(onShowSignin: _showSignin, onSignedUp: _showSignin)
-            : SigninScreen(
-                initialEmail: emailAfterSignup,
-                onShowSignup: () => setState(() => isSignup = true),
-                onAuthenticated: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const MainScreen()),
-                  );
-                },
-              );
-      },
-    );
+      case AuthStep.signUp:
+        return SignupScreen(
+          onShowSignin: _navigateToSignIn,
+          onSignedUp: (email) {
+            // Direct callback path: passes data backwards cleanly without fake triggers
+            _navigateToSignIn(email);
+          },
+        );
+
+      case AuthStep.authenticated:
+        return const MainScreen();
+    }
   }
 }

@@ -11,8 +11,9 @@ class AuthRepository {
 
   static final LocalAuthStore _store = LocalAuthStore();
   static final EventService _eventService = EventService(_store);
-  static final RegistrationService _registrationService =
-      RegistrationService(_store);
+  static final RegistrationService _registrationService = RegistrationService(
+    _store,
+  );
   static User? _currentUser;
   static final ValueNotifier<List<Event>> registrations =
       ValueNotifier<List<Event>>([]);
@@ -23,15 +24,15 @@ class AuthRepository {
   static String? get currentUserName => _currentUser?.displayName;
   static bool can(UserPermission permission) =>
       _currentUser?.hasPermission(permission) ?? false;
-    static bool canUpdate(Event event) =>
+  static bool canUpdate(Event event) =>
       can(UserPermission.manageAllEvents) ||
       (event.creatorId == _currentUser?.id &&
           can(UserPermission.updateOwnEvents));
-    static bool canDelete(Event event) =>
+  static bool canDelete(Event event) =>
       can(UserPermission.manageAllEvents) ||
       (event.creatorId == _currentUser?.id &&
-        can(UserPermission.deleteOwnEvents));
-    static bool canManage(Event event) => canUpdate(event);
+          can(UserPermission.deleteOwnEvents));
+  static bool canManage(Event event) => canUpdate(event);
 
   static Future<void> initialize() async {
     final sessionEmail = await _store.readSessionEmail();
@@ -122,7 +123,7 @@ class AuthRepository {
 
     final users = await _store.readUsers();
     final entry = users.entries
-      .cast<MapEntry<String, LocalUserRecord>?>()
+        .cast<MapEntry<String, LocalUserRecord>?>()
         .firstWhere((entry) => entry?.value.id == userId, orElse: () => null);
     if (entry == null) return 'User could not be found';
 
@@ -151,56 +152,6 @@ class AuthRepository {
       return 'Unable to save notification preference';
     }
     _currentUser = current.copyWith(notificationsEnabled: enabled);
-    return null;
-  }
-
-  static Future<String?> registerEvent(Event event) async {
-    final user = _currentUser;
-    if (user == null) return 'Please sign in to register for an event';
-    if (!user.hasPermission(UserPermission.registerForEvents)) {
-      return 'Your account is not allowed to register for events';
-    }
-    final result = await _registrationService.register(user.id, event);
-    if (result.error != null) return result.error;
-    registrations.value = result.events;
-    return null;
-  }
-
-  static Future<String?> cancelEvent(Event event) async {
-    final user = _currentUser;
-    if (user == null) return 'Please sign in to manage registrations';
-    final result = await _registrationService.cancel(user.id, event);
-    if (result.error != null) return result.error;
-    registrations.value = result.events;
-    return null;
-  }
-
-  static Future<String?> createEvent(Event event) async {
-    final user = _currentUser;
-    if (user == null) return 'Please sign in to create an event';
-    if (!user.hasPermission(UserPermission.createEvents)) {
-      return 'Organizer access is required to create events';
-    }
-    createdEvents.value =
-        (await _eventService.create(event, user)).events;
-    return null;
-  }
-
-  static Future<String?> updateEvent(Event event) async {
-    if (!canUpdate(event)) {
-      return 'You do not have permission to update this event';
-    }
-    final result = await _eventService.update(event);
-    if (result.error != null) return result.error;
-    createdEvents.value = result.events;
-    return null;
-  }
-
-  static Future<String?> deleteEvent(Event event) async {
-    if (!canDelete(event)) {
-      return 'You do not have permission to delete this event';
-    }
-    createdEvents.value = (await _eventService.delete(event)).events;
     return null;
   }
 }

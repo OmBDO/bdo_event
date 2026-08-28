@@ -102,7 +102,8 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json['id'] as String? ?? json['email'] as String,
-    displayName: json['displayName'] as String? ?? json['name'] as String? ?? '',
+    displayName:
+        json['displayName'] as String? ?? json['name'] as String? ?? '',
     email: json['email'] as String,
     roles: ((json['roles'] as List<dynamic>?) ?? const ['attendee'])
         .map(UserRole.fromStorage)
@@ -112,7 +113,8 @@ class User {
     bio: json['bio'] as String?,
     locale: json['locale'] as String? ?? 'en-IN',
     notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
-    createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+    createdAt:
+        DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
     updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? ''),
     lastSignedInAt: DateTime.tryParse(json['lastSignedInAt'] as String? ?? ''),
   );

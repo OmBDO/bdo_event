@@ -64,8 +64,8 @@ class EventController {
     ),
   ];
 
-  final List<Event> list2 = list.take(2).toList();
-  final List<Event> list3 = list.take(1).toList();
+  late final List<Event> list2 = list.take(2).toList();
+  late final List<Event> list3 = list.take(1).toList();
 
   late final List<List<Event>> eventList = [list, list2, list3];
 }

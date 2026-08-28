@@ -1,0 +1,44 @@
+import 'package:flutter/material.dart';
+
+class AuthSwitch extends StatelessWidget {
+  final String prompt;
+  final String action;
+  final VoidCallback onTap;
+
+  const AuthSwitch({
+    super.key,
+    required this.prompt,
+    required this.action,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Wrap(
+        alignment: WrapAlignment.center, // Centers items horizontally
+        crossAxisAlignment:
+            WrapCrossAlignment.center, // Centers items vertically
+        spacing: 4, // Horizontal space between items
+        runSpacing: 4, // Vertical space if wrapped to new line
+        children: [
+          Text(
+            prompt,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF6F607A)),
+          ),
+          TextButton(
+            onPressed: onTap,
+            // Removes internal padding so button text sits close to prompt
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(0, 0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(action),
+          ),
+        ],
+      ),
+    );
+  }
+}

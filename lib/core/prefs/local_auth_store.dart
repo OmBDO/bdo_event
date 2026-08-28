@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:bdo_event/core/db/utility/database_codec.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/local_user_record.dart';
-import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/db/local_database.dart';
 import 'package:bdo_event/core/prefs/share_pref.dart';
 
@@ -12,8 +11,7 @@ class LocalAuthStore {
   static const _sessionKey = 'auth_session';
   static const _legacyRegistrationsKey = 'auth_registrations';
   static const _registrationsPrefix = 'auth_registrations:';
-  static const _legacyRegistrationOwnerKey =
-      'auth_registrations_legacy_owner';
+  static const _legacyRegistrationOwnerKey = 'auth_registrations_legacy_owner';
   static const _legacyRegistrationsMigratedKey =
       'auth_registrations_migrated_to_user_scope';
   static const _notificationPreferencePrefix = 'auth_notifications:';
@@ -70,11 +68,11 @@ class LocalAuthStore {
               : throw const FormatException('Invalid user record'),
         ),
       );
-          await _writeDatabase(
-            () => _database.writeUsers(DatabaseCodec.encodeUsers(users)),
-          );
-          await _write((preferences) => preferences.remove(_usersKey));
-          return users;
+      await _writeDatabase(
+        () => _database.writeUsers(DatabaseCodec.encodeUsers(users)),
+      );
+      await _write((preferences) => preferences.remove(_usersKey));
+      return users;
     } on Object {
       return {};
     }
@@ -88,7 +86,9 @@ class LocalAuthStore {
 
   Future<List<Event>> readCreatedEvents() async {
     final storedEvents = await _database.readEvents();
-    if (storedEvents.isNotEmpty) return DatabaseCodec.decodeEvents(storedEvents);
+    if (storedEvents.isNotEmpty) {
+      return DatabaseCodec.decodeEvents(storedEvents);
+    }
 
     final value = (await _preferences).readString(_createdEventsKey);
     if (value == null) return [];
@@ -110,7 +110,9 @@ class LocalAuthStore {
 
   Future<List<Event>> loadRegistrations(String userId) async {
     final storedEvents = await _database.readRegistrations(userId);
-    if (storedEvents.isNotEmpty) return DatabaseCodec.decodeEvents(storedEvents);
+    if (storedEvents.isNotEmpty) {
+      return DatabaseCodec.decodeEvents(storedEvents);
+    }
 
     final preferences = await _preferences;
     final scoped = _readRegistrations(preferences, userId);
@@ -137,9 +139,7 @@ class LocalAuthStore {
       (preferences) =>
           preferences.writeBool(_legacyRegistrationsMigratedKey, true),
     );
-    await _write(
-      (preferences) => preferences.remove(_legacyRegistrationsKey),
-    );
+    await _write((preferences) => preferences.remove(_legacyRegistrationsKey));
     return legacyEvents;
   }
 
@@ -169,7 +169,9 @@ class LocalAuthStore {
     }
   }
 
-  Future<void> _write(Future<bool> Function(SharePref preferences) operation) async {
+  Future<void> _write(
+    Future<bool> Function(SharePref preferences) operation,
+  ) async {
     if (!await operation(await _preferences)) {
       throw const LocalStorageException();
     }
@@ -197,8 +199,7 @@ class LocalAuthStore {
     }
   }
 
-  String _registrationKeyFor(String userId) =>
-      '$_registrationsPrefix$userId';
+  String _registrationKeyFor(String userId) => '$_registrationsPrefix$userId';
 }
 
 class LocalStorageException implements Exception {
