@@ -5,7 +5,6 @@ import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 
 class EventDetailPage extends StatefulWidget {

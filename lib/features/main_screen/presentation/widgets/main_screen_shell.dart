@@ -23,9 +23,10 @@ class MainScreenShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<MainScreenCubit>();
-    final currentIndex = destinations.indexWhere(
+    final selectedIndex = destinations.indexWhere(
       (destination) => destination.tab == currentTab,
     );
+    final currentIndex = selectedIndex < 0 ? 0 : selectedIndex;
 
     return Scaffold(
       body: Container(

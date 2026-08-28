@@ -8,6 +8,7 @@ import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_st
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_destinations.dart';
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_shell.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +38,10 @@ class _MainScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MainScreenCubit, MainScreenState>(
-      builder: (context, state) => AnimatedSwitcher(
+    return BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
+      builder: (context, profileState) =>
+          BlocBuilder<MainScreenCubit, MainScreenState>(
+            builder: (context, state) => AnimatedSwitcher(
         duration: const Duration(milliseconds: 450),
         switchInCurve: Curves.easeOut,
         switchOutCurve: Curves.easeIn,
@@ -54,20 +57,20 @@ class _MainScreenView extends StatelessWidget {
             : MainScreenShell(
                 key: const ValueKey('main-screen'),
                 destinations: mainScreenDestinations(
-                  canScan: context.read<ProfileScreenCubit>().state.user
-                          ?.hasPermission(UserPermission.scanRegistrations) ??
+                    canScan: profileState.user?.hasPermission(
+                      UserPermission.scanRegistrations,
+                      ) ??
                       false,
-                  canCreateEvents: context
-                          .read<ProfileScreenCubit>()
-                          .state
-                          .user
-                          ?.hasPermission(UserPermission.createEvents) ??
+                    canCreateEvents: profileState.user?.hasPermission(
+                      UserPermission.createEvents,
+                      ) ??
                       false,
                 ),
                 currentTab: state.currentTab,
                 onLogoutSelected: () => _logout(context),
               ),
-      ),
+            ),
+          ),
     );
   }
 }
