@@ -57,15 +57,15 @@ void main() {
 
   test('event service preserves ownership metadata during updates', () async {
     final service = EventRemoteDataSource(store);
-    final organizer = User(
-      id: 'organizer-1',
-      displayName: 'Organizer',
-      email: 'organizer@example.com',
-      roles: {UserRole.organizer},
+    final admin = User(
+      id: 'admin-1',
+      displayName: 'Admin',
+      email: 'admin@example.com',
+      roles: {UserRole.admin},
       createdAt: DateTime(2026),
     );
 
-    final created = await service.create(event, organizer);
+    final created = await service.create(event, admin);
     final updated = await service.update(
       event.copyWith(title: 'Updated Festival'),
     );
@@ -73,8 +73,8 @@ void main() {
     expect(created.error, isNull);
     expect(updated.error, isNull);
     expect(updated.events.single.title, 'Updated Festival');
-    expect(updated.events.single.creatorId, 'organizer-1');
-    expect(updated.events.single.organizerName, 'Organizer');
+    expect(updated.events.single.creatorId, 'admin-1');
+    expect(updated.events.single.organizerName, 'Admin');
   });
 
   test('event service reports updates for missing events', () async {
@@ -118,4 +118,36 @@ class InMemoryEventStore implements EventStore {
   Future<void> writeRegistrations(String userId, List<Event> events) async {
     registrations[userId] = [...events];
   }
+
+  @override
+  Future<void> activateRegistration(String userId, Event event) async {
+    final userEvents = registrations.putIfAbsent(userId, () => []);
+    if (!userEvents.any((registered) => registered.id == event.id)) {
+      userEvents.add(event);
+    }
+  }
+
+  @override
+  Future<void> revokeRegistration(String userId, String eventId) async {
+    registrations[userId]?.removeWhere((event) => event.id == eventId);
+  }
+
+  @override
+  Future<String?> loadRegistrationToken(String userId, String eventId) async =>
+      null;
+
+  @override
+  Future<Map<String, dynamic>?> validateRegistration({
+    required String token,
+    required String eventId,
+  }) async => null;
+
+  @override
+  Future<String> checkInRegistration({
+    required String token,
+    required String eventId,
+  }) async => 'invalid';
+
+  @override
+  Future<int> loadAttendanceCount(String eventId) async => 0;
 }
