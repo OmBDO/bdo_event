@@ -1,30 +1,32 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<String> storePickedImage(XFile image) async {
-  final documentsDirectory = await getApplicationDocumentsDirectory();
-  final storedImage = await File(image.path).copy(
-    '${documentsDirectory.path}/${AppIdentifiers.storedEventFilePrefix}${DateTime.now().microsecondsSinceEpoch}${AppIdentifiers.storedEventFileExtension}',
+  final client = Supabase.instance.client;
+  final userId = client.auth.currentUser?.id;
+  if (userId == null) throw StateError('Authentication required');
+
+  final imagePath = '$userId/${DateTime.now().microsecondsSinceEpoch}.jpg';
+  await client.storage.from('event-images').uploadBinary(
+    imagePath,
+    await image.readAsBytes(),
+    fileOptions: FileOptions(
+      contentType: image.mimeType ?? 'image/jpeg',
+      upsert: false,
+    ),
   );
-  return storedImage.path;
+  return imagePath;
 }
 
-Widget buildStoredImage({
-  required String path,
-  required double? width,
-  required double? height,
-  required BoxFit fit,
-  required ImageErrorWidgetBuilder? errorBuilder,
-}) {
-  return Image.file(
-    File(path),
-    width: width,
-    height: height,
-    fit: fit,
-    errorBuilder: errorBuilder,
-  );
+Future<String> resolveStoredImageUrl(String path) async {
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return Supabase.instance.client.storage
+      .from('event-images')
+      .createSignedUrl(path, 3600);
+}
+
+Future<void> deleteStoredImage(String path) async {
+  if (path.startsWith('http://') || path.startsWith('https://')) return;
+  await Supabase.instance.client.storage.from('event-images').remove([path]);
 }

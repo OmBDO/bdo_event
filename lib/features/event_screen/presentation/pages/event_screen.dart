@@ -1,7 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
@@ -109,7 +111,10 @@ class _EventPageViewState extends State<_EventPageView> {
                     tappable: false,
 
                     openBuilder: (context, closeContainer) {
-                      return EventDetailPage(event: cardData);
+                      return BlocProvider(
+                        create: (_) => getIt<EventDetailCubit>(),
+                        child: EventDetailPage(event: cardData),
+                      );
                     },
 
                     closedBuilder: (context, openContainer) {

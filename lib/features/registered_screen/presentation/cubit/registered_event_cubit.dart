@@ -16,18 +16,20 @@ class RegisteredEventCubit extends Cubit<RegisteredEventState> {
   final CancelRegisteredEvent _cancelRegisteredEvent;
   final AuthRepositoryContract _authRepository;
   final EventStore _eventStore;
+  int _tokenRequestId = 0;
 
   Future<void> loadToken(String eventId) async {
     final userId = _authRepository.currentUser?.id;
     if (userId == null) return;
     emit(state.copyWith(isLoadingToken: true, clearError: true));
+    final requestId = ++_tokenRequestId;
     try {
       final token = await _eventStore.loadRegistrationToken(userId, eventId);
-      if (!isClosed) {
+      if (!isClosed && requestId == _tokenRequestId) {
         emit(state.copyWith(isLoadingToken: false, registrationToken: token));
       }
     } on Object {
-      if (!isClosed) {
+      if (!isClosed && requestId == _tokenRequestId) {
         emit(
           state.copyWith(
             isLoadingToken: false,

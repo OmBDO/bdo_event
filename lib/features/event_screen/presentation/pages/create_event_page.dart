@@ -44,11 +44,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _descriptionController = TextEditingController();
   final _imagePicker = ImagePicker();
   String? _selectedImagePath;
+  String? _originalImagePath;
+  final _pendingImagePaths = <String>{};
   Location? _selectedLocation;
   LatLng? _selectedCoordinates;
   EventCategory? _selectedCategory;
   final _locationSearchController = TextEditingController();
   bool _isSaving = false;
+  bool _isCancelling = false;
   int _locationSearchRequest = 0;
 
   bool get _isEditing => widget.event != null;
@@ -72,6 +75,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
           : null;
       _descriptionController.text = event.description;
       _selectedImagePath = event.imageUrl;
+      _originalImagePath = event.imageUrl;
     }
   }
 
@@ -93,8 +97,22 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
     if (image == null) return;
 
-    final storedImagePath = await storePickedImage(image);
-    if (mounted) setState(() => _selectedImagePath = storedImagePath);
+    try {
+      final storedImagePath = await storePickedImage(image);
+      if (mounted) {
+        setState(() {
+          _pendingImagePaths.add(storedImagePath);
+          _selectedImagePath = storedImagePath;
+        });
+      } else {
+        await deleteStoredImage(storedImagePath);
+      }
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppText.unableToUploadEventImage)),
+      );
+    }
   }
 
   Future<void> _submit() async {
@@ -131,9 +149,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (!mounted) return;
     setState(() => _isSaving = false);
     if (error != null) {
+      await _deletePendingImages();
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error)));
       return;
+    }
+    await _deletePendingImages(except: _selectedImagePath);
+    if (_isEditing &&
+        _originalImagePath != null &&
+        _originalImagePath != _selectedImagePath) {
+      await _tryDeleteImage(_originalImagePath!);
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -144,6 +169,26 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (!_isEditing && widget.popParentOnCreateSuccess) {
       Navigator.of(context).pop();
     }
+  }
+
+  Future<void> _deletePendingImages({String? except}) async {
+    final paths = _pendingImagePaths.where((path) => path != except).toList();
+    _pendingImagePaths.clear();
+    if (paths.isEmpty) return;
+    await Future.wait(paths.map(_tryDeleteImage));
+  }
+
+  Future<void> _tryDeleteImage(String path) async {
+    try {
+      await deleteStoredImage(path);
+    } on Object catch (_) {}
+  }
+
+  Future<void> _cancel() async {
+    if (_isCancelling) return;
+    _isCancelling = true;
+    await _deletePendingImages();
+    if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _pickDate() async {
@@ -195,7 +240,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope<void>(
+      canPop: _pendingImagePaths.isEmpty,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _cancel();
+      },
+      child: Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -204,7 +254,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    _cancel();
                   },
                   icon: Icon(Icons.arrow_back),
                 ),
@@ -515,6 +565,7 @@ class _LocationPickerSection extends StatelessWidget {
           style: TextStyle(color: Colors.black54, fontSize: 12),
         ),
       ],
+      ),
     );
   }
 }

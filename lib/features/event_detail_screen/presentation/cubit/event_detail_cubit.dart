@@ -19,6 +19,7 @@ class EventDetailCubit extends Cubit<EventDetailState> {
   final CancelEventRegistration _cancelEventRegistration;
   final EventStore _eventStore;
   final AuthRepositoryContract _authRepository;
+  int _attendanceRequestId = 0;
 
   Future<void> checkRegistration(Event event) async {
     final registered = await _registerForEvent.isUserRegistered(event.id);
@@ -31,15 +32,18 @@ class EventDetailCubit extends Cubit<EventDetailState> {
       return;
     }
     emit(state.copyWith(isLoadingAttendance: true));
+    final requestId = ++_attendanceRequestId;
     try {
       final count = await _eventStore.loadAttendanceCount(event.id);
-      if (!isClosed) {
+      if (!isClosed && requestId == _attendanceRequestId) {
         emit(
           state.copyWith(attendanceCount: count, isLoadingAttendance: false),
         );
       }
     } on Object {
-      if (!isClosed) emit(state.copyWith(isLoadingAttendance: false));
+      if (!isClosed && requestId == _attendanceRequestId) {
+        emit(state.copyWith(isLoadingAttendance: false));
+      }
     }
   }
 

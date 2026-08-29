@@ -1,10 +1,12 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/pages/registered_event_page.dart';
+import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,7 +57,10 @@ class BottomEventRegisterSection extends StatelessWidget {
           buttonAction = () async {
             await Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => RegisteredEventPage(event: event),
+                builder: (_) => BlocProvider(
+                  create: (_) => getIt<RegisteredEventCubit>(),
+                  child: RegisteredEventPage(event: event),
+                ),
               ),
             );
             if (!context.mounted) return;

@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
 abstract interface class EventDataSource {
   Future<List<Event>> loadEvents();
@@ -78,6 +79,7 @@ class EventRemoteDataSource implements EventDataSource {
     } on LocalStorageException {
       return const EventOperationResult([], 'Unable to delete the event');
     }
+    await deleteStoredImage(event.imageUrl);
     return EventOperationResult(await loadEvents());
   }
 }
