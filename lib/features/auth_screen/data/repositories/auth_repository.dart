@@ -32,7 +32,15 @@ class AuthRepository implements AuthRepositoryContract {
   Future<void> initialize() async {
     final authUser = _authDataSource.currentUser;
     if (authUser == null) return;
-    _currentUser = await _mapUser(authUser);
+
+    supabase.User userForMapping = authUser;
+    try {
+      userForMapping = await _authDataSource.refreshSession() ?? authUser;
+    } on supabase.AuthException {
+      // Continue with the persisted session when a refresh is unavailable.
+    }
+
+    _currentUser = await _mapUser(userForMapping);
   }
 
   Future<String?> register({
