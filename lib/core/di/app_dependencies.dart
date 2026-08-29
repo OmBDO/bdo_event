@@ -14,7 +14,7 @@ import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_s
 import 'package:bdo_event/features/event_detail_screen/data/repositories/registered_event_repository.dart'
     as event_detail;
 import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart'
-  as event_detail_data_source;
+    as event_detail_data_source;
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/registration_use_cases.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/repositories/registration_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
@@ -38,9 +38,7 @@ final getIt = GetIt.instance;
 void configureDependencies() {
   if (getIt.isRegistered<AuthScreenCubit>()) return;
 
-  getIt.registerLazySingleton<SupabaseRequestLogger>(
-    SupabaseRequestLogger.new,
-  );
+  getIt.registerLazySingleton<SupabaseRequestLogger>(SupabaseRequestLogger.new);
   getIt.registerLazySingleton<SupabaseStore>(
     () => SupabaseStore(logger: getIt()),
   );
@@ -74,14 +72,14 @@ void configureDependencies() {
   getIt.registerLazySingleton<CancelRegisteredEvent>(
     () => CancelRegisteredEvent(getIt()),
   );
-  getIt.registerLazySingleton<event_detail.RegistrationDataSource>(
+  getIt.registerLazySingleton<event_detail_data_source.RegistrationDataSource>(
     () => event_detail_data_source.RegistrationRemoteDataSource(
       getIt<EventStore>(),
     ),
   );
   getIt.registerLazySingleton<RegistrationRepositoryContract>(
     () => event_detail.RegisteredEventRepository(
-      dataSource: getIt<event_detail.RegistrationDataSource>(),
+      dataSource: getIt<event_detail_data_source.RegistrationDataSource>(),
       authRepository: getIt<AuthRepository>(),
     ),
   );
