@@ -40,7 +40,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _dateController = TextEditingController();
+  final _startTimeController = TextEditingController();
+  final _endTimeController = TextEditingController();
   final _capacityController = TextEditingController();
+  final _registrationDeadlineController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _imagePicker = ImagePicker();
@@ -54,6 +57,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
   bool _isSaving = false;
   bool _isCancelling = false;
   bool _seatLimitEnabled = false;
+  bool _registrationDeadlineEnabled = false;
+  DateTime? _registrationDeadline;
   int _locationSearchRequest = 0;
 
   bool get _isEditing => widget.event != null;
@@ -68,8 +73,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (event != null) {
       _titleController.text = event.title;
       _dateController.text = event.date;
+      _startTimeController.text = event.startTime ?? '';
+      _endTimeController.text = event.endTime ?? '';
       _seatLimitEnabled = event.capacity != null;
       _capacityController.text = event.capacity?.toString() ?? '';
+      _registrationDeadline = event.registrationDeadline?.toLocal();
+      _registrationDeadlineEnabled = _registrationDeadline != null;
+      _registrationDeadlineController.text = _formatDateTime(
+        _registrationDeadline,
+      );
       _locationController.text = event.location;
       _selectedLocation = _officeLocations.where((location) {
         return location.id == event.locationId;
@@ -87,7 +99,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
   void dispose() {
     _titleController.dispose();
     _dateController.dispose();
+    _startTimeController.dispose();
+    _endTimeController.dispose();
     _capacityController.dispose();
+    _registrationDeadlineController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
     _locationSearchController.dispose();
@@ -136,8 +151,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
           '${AppIdentifiers.createdEventPrefix}${DateTime.now().microsecondsSinceEpoch}',
       title: _titleController.text.trim(),
       date: _dateController.text,
-        capacity: _seatLimitEnabled
+      startTime: _startTimeController.text.trim(),
+      endTime: _endTimeController.text.trim(),
+      capacity: _seatLimitEnabled
           ? int.tryParse(_capacityController.text.trim())
+          : null,
+      registrationDeadline: _registrationDeadlineEnabled
+          ? _registrationDeadline
           : null,
       location: _locationController.text.trim(),
       imageUrl: _selectedImagePath!,
@@ -208,6 +228,76 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
     if (date == null) return;
     _dateController.text = '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _pickTime(TextEditingController controller) async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: controller.text.isEmpty
+          ? TimeOfDay.now()
+          : _parseTime(controller.text) ?? TimeOfDay.now(),
+    );
+    if (time == null || !mounted) return;
+    controller.text = _formatTime(time);
+    setState(() {});
+  }
+
+  TimeOfDay? _parseTime(String value) {
+    final parts = value.split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null || hour > 23 || minute > 59) {
+      return null;
+    }
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  String _formatTime(TimeOfDay time) =>
+      '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+
+  String? _validateTimeRange() {
+    final start = _parseTime(_startTimeController.text.trim());
+    final end = _parseTime(_endTimeController.text.trim());
+    if (start == null || end == null) return 'Choose a start and end time';
+    final startMinutes = start.hour * 60 + start.minute;
+    final endMinutes = end.hour * 60 + end.minute;
+    return endMinutes > startMinutes ? null : 'End time must be after start time';
+  }
+
+  Future<void> _pickRegistrationDeadline() async {
+    final now = DateTime.now();
+    final current = _registrationDeadline ?? now.add(const Duration(hours: 1));
+    final date = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2035),
+      initialDate: DateTime(current.year, current.month, current.day),
+    );
+    if (date == null || !mounted) return;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(current),
+    );
+    if (time == null || !mounted) return;
+    final deadline = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    setState(() {
+      _registrationDeadline = deadline;
+      _registrationDeadlineController.text = _formatDateTime(deadline);
+    });
+  }
+
+  String _formatDateTime(DateTime? value) {
+    if (value == null) return '';
+    final hour = value.hour % 12 == 0 ? 12 : value.hour % 12;
+    final period = value.hour >= 12 ? 'PM' : 'AM';
+    return '${value.day}/${value.month}/${value.year} $hour:${value.minute.toString().padLeft(2, '0')} $period';
   }
 
   Future<void> _searchLocation() async {
@@ -347,15 +437,69 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             : null,
                       ),
                       const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _dateController,
-                        label: AppText.eventDate,
-                        icon: Icons.calendar_today_outlined,
-                        readOnly: true,
-                        onTap: _pickDate,
-                        validator: (value) => value == null || value.isEmpty
-                            ? AppText.chooseEventDate
-                            : null,
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final compact = constraints.maxWidth < 520;
+                          final fields = [
+                            AppTextField(
+                              controller: _dateController,
+                              label: AppText.eventDate,
+                              icon: Icons.calendar_today_outlined,
+                              readOnly: true,
+                              onTap: _pickDate,
+                              validator: (value) =>
+                                  value == null || value.isEmpty
+                                  ? AppText.chooseEventDate
+                                  : null,
+                            ),
+                            AppTextField(
+                              controller: _startTimeController,
+                              label: 'Start time',
+                              icon: Icons.schedule_outlined,
+                              readOnly: true,
+                              onTap: () => _pickTime(_startTimeController),
+                              validator: (value) => value == null || value.isEmpty
+                                  ? 'Choose a start time'
+                                  : null,
+                            ),
+                            AppTextField(
+                              controller: _endTimeController,
+                              label: 'End time',
+                              icon: Icons.schedule_outlined,
+                              readOnly: true,
+                              onTap: () => _pickTime(_endTimeController),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Choose an end time';
+                                }
+                                return _validateTimeRange();
+                              },
+                            ),
+                          ];
+                          return compact
+                              ? Column(
+                                  children: [
+                                    fields[0],
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Expanded(child: fields[1]),
+                                        const SizedBox(width: 12),
+                                        Expanded(child: fields[2]),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Expanded(child: fields[0]),
+                                    const SizedBox(width: 12),
+                                    Expanded(child: fields[1]),
+                                    const SizedBox(width: 12),
+                                    Expanded(child: fields[2]),
+                                  ],
+                                );
+                        },
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -395,6 +539,49 @@ class _CreateEventPageState extends State<CreateEventPage> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Registration deadline',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          Switch(
+                            value: _registrationDeadlineEnabled,
+                            onChanged: (enabled) => setState(() {
+                              _registrationDeadlineEnabled = enabled;
+                              if (!enabled) {
+                                _registrationDeadline = null;
+                                _registrationDeadlineController.clear();
+                              }
+                            }),
+                          ),
+                        ],
+                      ),
+                      if (_registrationDeadlineEnabled) ...[
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _registrationDeadlineController,
+                          readOnly: true,
+                          onTap: _pickRegistrationDeadline,
+                          validator: (_) {
+                            if (_registrationDeadline == null) {
+                              return 'Choose a registration deadline';
+                            }
+                            if (!_registrationDeadline!.isAfter(DateTime.now())) {
+                              return 'Deadline must be in the future';
+                            }
+                            return null;
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Deadline date and time',
+                            prefixIcon: Icon(Icons.schedule_outlined),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       AppDropDownField<Location>(
                         label: AppText.location,

@@ -26,8 +26,8 @@ class _MyEventScreenState extends State<MyEventScreen> {
     _loadEvents();
   }
 
-  void _loadEvents() {
-    context.read<EventScreenCubit>().load();
+  void _loadEvents({bool force = false}) {
+    context.read<EventScreenCubit>().load(force: force);
   }
 
   // 5. Trigger a reload when coming back from Create/Edit screen
@@ -40,7 +40,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
       await Navigator.of(context)
           .push(MaterialPageRoute(builder: (_) => const CategoryEventPage()));
     }
-    _loadEvents(); // Refresh data from backend when user navigates back
+    _loadEvents(force: true); // Refresh after a create/edit operation
   }
 
   Future<void> _confirmDelete(Event event) async {

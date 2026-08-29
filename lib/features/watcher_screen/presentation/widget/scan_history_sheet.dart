@@ -34,7 +34,7 @@ class ScanHistorySheet extends StatelessWidget {
                           : Icons.person_outline,
                     ),
                   ),
-                  title: Text(entry.userId ?? 'Unknown attendee'),
+                  title: Text(entry.displayName ?? 'Unknown attendee'),
                   subtitle: Text(entry.status),
                 );
               },

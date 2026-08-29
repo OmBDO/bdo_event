@@ -39,7 +39,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     }
 
     try {
-      final payload = jsonDecode(rawValue);
+      final payload = _decodeRegistrationValue(rawValue);
       if (payload is! Map<String, dynamic> ||
           payload['type'] != AppIdentifiers.qrRegistrationType ||
           payload['eventId'] is! String ||
@@ -78,10 +78,12 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
             ScanHistoryEntry(
               registrationToken: payload['token'] as String,
               userId: result['user_id'] as String?,
+              displayName: result['display_name'] as String?,
+              eventId: result['event_id'] as String?,
               status: 'Ready to check in',
             ),
             ...state.history,
-          ].take(5).toList(),
+          ].take(20).toList(),
         ),
       );
       await _loadDashboard(result['event_id'] as String);
@@ -92,6 +94,33 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
           message: AppText.invalidRegistrationQr,
         ),
       );
+    }
+  }
+
+  Map<String, dynamic>? _decodeRegistrationValue(String rawValue) {
+    try {
+      final payload = jsonDecode(rawValue);
+      return payload is Map<String, dynamic> ? payload : null;
+    } on FormatException {
+      if (!rawValue.startsWith('BDO1')) return null;
+      try {
+        final encoded = rawValue.substring(4);
+        if (encoded.isEmpty || encoded.length.isOdd) return null;
+        final bytes = <int>[];
+        for (var index = 0; index < encoded.length; index += 2) {
+          bytes.add(int.parse(encoded.substring(index, index + 2), radix: 16));
+        }
+        final decoded = utf8.decode(bytes);
+        final separator = decoded.lastIndexOf('|');
+        if (separator <= 0 || separator == decoded.length - 1) return null;
+        return {
+          'type': AppIdentifiers.qrRegistrationType,
+          'eventId': decoded.substring(0, separator),
+          'token': decoded.substring(separator + 1),
+        };
+      } on FormatException {
+        return null;
+      }
     }
   }
 
@@ -138,6 +167,51 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       );
     }
   }
+
+  Future<void> checkInAll() async {
+    final pending = state.history
+        .where((entry) => entry.status == 'Ready to check in')
+        .toList();
+    if (pending.isEmpty || state.status == WatcherScanStatus.checkingIn) return;
+
+    emit(state.copyWith(status: WatcherScanStatus.checkingIn));
+    for (final entry in pending) {
+      final eventId = entry.eventId;
+      if (eventId == null) continue;
+      try {
+        final result = await _checkInRegistration(
+          token: entry.registrationToken,
+          eventId: eventId,
+        );
+        final updatedHistory = state.history.map((current) {
+          if (current.registrationToken != entry.registrationToken) {
+            return current;
+          }
+          return current.copyWith(status: _checkInStatus(result));
+        }).toList();
+        emit(state.copyWith(history: updatedHistory));
+      } on Object {
+        // Keep failed entries pending so the watcher can retry them.
+      }
+    }
+    if (!isClosed) {
+      emit(
+        state.copyWith(
+          status: WatcherScanStatus.idle,
+          clearResult: true,
+          message: AppText.checkedIn,
+        ),
+      );
+    }
+    final eventId = pending.first.eventId;
+    if (eventId != null) await _loadDashboard(eventId);
+  }
+
+  String _checkInStatus(String result) => switch (result) {
+    'checked_in' => 'Checked in',
+    'already_checked_in' => 'Already checked in',
+    _ => 'Unavailable',
+  };
 
   void reset() => emit(
     state.copyWith(

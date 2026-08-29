@@ -4,6 +4,8 @@ class Event {
   final String id;
   final String title;
   final String date;
+  final String? startTime;
+  final String? endTime;
   final String location;
   final String? locationId;
   final String? locationAddress;
@@ -14,6 +16,7 @@ class Event {
   final bool isAvailable;
   final int attendeeCount;
   final int? capacity;
+  final DateTime? registrationDeadline;
   final String? organizerName;
   final String? creatorId;
   final DateTime? createdAt;
@@ -23,6 +26,8 @@ class Event {
     required this.id,
     required this.title,
     required this.date,
+    this.startTime,
+    this.endTime,
     required this.location,
     this.locationId,
     this.locationAddress,
@@ -33,6 +38,7 @@ class Event {
     this.isAvailable = true,
     this.attendeeCount = 0,
     this.capacity,
+    this.registrationDeadline,
     this.organizerName,
     this.creatorId,
     this.createdAt,
@@ -43,6 +49,8 @@ class Event {
     String? id,
     String? title,
     String? date,
+    String? startTime,
+    String? endTime,
     String? location,
     String? locationId,
     String? locationAddress,
@@ -53,6 +61,7 @@ class Event {
     bool? isAvailable,
     int? attendeeCount,
     int? capacity,
+    DateTime? registrationDeadline,
     String? organizerName,
     String? creatorId,
     DateTime? createdAt,
@@ -62,6 +71,8 @@ class Event {
       id: id ?? this.id,
       title: title ?? this.title,
       date: date ?? this.date,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
       location: location ?? this.location,
       locationId: locationId ?? this.locationId,
       locationAddress: locationAddress ?? this.locationAddress,
@@ -72,6 +83,7 @@ class Event {
       isAvailable: isAvailable ?? this.isAvailable,
       attendeeCount: attendeeCount ?? this.attendeeCount,
       capacity: capacity ?? this.capacity,
+      registrationDeadline: registrationDeadline ?? this.registrationDeadline,
       organizerName: organizerName ?? this.organizerName,
       creatorId: creatorId ?? this.creatorId,
       createdAt: createdAt ?? this.createdAt,
@@ -84,6 +96,8 @@ class Event {
       id: json['id'] as String? ?? _fallbackId(json['title'] as String),
       title: json['title'] as String,
       date: json['date'] as String,
+      startTime: json['startTime'] as String?,
+      endTime: json['endTime'] as String?,
       location: json['location'] as String,
       locationId: json['locationId'] as String?,
       locationAddress: json['locationAddress'] as String?,
@@ -94,6 +108,9 @@ class Event {
       isAvailable: json['isAvailable'] as bool? ?? true,
       attendeeCount: json['attendeeCount'] as int? ?? 0,
       capacity: json['capacity'] as int?,
+      registrationDeadline: json['registrationDeadline'] == null
+          ? null
+          : DateTime.tryParse(json['registrationDeadline'] as String),
       organizerName: json['organizerName'] as String?,
       creatorId: json['creatorId'] as String?,
       createdAt: json['createdAt'] == null
@@ -108,6 +125,8 @@ class Event {
     'id': id,
     'title': title,
     'date': date,
+    'startTime': startTime,
+    'endTime': endTime,
     'location': location,
     'locationId': locationId,
     'locationAddress': locationAddress,
@@ -118,6 +137,7 @@ class Event {
     'isAvailable': isAvailable,
     'attendeeCount': attendeeCount,
     'capacity': capacity,
+    'registrationDeadline': registrationDeadline?.toUtc().toIso8601String(),
     'organizerName': organizerName,
     'creatorId': creatorId,
     'createdAt': createdAt?.toIso8601String(),

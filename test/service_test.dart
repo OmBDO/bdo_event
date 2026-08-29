@@ -45,6 +45,37 @@ void main() {
     expect(await repository.registerEvent(event), 'You are already registered for this event');
   });
 
+  test('event JSON preserves an optional deadline as an instant', () {
+    final deadline = DateTime(2026, 9, 1, 14, 30);
+    final restored = Event.fromJson(
+      event.copyWith(registrationDeadline: deadline).toJson(),
+    );
+
+    expect(restored.registrationDeadline, deadline.toUtc());
+  });
+
+  test('event JSON preserves event start and end times', () {
+    final restored = Event.fromJson(
+      event.copyWith(startTime: '09:30', endTime: '17:00').toJson(),
+    );
+
+    expect(restored.startTime, '09:30');
+    expect(restored.endTime, '17:00');
+  });
+
+  test('active registration repository rejects a passed deadline', () async {
+    final repository = RegisteredEventRepository(
+      dataSource: RegistrationRemoteDataSource(store),
+      authRepository: FakeAuthRepository(),
+    );
+
+    final error = await repository.registerEvent(
+      event.copyWith(registrationDeadline: DateTime.now().subtract(const Duration(minutes: 1))),
+    );
+
+    expect(error, 'Registration for this event has closed');
+  });
+
   test('active registration repository revokes a registration', () async {
     final repository = RegisteredEventRepository(
       dataSource: RegistrationRemoteDataSource(store),
@@ -76,6 +107,23 @@ void main() {
     expect(updated.events.single.title, 'Updated Festival');
     expect(updated.events.single.creatorId, 'admin-1');
     expect(updated.events.single.organizerName, 'Admin');
+  });
+
+  test('event service loads active registration counts into events', () async {
+    final service = EventRemoteDataSource(store);
+    final user = User(
+      id: 'user-1',
+      displayName: 'Test User',
+      email: 'test@example.com',
+      createdAt: DateTime(2026),
+    );
+
+    await service.create(event, user);
+    await store.activateRegistration(user.id, event);
+
+    final loaded = await service.loadEvents();
+
+    expect(loaded.single.attendeeCount, 1);
   });
 
   test('event service reports updates for missing events', () async {
@@ -152,6 +200,17 @@ class InMemoryEventStore implements EventStore {
   Future<List<Event>> loadRegistrations(String userId) async => [
     ...(registrations[userId] ?? const <Event>[]),
   ];
+
+  @override
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async {
+    return {
+      for (final eventId in eventIds)
+        eventId: registrations.values
+            .expand((events) => events)
+            .where((event) => event.id == eventId)
+            .length,
+    };
+  }
 
   @override
   Future<void> activateRegistration(String userId, Event event) async {
