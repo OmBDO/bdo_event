@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui' show ImageFilter;
 
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
@@ -253,10 +254,32 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         border: Border.all(color: const Color(0xFFE8E1E1)),
                       ),
                       child: state.registrationToken == null
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 220,
                               height: 220,
-                              child: Center(child: CircularProgressIndicator()),
+                              child: ImageFiltered(
+                                imageFilter: ImageFilter.blur(
+                                  sigmaX: 5,
+                                  sigmaY: 5,
+                                ),
+                                child: Opacity(
+                                  opacity: 0.55,
+                                  child: QrImageView(
+                                    data: 'bdo-event-ticket-preparing',
+                                    version: QrVersions.auto,
+                                    size: 220,
+                                    eyeStyle: const QrEyeStyle(
+                                      eyeShape: QrEyeShape.square,
+                                      color: Color(0xFF2D0C57),
+                                    ),
+                                    dataModuleStyle: const QrDataModuleStyle(
+                                      dataModuleShape: QrDataModuleShape.square,
+                                      color: Color(0xFF2D0C57),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                  ),
+                                ),
+                              ),
                             )
                           : QrImageView(
                               data: _qrData(state.registrationToken!),
@@ -423,19 +446,23 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         onPressed: state.isCancelling
                             ? null
                             : _confirmCancellation,
-                        icon: state.isCancelling
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.delete_outline_rounded),
-                        label: Text(
-                          state.isCancelling
-                              ? AppText.cancelling
-                              : AppText.cancelRegistrationButton,
+                        icon: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: Icon(
+                            state.isCancelling
+                                ? Icons.flight_takeoff_rounded
+                                : Icons.delete_outline_rounded,
+                            key: ValueKey(state.isCancelling),
+                          ),
+                        ),
+                        label: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: Text(
+                            state.isCancelling
+                                ? 'Ticket is departing...'
+                                : AppText.cancelRegistrationButton,
+                            key: ValueKey(state.isCancelling),
+                          ),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFB64234),
@@ -444,6 +471,17 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         ),
                       ),
                     ),
+                    if (state.error != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        state.error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFB64234),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

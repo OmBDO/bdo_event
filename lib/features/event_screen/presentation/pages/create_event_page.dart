@@ -40,6 +40,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _dateController = TextEditingController();
+  final _capacityController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _imagePicker = ImagePicker();
@@ -52,6 +53,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _locationSearchController = TextEditingController();
   bool _isSaving = false;
   bool _isCancelling = false;
+  bool _seatLimitEnabled = false;
   int _locationSearchRequest = 0;
 
   bool get _isEditing => widget.event != null;
@@ -66,6 +68,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (event != null) {
       _titleController.text = event.title;
       _dateController.text = event.date;
+      _seatLimitEnabled = event.capacity != null;
+      _capacityController.text = event.capacity?.toString() ?? '';
       _locationController.text = event.location;
       _selectedLocation = _officeLocations.where((location) {
         return location.id == event.locationId;
@@ -83,6 +87,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   void dispose() {
     _titleController.dispose();
     _dateController.dispose();
+    _capacityController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
     _locationSearchController.dispose();
@@ -131,6 +136,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
           '${AppIdentifiers.createdEventPrefix}${DateTime.now().microsecondsSinceEpoch}',
       title: _titleController.text.trim(),
       date: _dateController.text,
+        capacity: _seatLimitEnabled
+          ? int.tryParse(_capacityController.text.trim())
+          : null,
       location: _locationController.text.trim(),
       imageUrl: _selectedImagePath!,
       description: _descriptionController.text.trim(),
@@ -350,6 +358,44 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             : null,
                       ),
                       const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Limit seats',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          Switch(
+                            value: _seatLimitEnabled,
+                            onChanged: (enabled) => setState(
+                              () => _seatLimitEnabled = enabled,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 96,
+                            child: TextFormField(
+                              controller: _capacityController,
+                              enabled: _seatLimitEnabled,
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.done,
+                              validator: (value) {
+                                if (!_seatLimitEnabled) return null;
+                                final capacity = int.tryParse(value?.trim() ?? '');
+                                return capacity == null || capacity < 1
+                                    ? 'Enter a positive number'
+                                    : null;
+                              },
+                              decoration: const InputDecoration(
+                                labelText: 'Seats',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                       AppDropDownField<Location>(
                         label: AppText.location,
                         icon: Icons.location_on_outlined,
@@ -398,6 +444,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       _LocationPickerSection(
                         searchController: _locationSearchController,
                         coordinates: _selectedCoordinates,
+                        locationLocked: _selectedLocation != null,
                         onSearch: _searchLocation,
                         onTap: (coordinates) {
                           setState(() {
@@ -489,12 +536,14 @@ class _LocationPickerSection extends StatelessWidget {
   const _LocationPickerSection({
     required this.searchController,
     required this.coordinates,
+    required this.locationLocked,
     required this.onSearch,
     required this.onTap,
   });
 
   final TextEditingController searchController;
   final LatLng? coordinates;
+  final bool locationLocked;
   final VoidCallback onSearch;
   final ValueChanged<LatLng> onTap;
 
@@ -512,11 +561,12 @@ class _LocationPickerSection extends StatelessWidget {
             hintText: 'Search an address or place',
             prefixIcon: const Icon(Icons.search_rounded),
             suffixIcon: IconButton(
-              onPressed: onSearch,
+              onPressed: locationLocked ? null : onSearch,
               icon: const Icon(Icons.arrow_forward_rounded),
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           ),
+          enabled: !locationLocked,
         ),
         const SizedBox(height: 10),
         ClipRRect(
@@ -528,7 +578,12 @@ class _LocationPickerSection extends StatelessWidget {
               options: MapOptions(
                 initialCenter: center,
                 initialZoom: coordinates == null ? 4.5 : 13,
-                onTap: (_, point) => onTap(point),
+                interactionOptions: InteractionOptions(
+                  flags: locationLocked
+                      ? InteractiveFlag.none
+                      : InteractiveFlag.all,
+                ),
+                onTap: locationLocked ? null : (_, point) => onTap(point),
               ),
               children: [
                 TileLayer(

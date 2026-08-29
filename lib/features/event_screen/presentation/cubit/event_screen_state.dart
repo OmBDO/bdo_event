@@ -7,6 +7,7 @@ class EventScreenState {
   final Set<String> registeredEventIds;
   final bool isLoading;
   final bool isSaving;
+  final Set<String> deletingEventIds;
   final String? error;
 
   const EventScreenState({
@@ -16,6 +17,7 @@ class EventScreenState {
     this.registeredEventIds = const {},
     this.isLoading = false,
     this.isSaving = false,
+    this.deletingEventIds = const {},
     this.error,
   });
 
@@ -65,6 +67,7 @@ class EventScreenState {
     Set<String>? registeredEventIds,
     bool? isLoading,
     bool? isSaving,
+    Set<String>? deletingEventIds,
     String? error,
     bool clearError = false,
   }) => EventScreenState(
@@ -74,6 +77,7 @@ class EventScreenState {
     registeredEventIds: registeredEventIds ?? this.registeredEventIds,
     isLoading: isLoading ?? this.isLoading,
     isSaving: isSaving ?? this.isSaving,
+    deletingEventIds: deletingEventIds ?? this.deletingEventIds,
     error: clearError ? null : error ?? this.error,
   );
 }
