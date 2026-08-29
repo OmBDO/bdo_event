@@ -3,10 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthUserDto {
   const AuthUserDto({required this.user, required this.notificationsEnabled});
-
   final supabase.User user;
   final bool notificationsEnabled;
-
   User toEntity() {
     final metadata = user.userMetadata ?? const <String, dynamic>{};
     final configuredRoles = user.appMetadata['roles'];
@@ -18,7 +16,8 @@ class AuthUserDto {
     final roles = roleValues.map(UserRole.fromStorage).toSet();
     return User(
       id: user.id,
-      displayName: metadata['display_name'] as String? ??
+      displayName:
+          metadata['display_name'] as String? ??
           metadata['full_name'] as String? ??
           user.email?.split('@').first ??
           'User',

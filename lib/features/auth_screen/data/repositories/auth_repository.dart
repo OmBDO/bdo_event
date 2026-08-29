@@ -17,20 +17,25 @@ class AuthRepository implements AuthRepositoryContract {
   final AuthRemoteDataSource _authDataSource;
   User? _currentUser;
 
+  @override
   User? get currentUser => _currentUser;
   String? get currentUserName => _currentUser?.displayName;
+  @override
   bool can(UserPermission permission) =>
       _currentUser?.hasPermission(permission) ?? false;
+  @override
   bool canUpdate(Event event) =>
       can(UserPermission.manageAllEvents) ||
       (event.creatorId == _currentUser?.id &&
           can(UserPermission.updateOwnEvents));
+  @override
   bool canDelete(Event event) =>
       can(UserPermission.manageAllEvents) ||
       (event.creatorId == _currentUser?.id &&
           can(UserPermission.deleteOwnEvents));
   bool canManage(Event event) => canUpdate(event);
 
+  @override
   Future<void> initialize() async {
     final authUser = _authDataSource.currentUser;
     if (authUser == null) return;
@@ -46,6 +51,7 @@ class AuthRepository implements AuthRepositoryContract {
     _logUserClaims('session restored', userForMapping, _currentUser!);
   }
 
+  @override
   Future<String?> register({
     required String name,
     required String email,
@@ -67,6 +73,7 @@ class AuthRepository implements AuthRepositoryContract {
     return null;
   }
 
+  @override
   Future<String?> login({
     required String email,
     required String password,
@@ -88,6 +95,7 @@ class AuthRepository implements AuthRepositoryContract {
     return null;
   }
 
+  @override
   Future<void> logout() async {
     _currentUser = null;
     await _authDataSource.signOut();

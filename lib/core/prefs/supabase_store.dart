@@ -38,15 +38,17 @@ abstract interface class EventStore {
 class SupabaseStore implements EventStore {
   SupabaseStore({
     supabase.SupabaseClient? client,
-    SupabaseRequestLogger logger = const SupabaseRequestLogger(),
-  }) : _client = client ?? supabase.Supabase.instance.client,
-       _logger = logger;
+    this._logger = const SupabaseRequestLogger(),
+  }) : _client = client ?? supabase.Supabase.instance.client;
 
   final supabase.SupabaseClient _client;
   final SupabaseRequestLogger _logger;
 
   Future<bool> readNotificationPreference(String userId) async {
-    final value = _client.auth.currentUser?.userMetadata?[AppStorageKeys.notificationsEnabled];
+    final value = _client
+        .auth
+        .currentUser
+        ?.userMetadata?[AppStorageKeys.notificationsEnabled];
     return value is bool ? value : true;
   }
 
@@ -119,7 +121,10 @@ class SupabaseStore implements EventStore {
     try {
       await _logger.track(
         'events.delete',
-        () => _client.from(AppDatabase.eventsTable).delete().eq(AppDatabase.id, eventId),
+        () => _client
+            .from(AppDatabase.eventsTable)
+            .delete()
+            .eq(AppDatabase.id, eventId),
         parameters: {'eventId': eventId},
       );
     } on Object {
@@ -140,7 +145,7 @@ class SupabaseStore implements EventStore {
         parameters: {'userId': userId},
       );
       return rows
-            .map((row) => Event.fromJson(_payload(row[AppDatabase.payload])))
+          .map((row) => Event.fromJson(_payload(row[AppDatabase.payload])))
           .toList();
     } on Object {
       throw const LocalStorageException();
@@ -181,10 +186,13 @@ class SupabaseStore implements EventStore {
     try {
       await _logger.track(
         'rpc.activateEventRegistration',
-        () => _client.rpc('activate_event_registration', params: {
-          'requested_event_id': event.id,
-          'event_payload': event.toJson(),
-        }),
+        () => _client.rpc(
+          'activate_event_registration',
+          params: {
+            'requested_event_id': event.id,
+            'event_payload': event.toJson(),
+          },
+        ),
         parameters: {'eventId': event.id, 'userId': userId},
       );
     } on Object {
@@ -197,9 +205,10 @@ class SupabaseStore implements EventStore {
     try {
       await _logger.track(
         'rpc.revokeEventRegistration',
-        () => _client.rpc('revoke_event_registration', params: {
-          'requested_event_id': eventId,
-        }),
+        () => _client.rpc(
+          'revoke_event_registration',
+          params: {'requested_event_id': eventId},
+        ),
         parameters: {'eventId': eventId, 'userId': userId},
       );
     } on Object {
@@ -237,10 +246,7 @@ class SupabaseStore implements EventStore {
         'rpc.validateEventRegistration',
         () => _client.rpc(
           'validate_event_registration',
-          params: {
-            'requested_token': token,
-            'requested_event_id': eventId,
-          },
+          params: {'requested_token': token, 'requested_event_id': eventId},
         ),
         parameters: {'eventId': eventId, 'token': token},
       );
@@ -263,10 +269,7 @@ class SupabaseStore implements EventStore {
         'rpc.checkInEventRegistration',
         () => _client.rpc(
           'check_in_event_registration',
-          params: {
-            'requested_token': token,
-            'requested_event_id': eventId,
-          },
+          params: {'requested_token': token, 'requested_event_id': eventId},
         ),
         parameters: {'eventId': eventId, 'token': token},
       );
@@ -306,8 +309,8 @@ class SupabaseStore implements EventStore {
   Map<String, dynamic> _eventToRow(Event event) => {
     AppDatabase.id: event.id,
     AppDatabase.creatorId: event.creatorId,
-    AppDatabase.createdAt:
-        (event.createdAt ?? DateTime.now()).toIso8601String(),
+    AppDatabase.createdAt: (event.createdAt ?? DateTime.now())
+        .toIso8601String(),
     AppDatabase.payload: event.toJson(),
   };
 

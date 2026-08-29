@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 
 abstract interface class AuthRepositoryContract {
@@ -18,10 +19,7 @@ abstract interface class AuthRepositoryContract {
     required UserRole requestedRole,
   });
 
-  Future<String?> login({
-    required String email,
-    required String password,
-  });
+  Future<String?> login({required String email, required String password});
 
   Future<void> logout();
 }

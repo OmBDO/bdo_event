@@ -4,9 +4,8 @@ import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_l
 class AuthRemoteDataSource {
   AuthRemoteDataSource({
     supabase.SupabaseClient? client,
-    SupabaseRequestLogger logger = const SupabaseRequestLogger(),
-  }) : _client = client ?? supabase.Supabase.instance.client,
-       _logger = logger;
+    this._logger = const SupabaseRequestLogger(),
+  }) : _client = client ?? supabase.Supabase.instance.client;
 
   final supabase.SupabaseClient _client;
   final SupabaseRequestLogger _logger;
@@ -24,35 +23,30 @@ class AuthRemoteDataSource {
     required String displayName,
     required String requestedRole,
   }) => _logger.track(
-        'auth.signUp',
-        () => _client.auth.signUp(
-          email: email,
-          password: password,
-          data: {
-            'display_name': displayName,
-            'requested_role': requestedRole,
-          },
-        ),
-        parameters: {
-          'email': email,
-          'requestedRole': requestedRole,
-          'password': password,
-        },
-      );
+    'auth.signUp',
+    () => _client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'display_name': displayName, 'requested_role': requestedRole},
+    ),
+    parameters: {
+      'email': email,
+      'requestedRole': requestedRole,
+      'password': password,
+    },
+  );
 
   Future<supabase.AuthResponse> signIn({
     required String email,
     required String password,
   }) => _logger.track(
-        'auth.signInWithPassword',
-        () => _client.auth.signInWithPassword(email: email, password: password),
-        parameters: {'email': email, 'password': password},
-      );
+    'auth.signInWithPassword',
+    () => _client.auth.signInWithPassword(email: email, password: password),
+    parameters: {'email': email, 'password': password},
+  );
 
-  Future<void> signOut() => _logger.track(
-        'auth.signOut',
-        () => _client.auth.signOut(),
-      );
+  Future<void> signOut() =>
+      _logger.track('auth.signOut', () => _client.auth.signOut());
 
   Future<supabase.UserResponse> updateUserData(Map<String, dynamic> data) =>
       _logger.track(
