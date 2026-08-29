@@ -5,6 +5,7 @@ import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
+import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -81,7 +82,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
             child: Builder(
               builder: (context) {
                 if (state.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const EventListShimmer();
                 }
 
                 if (state.error != null) {

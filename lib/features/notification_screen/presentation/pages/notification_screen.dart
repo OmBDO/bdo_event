@@ -2,6 +2,7 @@ import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -60,7 +61,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         future: _notificationsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const NotificationListShimmer();
           }
           if (snapshot.hasError) {
             return Center(child: Text(AppText.unableToLoadNotifications));

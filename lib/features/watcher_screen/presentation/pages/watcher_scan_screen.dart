@@ -144,9 +144,11 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                   enabled: state.status == WatcherScanStatus.idle,
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
-                    labelText: 'Enter registration code',
-                    hintText: 'Paste the QR text here',
-                    border: const OutlineInputBorder(),
+                    labelText: AppText.enterRegistrationCode,
+                    hintText: AppText.pasteRegistrationCode,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     suffixIcon: IconButton(
                       tooltip: 'Validate registration code',
                       icon: const Icon(Icons.arrow_forward),

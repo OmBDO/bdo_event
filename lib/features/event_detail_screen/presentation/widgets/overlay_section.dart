@@ -5,6 +5,7 @@ import 'package:bdo_event/features/event_detail_screen/presentation/widgets/even
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -226,6 +227,9 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                     widget.event.id,
                   ),
                   builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const AttendeeSummaryShimmer();
+                    }
                     final attendees = snapshot.data ?? const <EventAttendee>[];
                     return Row(
                       children: [

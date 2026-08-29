@@ -62,8 +62,18 @@ class EventCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: const Color(0xCC111827),
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.72),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.28),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Text(
                     event.date,
@@ -76,33 +86,33 @@ class EventCard extends StatelessWidget {
                 ),
               ),
 
-              if (onUpdate != null && onDelete != null)
-                Positioned(
-                  top: 54,
-                  right: 12,
-                  child: PopupMenuButton<String>(
-                    tooltip: AppText.manageEvent,
-                    onSelected: (value) {
-                      if (value == 'update') onUpdate!();
-                      if (value == 'delete') onDelete!();
-                    },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 'update',
-                        child: Text(AppText.update),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Text(AppText.delete),
-                      ),
-                    ],
-                    child: const CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white70,
-                      child: Icon(Icons.more_horiz, color: Colors.black87),
-                    ),
-                  ),
-                ),
+              // if (onUpdate != null && onDelete != null)
+              //   Positioned(
+              //     top: 54,
+              //     right: 12,
+              //     child: PopupMenuButton<String>(
+              //       tooltip: AppText.manageEvent,
+              //       onSelected: (value) {
+              //         if (value == 'update') onUpdate!();
+              //         if (value == 'delete') onDelete!();
+              //       },
+              //       itemBuilder: (context) => const [
+              //         PopupMenuItem(
+              //           value: 'update',
+              //           child: Text(AppText.update),
+              //         ),
+              //         PopupMenuItem(
+              //           value: 'delete',
+              //           child: Text(AppText.delete),
+              //         ),
+              //       ],
+              //       child: const CircleAvatar(
+              //         radius: 18,
+              //         backgroundColor: Colors.white70,
+              //         child: Icon(Icons.more_horiz, color: Colors.black87),
+              //       ),
+              //     ),
+              //   ),
 
               // Floating Attending Avatars (Bottom Left Overlapping Border)
               Positioned(
