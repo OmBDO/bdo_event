@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_logger.dart';
 import 'package:bdo_event/features/auth_screen/data/datasource/auth_remote_data_source.dart';
 import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
@@ -30,8 +31,15 @@ final getIt = GetIt.instance;
 void configureDependencies() {
   if (getIt.isRegistered<AuthScreenCubit>()) return;
 
-  getIt.registerLazySingleton<SupabaseStore>(SupabaseStore.new);
-  getIt.registerLazySingleton<AuthRemoteDataSource>(AuthRemoteDataSource.new);
+  getIt.registerLazySingleton<SupabaseRequestLogger>(
+    SupabaseRequestLogger.new,
+  );
+  getIt.registerLazySingleton<SupabaseStore>(
+    () => SupabaseStore(logger: getIt()),
+  );
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSource(logger: getIt()),
+  );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepository(store: getIt(), authDataSource: getIt()),
   );

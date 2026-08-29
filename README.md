@@ -9,6 +9,10 @@ publishable anon key supplied as compile-time defines:
 flutter run --dart-define=SUPABASE_URL=https://your-project.supabase.co --dart-define=SUPABASE_ANON_KEY=your-anon-key
 ```
 
+The required variable names are also listed in [.env.example](.env.example).
+Flutter does not automatically load `.env` files, so pass the values as
+`--dart-define` arguments or configure them in your IDE launch settings.
+
 The sign-up flow stores the display name in Supabase user metadata. Roles are
 requested during sign-up as `requested_role` in client-editable user metadata,
 but effective roles (`user`, `admin`, or `watcher`) are read from Supabase
