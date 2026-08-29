@@ -22,9 +22,15 @@ import 'package:bdo_event/core/util/event.resource.dart';
 // ignore: must_be_immutable
 class CreateEventPage extends StatefulWidget {
   final Event? event;
+  final bool popParentOnCreateSuccess;
   EventCategory? catagory;
 
-  CreateEventPage({super.key, this.event, this.catagory});
+  CreateEventPage({
+    super.key,
+    this.event,
+    this.catagory,
+    this.popParentOnCreateSuccess = false,
+  });
 
   @override
   State<CreateEventPage> createState() => _CreateEventPageState();
@@ -135,6 +141,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
       ),
     );
     Navigator.of(context).pop();
+    if (!_isEditing && widget.popParentOnCreateSuccess) {
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> _pickDate() async {

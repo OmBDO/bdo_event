@@ -1,4 +1,5 @@
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/background_decoration.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_detail_header.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/bottom_event_register_section.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
@@ -42,6 +43,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
             height: MediaQuery.of(context).size.height * 0.45,
             child: BackgroundDecoration(widget: widget),
           ),
+
+          EventDetailHeader(event: widget.event),
 
           // 2. Main Overlapping Rounded Bottom Content Sheet
           Positioned(

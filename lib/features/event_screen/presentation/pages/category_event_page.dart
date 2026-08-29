@@ -30,7 +30,10 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CreateEventPage(catagory: category),
+        builder: (context) => CreateEventPage(
+          catagory: category,
+          popParentOnCreateSuccess: true,
+        ),
       ),
     );
   }

@@ -6,6 +6,9 @@ import 'package:bdo_event/core/model/location_model/location_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
 
 class HeaderElement extends StatefulWidget {
   final int currentScreenIndex;
@@ -24,6 +27,17 @@ class HeaderElement extends StatefulWidget {
 }
 
 class _HeaderElementState extends State<HeaderElement> {
+  late Future<int> _unreadCountFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshUnreadCount();
+  }
+
+  void _refreshUnreadCount() {
+    _unreadCountFuture = getIt<EventStore>().loadUnreadNotificationCount();
+  }
   Location selectedLocation = const Location(
     id: AppLocations.mumbaiZoneOneId,
     name: AppLocations.mumbai,
@@ -36,10 +50,12 @@ class _HeaderElementState extends State<HeaderElement> {
     ...LocationCatalog.offices,
   ];
 
-  void onNotificationClick() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppText.noNewNotifications)),
+  Future<void> onNotificationClick() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const NotificationScreen()),
     );
+    if (!mounted) return;
+    setState(_refreshUnreadCount);
   }
 
   @override
@@ -130,15 +146,50 @@ class _HeaderElementState extends State<HeaderElement> {
                     width: 1,
                   ),
                 ),
-                child: IconButton(
-                  onPressed: onNotificationClick,
-                  icon: const Icon(
-                    Icons.notifications_none_outlined,
-                    size: 20,
-                    color: Colors.black87,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      onPressed: onNotificationClick,
+                      icon: const Icon(
+                        Icons.notifications_none_outlined,
+                        size: 20,
+                        color: Colors.black87,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                   ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                    Positioned(
+                      top: -4,
+                      right: -4,
+                      child: FutureBuilder<int>(
+                        future: _unreadCountFuture,
+                        builder: (context, snapshot) {
+                          final count = snapshot.data ?? 0;
+                          if (count == 0) return const SizedBox.shrink();
+                          return Container(
+                            constraints: const BoxConstraints(minWidth: 18),
+                            height: 18,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              count > 99 ? '99+' : '$count',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
