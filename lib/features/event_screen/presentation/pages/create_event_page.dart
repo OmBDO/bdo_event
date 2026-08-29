@@ -2,10 +2,18 @@ import 'package:bdo_event/core/common/form_elements/app_text_field.dart';
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
 import 'package:bdo_event/core/common/form_elements/drop_down_field.dart';
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
+import 'package:bdo_event/core/model/location_model/location_model.dart';
+import 'package:bdo_event/core/model/location_model/location_catalog.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:http/http.dart' as http;
+
+import 'dart:convert';
+
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
@@ -30,7 +38,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _descriptionController = TextEditingController();
   final _imagePicker = ImagePicker();
   String? _selectedImagePath;
+  Location? _selectedLocation;
+  LatLng? _selectedCoordinates;
+  final _locationSearchController = TextEditingController();
   bool _isSaving = false;
+  int _locationSearchRequest = 0;
 
   bool get _isEditing => widget.event != null;
 
@@ -44,6 +56,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
       _titleController.text = event.title;
       _dateController.text = event.date;
       _locationController.text = event.location;
+      _selectedLocation = _officeLocations.where((location) {
+        return location.id == event.locationId;
+      }).firstOrNull;
+      _selectedCoordinates = event.latitude != null && event.longitude != null
+          ? LatLng(event.latitude!, event.longitude!)
+          : null;
       _descriptionController.text = event.description;
       _selectedImagePath = event.imageUrl;
     }
@@ -55,6 +73,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     _dateController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
+    _locationSearchController.dispose();
     super.dispose();
   }
 
@@ -89,6 +108,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
       location: _locationController.text.trim(),
       imageUrl: _selectedImagePath!,
       description: _descriptionController.text.trim(),
+      locationId: _selectedLocation?.id,
+      locationAddress:
+          _selectedLocation?.address ?? _locationController.text.trim(),
+      latitude: _selectedCoordinates?.latitude,
+      longitude: _selectedCoordinates?.longitude,
       createdAt: DateTime.now(),
       catagory: widget.catagory,
     );
@@ -116,8 +140,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
     _titleController.clear();
     _dateController.clear();
     _locationController.clear();
+    _locationSearchController.clear();
     _descriptionController.clear();
-    setState(() => _selectedImagePath = null);
+    setState(() {
+      _selectedImagePath = null;
+      _selectedLocation = null;
+      _selectedCoordinates = null;
+    });
   }
 
   Future<void> _pickDate() async {
@@ -129,6 +158,42 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
     if (date == null) return;
     _dateController.text = '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _searchLocation() async {
+    final query = _locationSearchController.text.trim();
+    if (query.isEmpty) return;
+    final requestId = ++_locationSearchRequest;
+    final uri = Uri.https('nominatim.openstreetmap.org', '/search', {
+      'q': query,
+      'format': 'jsonv2',
+      'limit': '1',
+    });
+    try {
+      final response = await http.get(
+        uri,
+        headers: {'User-Agent': 'bdo-event'},
+      );
+      if (response.statusCode != 200) return;
+      final results = jsonDecode(response.body) as List<dynamic>;
+      if (results.isEmpty || !mounted || requestId != _locationSearchRequest)
+        return;
+      final result = results.first as Map<String, dynamic>;
+      final coordinates = LatLng(
+        double.parse(result['lat'] as String),
+        double.parse(result['lon'] as String),
+      );
+      setState(() {
+        _selectedLocation = null;
+        _selectedCoordinates = coordinates;
+        _locationController.text = result['display_name'] as String? ?? query;
+      });
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to find that location')),
+      );
+    }
   }
 
   @override
@@ -238,14 +303,64 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             : null,
                       ),
                       const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _locationController,
+                      AppDropDownField<Location>(
                         label: AppText.location,
                         icon: Icons.location_on_outlined,
+                        value: _selectedLocation,
                         validator: (value) =>
-                            value == null || value.trim().isEmpty
+                            value == null &&
+                                _locationController.text.trim().isEmpty
                             ? AppText.enterEventLocation
                             : null,
+                        items: [
+                          const DropdownMenuItem<Location>(
+                            value: null,
+                            child: Row(
+                              children: [
+                                Icon(Icons.location_searching_rounded),
+                                SizedBox(width: 12),
+                                Text('Select location'),
+                              ],
+                            ),
+                          ),
+                          ..._officeLocations.map(
+                            (location) => DropdownMenuItem<Location>(
+                              value: location,
+                              child: Text(location.displayName),
+                            ),
+                          ),
+                        ],
+                        onChanged: (location) {
+                          setState(() {
+                            _selectedLocation = location;
+                            _selectedCoordinates =
+                                location?.latitude != null &&
+                                    location?.longitude != null
+                                ? LatLng(
+                                    location!.latitude!,
+                                    location.longitude!,
+                                  )
+                                : null;
+                            _locationController.text = location == null
+                                ? ''
+                                : location.address ?? location.displayName;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      _LocationPickerSection(
+                        searchController: _locationSearchController,
+                        coordinates: _selectedCoordinates,
+                        onSearch: _searchLocation,
+                        onTap: (coordinates) {
+                          setState(() {
+                            _selectedCoordinates = coordinates;
+                            _selectedLocation = null;
+                            _locationController.text =
+                                '${coordinates.latitude.toStringAsFixed(5)}, '
+                                '${coordinates.longitude.toStringAsFixed(5)}';
+                          });
+                        },
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
@@ -297,8 +412,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             : _isEditing
                             ? AppText.updateEvent
                             : AppText.createEvent,
-                        isLoading: false,
-                        onPressed: _submit,
+                        isLoading: _isSaving,
+                        onPressed: () => _isSaving ? null : _submit,
                       ),
                     ],
                   ),
@@ -308,6 +423,92 @@ class _CreateEventPageState extends State<CreateEventPage> {
           ),
         ),
       ),
+    );
+  }
+
+  static const _officeLocations = LocationCatalog.offices;
+}
+
+class _LocationPickerSection extends StatelessWidget {
+  const _LocationPickerSection({
+    required this.searchController,
+    required this.coordinates,
+    required this.onSearch,
+    required this.onTap,
+  });
+
+  final TextEditingController searchController;
+  final LatLng? coordinates;
+  final VoidCallback onSearch;
+  final ValueChanged<LatLng> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final center = coordinates ?? const LatLng(20.5937, 78.9629);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: searchController,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => onSearch(),
+          decoration: InputDecoration(
+            hintText: 'Search an address or place',
+            prefixIcon: const Icon(Icons.search_rounded),
+            suffixIcon: IconButton(
+              onPressed: onSearch,
+              icon: const Icon(Icons.arrow_forward_rounded),
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+          ),
+        ),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: SizedBox(
+            height: 230,
+            child: FlutterMap(
+              key: ValueKey(coordinates),
+              options: MapOptions(
+                initialCenter: center,
+                initialZoom: coordinates == null ? 4.5 : 13,
+                onTap: (_, point) => onTap(point),
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.bdo.event',
+                ),
+                const RichAttributionWidget(
+                  attributions: [
+                    TextSourceAttribution('OpenStreetMap contributors'),
+                  ],
+                ),
+                if (coordinates != null)
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: coordinates!,
+                        width: 44,
+                        height: 44,
+                        child: const Icon(
+                          Icons.location_on,
+                          color: Colors.deepOrange,
+                          size: 42,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Choose an office above, search for a place, or tap the map to drop a pin.',
+          style: TextStyle(color: Colors.black54, fontSize: 12),
+        ),
+      ],
     );
   }
 }

@@ -4,6 +4,7 @@ class EventScreenState {
   final int selectedTab;
   final List<String> tabs;
   final List<Event> events;
+  final Set<String> registeredEventIds;
   final bool isLoading;
   final bool isSaving;
   final String? error;
@@ -12,20 +13,56 @@ class EventScreenState {
     this.selectedTab = 0,
     this.tabs = const ['Upcoming', 'My Events', 'Past'],
     this.events = const [],
+    this.registeredEventIds = const {},
     this.isLoading = false,
     this.isSaving = false,
     this.error,
   });
 
   List<Event> get currentTabEvents {
-    if (selectedTab == 0) return events;
-    if (selectedTab == 1) return events.take(2).toList();
-    return events.take(1).toList();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (selectedTab == 2) {
+      return events.where((event) {
+        final date = _parseEventDate(event.date);
+        return date != null && date.isBefore(today);
+      }).toList();
+    }
+
+    final upcomingEvents = events.where((event) {
+      final date = _parseEventDate(event.date);
+      return date != null && !date.isBefore(today);
+    });
+
+    if (selectedTab == 1) {
+      return upcomingEvents
+          .where((event) => registeredEventIds.contains(event.id))
+          .toList();
+    }
+
+    return upcomingEvents
+        .where((event) => !registeredEventIds.contains(event.id))
+        .toList();
+  }
+
+  static DateTime? _parseEventDate(String value) {
+    final parts = value.split('/');
+    if (parts.length == 3) {
+      final day = int.tryParse(parts[0]);
+      final month = int.tryParse(parts[1]);
+      final year = int.tryParse(parts[2]);
+      if (day != null && month != null && year != null) {
+        return DateTime(year, month, day);
+      }
+    }
+    return DateTime.tryParse(value);
   }
 
   EventScreenState copyWith({
     int? selectedTab,
     List<Event>? events,
+    Set<String>? registeredEventIds,
     bool? isLoading,
     bool? isSaving,
     String? error,
@@ -34,6 +71,7 @@ class EventScreenState {
     selectedTab: selectedTab ?? this.selectedTab,
     tabs: tabs,
     events: events ?? this.events,
+    registeredEventIds: registeredEventIds ?? this.registeredEventIds,
     isLoading: isLoading ?? this.isLoading,
     isSaving: isSaving ?? this.isSaving,
     error: clearError ? null : error ?? this.error,

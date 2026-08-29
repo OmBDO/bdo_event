@@ -1,5 +1,5 @@
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
-import 'package:bdo_event/features/event_detail_screen/presentation/widgets/map_lines_painter.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_location_map.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -96,7 +96,7 @@ class OverlayCurveSection extends StatelessWidget {
                 ),
                 const Gap(6),
                 Text(
-                  widget.event.location,
+                  widget.event.locationAddress ?? widget.event.location,
                   style: TextStyle(
                     color: textGrey,
                     fontSize: 14,
@@ -179,68 +179,7 @@ class OverlayCurveSection extends StatelessWidget {
             ),
             const Gap(16),
 
-            // 4. Clean Vector Roadmap Placeholder Widget Container
-            Container(
-              height: 180,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: mapBgColor,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Stack(
-                  children: [
-                    // Abstract Mock Grid Roads Vector Layout Drawing Loop
-                    CustomPaint(
-                      size: Size.infinite,
-                      painter: MapLinesPainter(),
-                    ),
-                    // Central Floating Target Marker Ring
-                    Positioned(
-                      top: 65,
-                      left: 140,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.orange.shade800,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
-                            ),
-                          ),
-                          const Icon(
-                            Icons.location_on,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Secondary Grey Anchor Dots
-                    const Positioned(
-                      top: 40,
-                      right: 80,
-                      child: CircleAvatar(
-                        radius: 6,
-                        backgroundColor: Colors.black26,
-                      ),
-                    ),
-                    const Positioned(
-                      bottom: 30,
-                      left: 60,
-                      child: CircleAvatar(
-                        radius: 8,
-                        backgroundColor: Colors.black12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            EventLocationMap(event: widget.event),
           ],
         ),
       ),

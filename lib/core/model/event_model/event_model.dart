@@ -5,6 +5,10 @@ class Event {
   final String title;
   final String date;
   final String location;
+  final String? locationId;
+  final String? locationAddress;
+  final double? latitude;
+  final double? longitude;
   final String imageUrl;
   final String description;
   final bool isAvailable;
@@ -20,6 +24,10 @@ class Event {
     required this.title,
     required this.date,
     required this.location,
+    this.locationId,
+    this.locationAddress,
+    this.latitude,
+    this.longitude,
     required this.imageUrl,
     this.description = '',
     this.isAvailable = true,
@@ -36,6 +44,10 @@ class Event {
     String? title,
     String? date,
     String? location,
+    String? locationId,
+    String? locationAddress,
+    double? latitude,
+    double? longitude,
     String? imageUrl,
     String? description,
     bool? isAvailable,
@@ -51,6 +63,10 @@ class Event {
       title: title ?? this.title,
       date: date ?? this.date,
       location: location ?? this.location,
+      locationId: locationId ?? this.locationId,
+      locationAddress: locationAddress ?? this.locationAddress,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       imageUrl: imageUrl ?? this.imageUrl,
       description: description ?? this.description,
       isAvailable: isAvailable ?? this.isAvailable,
@@ -69,6 +85,10 @@ class Event {
       title: json['title'] as String,
       date: json['date'] as String,
       location: json['location'] as String,
+      locationId: json['locationId'] as String?,
+      locationAddress: json['locationAddress'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       imageUrl: json['imageUrl'] as String? ?? '',
       description: json['description'] as String? ?? '',
       isAvailable: json['isAvailable'] as bool? ?? true,
@@ -89,6 +109,10 @@ class Event {
     'title': title,
     'date': date,
     'location': location,
+    'locationId': locationId,
+    'locationAddress': locationAddress,
+    'latitude': latitude,
+    'longitude': longitude,
     'imageUrl': imageUrl,
     'description': description,
     'isAvailable': isAvailable,

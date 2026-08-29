@@ -3,17 +3,10 @@ abstract final class AppText {
   static const configurationRequired = 'Supabase configuration required';
   static const configurationInstructions =
       'Provide SUPABASE_URL and SUPABASE_ANON_KEY with --dart-define before running the app.';
-  static const appMember = 'BDO Events member';
   static const brandName = 'BDO Events';
   static const missingEventImage = 'Missing event image';
   static const accountMenu = 'Account menu';
   static const logOut = 'Log out';
-  static const mayDayLabourDay = 'May Day / Labour Day';
-  static const techMeetupFestival = 'Tech Meetup Festival';
-  static const companyHackathon = 'Company Hackathon';
-  static const teamBuildingMela = 'Team Building Mela';
-  static const diwaliFestival = 'Diwali';
-  static const ganeshChaturthiGanapati = 'Ganesh Chaturthi / Ganapati';
 
   static const signIn = 'Sign in';
   static const signInTitle = 'Sign in to continue';
@@ -273,11 +266,25 @@ abstract final class AppLocations {
   static const mumbaiZoneTwoId = 'mumbai-zone-2';
   static const bangaloreWestId = 'bangalore-west';
   static const kolkataSouthId = 'kolkata-south';
+  static const bdoRiseHyderabadId = 'Hyderabad-south';
+  static const bdoRiseAhmedabadId = 'Ahmedabad';
+  static const bdoRiseGurugramId = 'Gurugram';
+
   static const delhiNcrId = 'delhi-ncr';
+
+  static const bdoRiseMumbaiId = 'bdo-rise-mumbai';
+  static const bdoRiseBengaluruId = 'bdo-rise-bengaluru';
+  static const bdoRiseKolkataId = 'bdo-rise-kolkata';
+  static const bdoRiseDelhiNcrId = 'bdo-rise-delhi-ncr';
+  static const bdoRiseOffice = 'BDO RISE Office';
   static const mumbai = 'Mumbai';
   static const bangalore = 'Bangalore';
   static const kolkata = 'Kolkata';
   static const delhi = 'Delhi';
+  static const hyderabad = 'hyderabad';
+  static const ahmedabad = 'ahmedabad';
+  static const gurugram = 'gurugram';
+
   static const india = 'India';
   static const zoneOne = 'Zone 1';
   static const zoneTwo = 'Zone 2';

@@ -42,10 +42,24 @@ class EventRemoteDataSource implements EventDataSource {
     }
 
     final existing = events[index];
-    events[index] = event.copyWith(
-      creatorId: existing.creatorId,
+    events[index] = Event(
+      id: event.id,
+      title: event.title,
+      date: event.date,
+      location: event.location,
+      locationId: event.locationId,
+      locationAddress: event.locationAddress,
+      latitude: event.latitude,
+      longitude: event.longitude,
+      imageUrl: event.imageUrl,
+      description: event.description,
+      isAvailable: event.isAvailable,
+      attendeeCount: event.attendeeCount,
+      capacity: event.capacity,
       organizerName: existing.organizerName,
+      creatorId: existing.creatorId,
       createdAt: existing.createdAt,
+      catagory: event.catagory,
     );
     try {
       await _store.updateEvent(events[index]);
