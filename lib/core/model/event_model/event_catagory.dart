@@ -82,6 +82,6 @@ class EventCategory {
   Map<String, dynamic> toJson() => {
     'name': name,
     'iconCode': icon.codePoint,
-    'colorValue': color.value,
+    'colorValue': color.toARGB32(),
   };
 }

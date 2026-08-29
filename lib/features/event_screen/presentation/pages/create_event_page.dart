@@ -11,6 +11,7 @@ import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
+// ignore: must_be_immutable
 class CreateEventPage extends StatefulWidget {
   final Event? event;
   EventCategory? catagory;

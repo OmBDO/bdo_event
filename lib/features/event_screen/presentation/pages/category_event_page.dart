@@ -23,7 +23,7 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
 
     // Filter events by checking if the category name matches (assuming event.category exists)
     // If your Event model doesn't have a category field yet, this will pass allEvents or can be adapted
-    final filteredEvents = allEvents.where((event) {
+    allEvents.where((event) {
       // replace with your model's exact field, e.g., event.category == category.name
       return true;
     }).toList();
@@ -64,7 +64,7 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: category.color.withOpacity(0.15),
+                      color: category.color.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(category.icon, size: 36, color: category.color),

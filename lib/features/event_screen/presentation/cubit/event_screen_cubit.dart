@@ -8,17 +8,12 @@ import 'package:bdo_event/core/util/event.resource.dart';
 
 class EventScreenCubit extends Cubit<EventScreenState> {
   EventScreenCubit({
-    required LoadEvents loadEvents,
-    required CreateEvent createEvent,
-    required UpdateEvent updateEvent,
-    required DeleteEvent deleteEvent,
-    required AuthRepository authRepository,
-  })  : _loadEvents = loadEvents,
-        _createEvent = createEvent,
-        _updateEvent = updateEvent,
-        _deleteEvent = deleteEvent,
-        _authRepository = authRepository,
-        super(const EventScreenState());
+    required this._loadEvents,
+    required this._createEvent,
+    required this._updateEvent,
+    required this._deleteEvent,
+    required this._authRepository,
+  }) : super(const EventScreenState());
 
   final LoadEvents _loadEvents;
   final CreateEvent _createEvent;

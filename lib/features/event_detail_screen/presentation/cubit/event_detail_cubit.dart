@@ -9,15 +9,11 @@ import 'package:bdo_event/core/prefs/supabase_store.dart';
 
 class EventDetailCubit extends Cubit<EventDetailState> {
   EventDetailCubit({
-    required RegisterForEvent registerForEvent,
-    required CancelEventRegistration cancelEventRegistration,
-    required EventStore eventStore,
-    required AuthRepository authRepository,
-  }) : _registerForEvent = registerForEvent,
-       _cancelEventRegistration = cancelEventRegistration,
-       _eventStore = eventStore,
-       _authRepository = authRepository,
-       super(const EventDetailState());
+    required this._registerForEvent,
+    required this._cancelEventRegistration,
+    required this._eventStore,
+    required this._authRepository,
+  }) : super(const EventDetailState());
 
   final RegisterForEvent _registerForEvent;
   final CancelEventRegistration _cancelEventRegistration;
@@ -48,10 +44,13 @@ class EventDetailCubit extends Cubit<EventDetailState> {
   }
 
   Future<String?> register(Event event) =>
-      _submit(event, action: _registerForEvent, registeredAfter: true);
+      _submit(event, action: _registerForEvent.call, registeredAfter: true);
 
-  Future<String?> cancel(Event event) =>
-      _submit(event, action: _cancelEventRegistration, registeredAfter: false);
+  Future<String?> cancel(Event event) => _submit(
+    event,
+    action: _cancelEventRegistration.call,
+    registeredAfter: false,
+  );
 
   void clearState() {
     emit(const EventDetailState());

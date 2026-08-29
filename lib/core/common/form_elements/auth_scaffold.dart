@@ -1,4 +1,3 @@
-import 'package:bdo_event/core/common/form_elements/widgets/benchmark.dart';
 import 'package:flutter/material.dart';
 
 class AuthScaffold extends StatelessWidget {
@@ -8,6 +7,7 @@ class AuthScaffold extends StatelessWidget {
   final Widget form;
 
   const AuthScaffold({
+    super.key,
     required this.eyebrow,
     required this.title,
     required this.subtitle,

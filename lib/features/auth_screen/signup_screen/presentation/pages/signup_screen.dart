@@ -67,10 +67,11 @@ class _SignupScreenState extends State<SignupScreen> {
       if (!mounted) return;
       if (error == null) widget.onSignedUp(_emailController.text.trim());
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         context.read<SignUpCubit>().showError(
           AppText.unexpectedCredentialError,
         );
+      }
     }
   }
 
@@ -96,7 +97,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<UserRole>(
-                value: _requestedRole,
+                initialValue: _requestedRole,
                 decoration: const InputDecoration(labelText: AppText.role),
                 items: UserRole.values
                     .map(

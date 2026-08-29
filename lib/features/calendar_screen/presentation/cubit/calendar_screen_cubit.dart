@@ -5,11 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   CalendarScreenCubit({
-    required LoadRegisteredEvents loadRegisteredEvents,
-    required AuthRepository authRepository,
-  })  : _loadRegisteredEvents = loadRegisteredEvents,
-        _authRepository = authRepository,
-        super(const CalendarScreenState()) {
+    required this._loadRegisteredEvents,
+    required this._authRepository,
+  }) : super(const CalendarScreenState()) {
     loadRegistrations();
   }
 
@@ -27,7 +25,9 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
     try {
       final events = await _loadRegisteredEvents(userId);
       if (!isClosed) {
-        emit(state.copyWith(events: events, status: CalendarScreenStatus.ready));
+        emit(
+          state.copyWith(events: events, status: CalendarScreenStatus.ready),
+        );
       }
     } on Object catch (error) {
       if (!isClosed) {

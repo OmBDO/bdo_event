@@ -1,3 +1,4 @@
+import 'package:bdo_event/dotenv.dart' show DotEnvInitialization;
 import 'package:bdo_event/features/auth_screen/presentation/pages/auth_screen.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -18,13 +19,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
-  const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
-  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+  // Run isolated configuration container
+  final env = await DotEnvInitialization.initialize();
+  if (env == null) {
     runApp(const ConfigurationErrorApp());
     return;
   }
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  // Initialize native integrations with valid configuration parameters
+  await Supabase.initialize(
+    url: env.supabaseUrl,
+    publishableKey: env.supabaseAnonKey,
+  );
   configureDependencies();
   getIt<AuthScreenCubit>().checkActiveSession();
   runApp(const MyApp());
@@ -33,7 +38,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -51,7 +55,9 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: AppText.appName,
-        theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
         debugShowCheckedModeBanner: false,
         home: const AuthScreen(),
       ),
