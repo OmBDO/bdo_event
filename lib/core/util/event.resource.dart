@@ -3,17 +3,10 @@ abstract final class AppText {
   static const configurationRequired = 'Supabase configuration required';
   static const configurationInstructions =
       'Provide SUPABASE_URL and SUPABASE_ANON_KEY with --dart-define before running the app.';
-  static const appMember = 'BDO Events member';
   static const brandName = 'BDO Events';
   static const missingEventImage = 'Missing event image';
   static const accountMenu = 'Account menu';
   static const logOut = 'Log out';
-  static const mayDayLabourDay = 'May Day / Labour Day';
-  static const techMeetupFestival = 'Tech Meetup Festival';
-  static const companyHackathon = 'Company Hackathon';
-  static const teamBuildingMela = 'Team Building Mela';
-  static const diwaliFestival = 'Diwali';
-  static const ganeshChaturthiGanapati = 'Ganesh Chaturthi / Ganapati';
 
   static const signIn = 'Sign in';
   static const signInTitle = 'Sign in to continue';

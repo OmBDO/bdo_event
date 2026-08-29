@@ -70,7 +70,7 @@ class _ProfileScreenView extends StatelessWidget {
                       ),
                       const Gap(16),
                       Text(
-                        user?.displayName ?? AppText.appMember,
+                        user?.displayName ?? 'Profile unavailable',
                         style: const TextStyle(
                           color: Color(0xFF2D0C57),
                           fontSize: 22,
