@@ -89,6 +89,17 @@ class _LocationDropdownState extends State<LocationDropdown> {
                         color: Colors.black87,
                       ),
                     ),
+                    subtitle: location.address == null
+                        ? null
+                        : Text(
+                            location.address!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.black54,
+                            ),
+                          ),
                     onTap: () => _selectLocation(location),
                   ),
                 );

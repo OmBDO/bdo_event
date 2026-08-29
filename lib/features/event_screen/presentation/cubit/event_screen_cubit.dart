@@ -63,7 +63,13 @@ class EventScreenCubit extends Cubit<EventScreenState> {
           ? await _updateEvent(event)
           : await _createEvent(event, user);
       if (!isClosed) {
-        emit(state.copyWith(isSaving: false, error: result.error));
+        emit(
+          state.copyWith(
+            events: result.events.isEmpty ? state.events : result.events,
+            isSaving: false,
+            error: result.error,
+          ),
+        );
       }
       return result.error;
     } on Object {

@@ -28,8 +28,11 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
       return true;
     }).toList();
 
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => CreateEventPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateEventPage(catagory: category),
+      ),
+    );
   }
 
   @override
