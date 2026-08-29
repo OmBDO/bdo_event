@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/common/form_elements/app_text_field.dart';
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
+import 'package:bdo_event/core/common/form_elements/auth_scaffold.dart';
 import 'package:bdo_event/core/common/form_elements/auth_switch.dart';
 import 'package:bdo_event/core/util/helpers/validation_email.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -7,8 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_state.dart';
-
-import '../../../core/common/form_elements/auth_scaffold.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SigninScreen extends StatefulWidget {
   final String? initialEmail;
@@ -60,7 +60,9 @@ class _SigninScreenState extends State<SigninScreen> {
       if (authenticated) widget.onAuthenticated();
     } catch (e) {
       if (mounted) {
-          context.read<SignInCubit>().showError(AppText.unexpectedConnectionError);
+        context.read<SignInCubit>().showError(
+          AppText.unexpectedConnectionError,
+        );
       }
     }
   }
@@ -69,70 +71,71 @@ class _SigninScreenState extends State<SigninScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<SignInCubit, SignInState>(
       builder: (context, state) => AuthScaffold(
-          eyebrow: 'WELCOME BACK',
-          title: AppText.signInTitle,
-          subtitle: AppText.signInSubtitle,
-          form: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            AppTextField(
-              controller: _emailController,
-              label: AppText.emailAddress,
-              icon: Icons.mail_outline_rounded,
-              keyboardType: TextInputType.emailAddress,
-              validator: validateEmail,
-            ),
-            const SizedBox(height: 16),
-            AppTextField(
-              controller: _passwordController,
-              label: AppText.password,
-              icon: Icons.lock_outline_rounded,
-              obscureText: !_isPasswordVisible,
-              validator: (value) =>
-                  value == null || value.isEmpty ? AppText.enterPassword : null,
-              suffixIcon: IconButton(
-                tooltip: _isPasswordVisible
-                  ? AppText.hidePassword
-                  : AppText.showPassword,
-                onPressed: () =>
-                    setState(() => _isPasswordVisible = !_isPasswordVisible),
-                icon: Icon(
-                  _isPasswordVisible
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                ),
+        eyebrow: 'WELCOME BACK',
+        title: AppText.signInTitle,
+        subtitle: AppText.signInSubtitle,
+        form: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              AppTextField(
+                controller: _emailController,
+                label: AppText.emailAddress,
+                icon: Icons.mail_outline_rounded,
+                keyboardType: TextInputType.emailAddress,
+                validator: validateEmail,
               ),
-            ),
-            if (state.error != null) ...[
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  state.error!,
-                  style: const TextStyle(
-                    color: Color(0xFFB64234),
-                    fontWeight: FontWeight.w500,
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _passwordController,
+                label: AppText.password,
+                icon: Icons.lock_outline_rounded,
+                obscureText: !_isPasswordVisible,
+                validator: (value) => value == null || value.isEmpty
+                    ? AppText.enterPassword
+                    : null,
+                suffixIcon: IconButton(
+                  tooltip: _isPasswordVisible
+                      ? AppText.hidePassword
+                      : AppText.showPassword,
+                  onPressed: () =>
+                      setState(() => _isPasswordVisible = !_isPasswordVisible),
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
                   ),
                 ),
               ),
+              if (state.error != null) ...[
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    state.error!,
+                    style: const TextStyle(
+                      color: Color(0xFFB64234),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 24),
+              AppButton(
+                label: AppText.signIn,
+                isLoading: state.isSubmitting,
+                onPressed: () =>
+                    _submit(), // Protect against double-tapping submission
+              ),
+              const SizedBox(height: 24),
+              AuthSwitch(
+                prompt: AppText.newToApp,
+                action: AppText.createAccountTitle,
+                onTap: widget.onShowSignup,
+              ),
             ],
-            const SizedBox(height: 24),
-            AppButton(
-              label: AppText.signIn,
-              isLoading: state.isSubmitting,
-              onPressed: () =>
-                  _submit(), // Protect against double-tapping submission
-            ),
-            const SizedBox(height: 24),
-            AuthSwitch(
-              prompt: AppText.newToApp,
-              action: AppText.createAccountTitle,
-              onTap: widget.onShowSignup,
-            ),
-          ],
-        ),
           ),
+        ),
       ),
     );
   }

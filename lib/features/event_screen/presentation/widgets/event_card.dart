@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
@@ -86,8 +87,14 @@ class EventCard extends StatelessWidget {
                       if (value == 'delete') onDelete!();
                     },
                     itemBuilder: (context) => const [
-                      PopupMenuItem(value: 'update', child: Text(AppText.update)),
-                      PopupMenuItem(value: 'delete', child: Text(AppText.delete)),
+                      PopupMenuItem(
+                        value: 'update',
+                        child: Text(AppText.update),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Text(AppText.delete),
+                      ),
                     ],
                     child: const CircleAvatar(
                       radius: 18,

@@ -4,6 +4,7 @@ import 'package:bdo_event/core/common/form_elements/drop_down_field.dart';
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
@@ -71,9 +72,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedImagePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppText.missingEventImage)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppText.missingEventImage)));
       return;
     }
     FocusScope.of(context).unfocus();
@@ -103,11 +104,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          _isEditing
-              ? AppText.eventUpdated
-              : AppText.eventCreated,
-        ),
+        content: Text(_isEditing ? AppText.eventUpdated : AppText.eventCreated),
       ),
     );
     if (_isEditing) {
@@ -158,8 +155,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     children: [
                       Text(
                         _isEditing
-                          ? AppText.updateEventEyebrow
-                          : AppText.createEventEyebrow,
+                            ? AppText.updateEventEyebrow
+                            : AppText.createEventEyebrow,
                         style: TextStyle(
                           color: Color(0xFFB14F36),
                           fontSize: 11,

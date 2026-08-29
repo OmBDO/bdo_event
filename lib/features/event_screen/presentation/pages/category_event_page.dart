@@ -1,9 +1,9 @@
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
-import 'package:bdo_event/features/event_screen/presentation/pages/my_event_screen.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 // 1. Define a structured model for Categories
 
@@ -35,7 +35,10 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppText.eventCategories), centerTitle: true),
+      appBar: AppBar(
+        title: const Text(AppText.eventCategories),
+        centerTitle: true,
+      ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _categories.length,

@@ -29,5 +29,10 @@ class RegisteredEventState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [isCancelling, isLoadingToken, registrationToken, error];
+  List<Object?> get props => [
+    isCancelling,
+    isLoadingToken,
+    registrationToken,
+    error,
+  ];
 }

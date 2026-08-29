@@ -2,6 +2,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
+import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
 import 'package:bdo_event/features/event_screen/domain/repositories/event_repository.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
@@ -9,8 +10,8 @@ class EventRepository implements EventRepositoryContract {
   EventRepository({
     required EventDataSource dataSource,
     required AuthRepository authRepository,
-  })  : _eventDataSource = dataSource,
-        _authRepository = authRepository;
+  }) : _eventDataSource = dataSource,
+       _authRepository = authRepository;
 
   final EventDataSource _eventDataSource;
   final AuthRepository _authRepository;
@@ -37,10 +38,7 @@ class EventRepository implements EventRepositoryContract {
   @override
   Future<EventOperationResult> updateEvent(Event event) async {
     if (!canUpdate(event)) {
-      return const EventOperationResult(
-        [],
-        AppText.cannotUpdateEvent,
-      );
+      return const EventOperationResult([], AppText.cannotUpdateEvent);
     }
     final result = await _eventDataSource.update(event);
     return result;
@@ -49,10 +47,7 @@ class EventRepository implements EventRepositoryContract {
   @override
   Future<EventOperationResult> deleteEvent(Event event) async {
     if (!canDelete(event)) {
-      return const EventOperationResult(
-        [],
-        AppText.cannotDeleteEvent,
-      );
+      return const EventOperationResult([], AppText.cannotDeleteEvent);
     }
     final result = await _eventDataSource.delete(event);
     return result;

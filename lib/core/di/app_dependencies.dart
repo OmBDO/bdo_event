@@ -8,8 +8,8 @@ import 'package:bdo_event/features/calendar_screen/data/datasource/registration_
 import 'package:bdo_event/features/calendar_screen/data/repositories/calendar_repository.dart';
 import 'package:bdo_event/features/calendar_screen/domain/usecases/load_registered_events.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
-import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
-import 'package:bdo_event/features/event_detail_screen/data/repositories/registered_event_repository.dart' as event_detail;
+import 'package:bdo_event/features/event_detail_screen/data/repositories/registered_event_repository.dart'
+    as event_detail;
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/registration_use_cases.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
@@ -33,10 +33,7 @@ void configureDependencies() {
   getIt.registerLazySingleton<SupabaseStore>(SupabaseStore.new);
   getIt.registerLazySingleton<AuthRemoteDataSource>(AuthRemoteDataSource.new);
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepository(
-      store: getIt(),
-      authDataSource: getIt(),
-    ),
+    () => AuthRepository(store: getIt(), authDataSource: getIt()),
   );
   getIt.registerLazySingleton<RegistrationRemoteDataSource>(
     () => RegistrationRemoteDataSource(getIt()),
@@ -66,7 +63,9 @@ void configureDependencies() {
     () => RegisterForEvent(getIt<event_detail.RegisteredEventRepository>()),
   );
   getIt.registerLazySingleton<CancelEventRegistration>(
-    () => CancelEventRegistration(getIt<event_detail.RegisteredEventRepository>()),
+    () => CancelEventRegistration(
+      getIt<event_detail.RegisteredEventRepository>(),
+    ),
   );
   getIt.registerLazySingleton<EventDataSource>(
     () => EventRemoteDataSource(getIt()),
@@ -82,17 +81,10 @@ void configureDependencies() {
   getIt.registerSingleton<AuthScreenCubit>(
     AuthScreenCubit(authRepository: getIt()),
   );
-  getIt.registerSingleton<SignInCubit>(
-    SignInCubit(authRepository: getIt()),
-  );
-  getIt.registerSingleton<SignUpCubit>(
-    SignUpCubit(authRepository: getIt()),
-  );
+  getIt.registerSingleton<SignInCubit>(SignInCubit(authRepository: getIt()));
+  getIt.registerSingleton<SignUpCubit>(SignUpCubit(authRepository: getIt()));
   getIt.registerSingleton<CalendarScreenCubit>(
-    CalendarScreenCubit(
-      loadRegisteredEvents: getIt(),
-      authRepository: getIt(),
-    ),
+    CalendarScreenCubit(loadRegisteredEvents: getIt(), authRepository: getIt()),
   );
   getIt.registerSingleton<EventDetailCubit>(
     EventDetailCubit(
