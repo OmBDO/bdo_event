@@ -159,6 +159,9 @@ class InMemoryEventStore implements EventStore {
   Future<int> loadAttendanceCount(String eventId) async => 0;
 
   @override
+  Future<int> loadCheckedInCount(String eventId) async => 0;
+
+  @override
   Future<List<EventAttendee>> loadEventAttendees(String eventId) async => [];
 
   @override

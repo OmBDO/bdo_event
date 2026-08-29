@@ -36,6 +36,8 @@ abstract interface class EventStore {
 
   Future<int> loadAttendanceCount(String eventId);
 
+  Future<int> loadCheckedInCount(String eventId);
+
   Future<List<EventAttendee>> loadEventAttendees(String eventId);
 
   Future<List<AppNotification>> loadNotifications();
@@ -301,6 +303,23 @@ class SupabaseStore implements EventStore {
         'rpc.loadEventAttendanceCount',
         () => _client.rpc(
           'load_event_attendance_count',
+          params: {'requested_event_id': eventId},
+        ),
+        parameters: {'eventId': eventId},
+      );
+      return (result as num).toInt();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<int> loadCheckedInCount(String eventId) async {
+    try {
+      final result = await _logger.track(
+        'rpc.loadEventCheckInCount',
+        () => _client.rpc(
+          'load_event_check_in_count',
           params: {'requested_event_id': eventId},
         ),
         parameters: {'eventId': eventId},
