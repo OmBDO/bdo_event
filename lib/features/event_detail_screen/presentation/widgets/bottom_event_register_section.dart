@@ -1,10 +1,12 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/pages/registered_event_page.dart';
+import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +32,9 @@ class BottomEventRegisterSection extends StatelessWidget {
     final cubit = context.read<EventDetailCubit>();
     final bool isFull =
         event.capacity != null && event.attendeeCount >= event.capacity!;
+    final bool isPastRegistrationDeadline =
+      event.registrationDeadline != null &&
+      !DateTime.now().isBefore(event.registrationDeadline!);
 
     return BlocBuilder<EventDetailCubit, EventDetailState>(
       bloc: cubit,
@@ -55,12 +60,15 @@ class BottomEventRegisterSection extends StatelessWidget {
           buttonAction = () async {
             await Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => RegisteredEventPage(event: event),
+                builder: (_) => BlocProvider(
+                  create: (_) => getIt<RegisteredEventCubit>(),
+                  child: RegisteredEventPage(event: event),
+                ),
               ),
             );
             if (!context.mounted) return;
             cubit.checkRegistration(event);
-            context.read<EventScreenCubit>().load();
+            context.read<EventScreenCubit>().load(force: true);
             context.read<CalendarScreenCubit>().loadRegistrations();
           };
         } else if (!event.isAvailable) {
@@ -73,6 +81,11 @@ class BottomEventRegisterSection extends StatelessWidget {
           statusColor = Colors.red.shade700;
           buttonText = AppText.fullyBooked;
           buttonAction = null;
+        } else if (isPastRegistrationDeadline) {
+          statusText = AppText.registrationClosed;
+          statusColor = textGrey;
+          buttonText = AppText.registrationClosed;
+          buttonAction = null;
         } else {
           // Action mapping: Fires real booking updates through the secondary repository
           buttonAction = () async {
@@ -80,7 +93,7 @@ class BottomEventRegisterSection extends StatelessWidget {
             if (!context.mounted) return;
 
             if (error == null) {
-              context.read<EventScreenCubit>().load();
+              context.read<EventScreenCubit>().load(force: true);
               context.read<CalendarScreenCubit>().loadRegistrations();
             }
 

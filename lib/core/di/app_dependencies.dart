@@ -132,8 +132,8 @@ void configureDependencies() {
   getIt.registerSingleton<CalendarScreenCubit>(
     CalendarScreenCubit(loadRegisteredEvents: getIt(), authRepository: getIt()),
   );
-  getIt.registerSingleton<EventDetailCubit>(
-    EventDetailCubit(
+  getIt.registerFactory<EventDetailCubit>(
+    () => EventDetailCubit(
       registerForEvent: getIt(),
       cancelEventRegistration: getIt(),
       eventStore: getIt(),
@@ -154,13 +154,14 @@ void configureDependencies() {
   getIt.registerSingleton<ProfileScreenCubit>(
     ProfileScreenCubit(authRepository: getIt()),
   );
-  getIt.registerSingleton<RegisteredEventCubit>(
-    RegisteredEventCubit(
+  getIt.registerFactory<RegisteredEventCubit>(
+    () => RegisteredEventCubit(
       cancelRegisteredEvent: getIt(),
       authRepository: getIt(),
       eventStore: getIt(),
     ),
   );
+
   getIt.registerSingleton<WatcherScanCubit>(
     WatcherScanCubit(
       validateRegistration: getIt(),

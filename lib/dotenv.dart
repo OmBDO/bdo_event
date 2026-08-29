@@ -12,21 +12,27 @@ class DotEnvInitialization {
 
   /// Loads configuration safely. Returns null if parameters are invalid or missing.
   static Future<DotEnvInitialization?> initialize() async {
+    const definedUrl = String.fromEnvironment('SUPABASE_URL');
+    const definedKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
     try {
-      // Load environment assets from filesystem storage
-      await dotenv.load(fileName: ".env");
-
-      final url = dotenv.maybeGet('SUPABASE_URL') ?? '';
-      final key = dotenv.maybeGet('SUPABASE_ANON_KEY') ?? '';
-
-      // Terminate if security definitions are blank
-      if (url.isEmpty || key.isEmpty) {
-        return null;
+      if (definedUrl.trim().isEmpty || definedKey.trim().isEmpty) {
+        await dotenv.load(fileName: '.env');
       }
+
+        final url = (definedUrl.trim().isNotEmpty
+              ? definedUrl
+              : dotenv.maybeGet('SUPABASE_URL') ?? '')
+          .trim();
+        final key = (definedKey.trim().isNotEmpty
+              ? definedKey
+              : dotenv.maybeGet('SUPABASE_ANON_KEY') ?? '')
+          .trim();
+
+      if (url.isEmpty || key.isEmpty) return null;
 
       return DotEnvInitialization._(supabaseUrl: url, supabaseAnonKey: key);
     } catch (_) {
-      // Catch empty file anomalies or bundle missing crashes
       return null;
     }
   }

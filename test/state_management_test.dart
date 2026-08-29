@@ -128,6 +128,67 @@ void main() {
     expect(store.validationCalls, 1);
     await cubit.close();
   });
+
+  test('watcher dashboard loads aggregate counts without attendee profiles', () async {
+    final store = FakeEventStore()
+      ..attendanceCount = 12
+      ..checkedInCount = 4;
+    final repository = WatcherRepository(WatcherRemoteDataSourceImpl(store));
+
+    final dashboard = await repository.loadDashboard(event.id);
+
+    expect(dashboard.expectedCount, 12);
+    expect(dashboard.checkedInCount, 4);
+    expect(store.attendanceCountCalls, 1);
+    expect(store.attendeeCalls, 0);
+  });
+
+  test('event attendance ignores a stale response from an older request', () async {
+    final firstResult = Completer<int>();
+    final secondResult = Completer<int>();
+    final store = FakeEventStore()
+      ..attendanceResults['event-1'] = firstResult.future
+      ..attendanceResults['event-2'] = secondResult.future;
+    final cubit = EventDetailCubit(
+      registerForEvent: RegisterForEvent(FakeRegistrationRepository()),
+      cancelEventRegistration: CancelEventRegistration(FakeRegistrationRepository()),
+      eventStore: store,
+      authRepository: FakeAuthRepository(),
+    );
+    final firstEvent = event.copyWith(id: 'event-1', creatorId: 'user-1');
+    final secondEvent = event.copyWith(id: 'event-2', creatorId: 'user-1');
+
+    final firstLoad = cubit.loadAttendanceCount(firstEvent);
+    final secondLoad = cubit.loadAttendanceCount(secondEvent);
+    secondResult.complete(2);
+    firstResult.complete(1);
+    await Future.wait([firstLoad, secondLoad]);
+
+    expect(cubit.state.attendanceCount, 2);
+    await cubit.close();
+  });
+
+  test('ticket token ignores a stale response from an older request', () async {
+    final firstResult = Completer<String?>();
+    final secondResult = Completer<String?>();
+    final store = FakeEventStore()
+      ..tokenResults['event-1'] = firstResult.future
+      ..tokenResults['event-2'] = secondResult.future;
+    final cubit = RegisteredEventCubit(
+      cancelRegisteredEvent: CancelRegisteredEvent(FakeRegisteredEventRepository()),
+      authRepository: FakeAuthRepository(),
+      eventStore: store,
+    );
+
+    final firstLoad = cubit.loadToken('event-1');
+    final secondLoad = cubit.loadToken('event-2');
+    secondResult.complete('token-2');
+    firstResult.complete('token-1');
+    await Future.wait([firstLoad, secondLoad]);
+
+    expect(cubit.state.registrationToken, 'token-2');
+    await cubit.close();
+  });
 }
 
 class FakeAuthRepository implements AuthRepositoryContract {
@@ -224,7 +285,13 @@ class FakeRegisteredEventRepository implements RegisteredEventRepositoryContract
 
 class FakeEventStore implements EventStore {
   Future<Map<String, dynamic>?> validationResult = Future.value(null);
+  final Map<String, Future<int>> attendanceResults = {};
+  final Map<String, Future<String?>> tokenResults = {};
   int validationCalls = 0;
+  int attendanceCount = 0;
+  int checkedInCount = 0;
+  int attendanceCountCalls = 0;
+  int attendeeCalls = 0;
 
   @override
   Future<List<Event>> readCreatedEvents() async => const [];
@@ -242,7 +309,8 @@ class FakeEventStore implements EventStore {
   Future<List<Event>> loadRegistrations(String userId) async => const [];
 
   @override
-  Future<void> writeRegistrations(String userId, List<Event> events) async {}
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async =>
+      const {};
 
   @override
   Future<void> activateRegistration(String userId, Event event) async {}
@@ -251,7 +319,8 @@ class FakeEventStore implements EventStore {
   Future<void> revokeRegistration(String userId, String eventId) async {}
 
   @override
-  Future<String?> loadRegistrationToken(String userId, String eventId) async => null;
+  Future<String?> loadRegistrationToken(String userId, String eventId) =>
+      tokenResults[eventId] ?? Future.value(null);
 
   @override
   Future<Map<String, dynamic>?> validateRegistration({
@@ -269,13 +338,19 @@ class FakeEventStore implements EventStore {
   }) async => 'checked_in';
 
   @override
-  Future<int> loadAttendanceCount(String eventId) async => 0;
+  Future<int> loadAttendanceCount(String eventId) {
+    attendanceCountCalls++;
+    return attendanceResults[eventId] ?? Future.value(attendanceCount);
+  }
 
   @override
-  Future<int> loadCheckedInCount(String eventId) async => 0;
+  Future<int> loadCheckedInCount(String eventId) async => checkedInCount;
 
   @override
-  Future<List<EventAttendee>> loadEventAttendees(String eventId) async => [];
+  Future<List<EventAttendee>> loadEventAttendees(String eventId) async {
+    attendeeCalls++;
+    return [];
+  }
 
   @override
   Future<List<AppNotification>> loadNotifications() async => [];

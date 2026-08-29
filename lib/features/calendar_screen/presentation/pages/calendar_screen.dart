@@ -1,10 +1,14 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
 import 'package:bdo_event/core/common/calendar_element/element/calendar_element.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
+import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_state.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/widgets/search_bar_widget.dart';
 import 'package:bdo_event/features/registered_screen/presentation/pages/registered_event_page.dart';
+import 'package:bdo_event/features/main_screen/domain/entities/main_tab.dart';
+import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
@@ -67,16 +71,84 @@ class _CalendarScreenView extends StatelessWidget {
                     }).toList();
 
                     if (visibleEvents.isEmpty) {
-                      return Padding(
-                        padding: EdgeInsets.fromLTRB(24, 20, 24, 30),
-                        child: Text(
-                          state.events.isEmpty
-                              ? AppText.noRegisteredEvents
-                              : AppText.noMatchingEvents,
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w600,
+                      final hasRegistrations = state.events.isNotEmpty;
+                      return Container(
+                        margin: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                        padding: const EdgeInsets.fromLTRB(24, 30, 24, 26),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(26),
+                          border: Border.all(
+                            color: const Color(0xFFD9E5F0),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF52718A).withValues(alpha: 0.12),
+                              blurRadius: 18,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 74,
+                              height: 74,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE5F0FA),
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              child: Icon(
+                                hasRegistrations
+                                    ? Icons.search_off_rounded
+                                    : Icons.event_available_rounded,
+                                size: 36,
+                                color: const Color(0xFF3B6989),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              hasRegistrations
+                                  ? 'No events found'
+                                  : 'Your calendar is ready',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Color(0xFF173D59),
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              hasRegistrations
+                                  ? AppText.noMatchingEvents
+                                  : 'Registered events will appear here so you can find every ticket in one place.',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Color(0xFF667A86),
+                                fontSize: 14,
+                                height: 1.45,
+                              ),
+                            ),
+                            if (!hasRegistrations) ...[
+                              const SizedBox(height: 22),
+                              FilledButton.icon(
+                                onPressed: () => context
+                                    .read<MainScreenCubit>()
+                                    .selectTab(MainTab.events),
+                                icon: const Icon(Icons.explore_outlined),
+                                label: const Text('Explore events'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: const Color(0xFF173D59),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                    vertical: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       );
                     }
@@ -94,13 +166,22 @@ class _CalendarScreenView extends StatelessWidget {
                         return Material(
                           color: Colors.transparent,
                           child: ListTile(
-                            onTap: () {
-                              Navigator.of(context).push(
+                            onTap: () async {
+                              await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) =>
-                                      RegisteredEventPage(event: event),
+                                        BlocProvider(
+                                          create: (_) =>
+                                              getIt<RegisteredEventCubit>(),
+                                          child: RegisteredEventPage(event: event),
+                                        ),
                                 ),
                               );
+                              if (context.mounted) {
+                                await context
+                                    .read<CalendarScreenCubit>()
+                                    .loadRegistrations();
+                              }
                             },
                             title: Text(
                               event.title,

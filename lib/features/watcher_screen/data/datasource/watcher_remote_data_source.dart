@@ -36,11 +36,11 @@ class WatcherRemoteDataSourceImpl implements WatcherRemoteDataSource {
   Future<ScanDashboard> loadDashboard(String eventId) async {
     final counts = await Future.wait([
       _store.loadCheckedInCount(eventId),
-      _store.loadEventAttendees(eventId),
+      _store.loadAttendanceCount(eventId),
     ]);
     return ScanDashboard(
       checkedInCount: counts[0] as int,
-      expectedCount: (counts[1] as List).length,
+      expectedCount: counts[1] as int,
     );
   }
 }

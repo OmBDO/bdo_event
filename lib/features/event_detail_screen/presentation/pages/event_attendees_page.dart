@@ -2,6 +2,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
 
 class EventAttendeesPage extends StatelessWidget {
@@ -17,7 +18,7 @@ class EventAttendeesPage extends StatelessWidget {
         future: getIt<EventStore>().loadEventAttendees(event.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const AttendeeListShimmer();
           }
           if (snapshot.hasError) {
             return const Center(child: Text('Unable to load attendees'));

@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/repositories/registration_repository.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -12,7 +12,7 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
   });
 
   final RegistrationDataSource _dataSource;
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   /// 1. Verifies if the logged-in user is registered for a specific event
   @override
@@ -34,6 +34,11 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
       return AppText.eventNoLongerAvailable;
     }
 
+    if (event.registrationDeadline != null &&
+        !DateTime.now().isBefore(event.registrationDeadline!)) {
+      return AppText.registrationDeadlinePassed;
+    }
+
     if (await isUserRegistered(event.id)) {
       return AppText.alreadyRegistered;
     }
@@ -49,7 +54,13 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
 
     try {
       await _dataSource.activate(user.id, event);
-    } on LocalStorageException {
+    } on LocalStorageException catch (error) {
+      if (error.message == 'Event has reached its capacity') {
+        return AppText.eventAtCapacity;
+      }
+      if (error.message == 'Registration for this event has closed') {
+        return AppText.registrationDeadlinePassed;
+      }
       return AppText.unableToSaveRegistration;
     }
     return null;

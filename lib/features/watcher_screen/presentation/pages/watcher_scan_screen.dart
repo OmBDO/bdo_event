@@ -70,9 +70,17 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
         }
       },
       child: BlocBuilder<WatcherScanCubit, WatcherScanState>(
-        builder: (context, state) => Scaffold(
-          appBar: AppBar(title: const Text(AppText.scanRegistration)),
-          body: Column(
+        builder: (context, state) {
+          final currentScan = state.history
+              .where((entry) => entry.status == 'Ready to check in')
+              .firstOrNull;
+          final pendingCount = state.history
+              .where((entry) => entry.status == 'Ready to check in')
+              .length;
+
+          return Scaffold(
+            appBar: AppBar(title: const Text(AppText.scanRegistration)),
+            body: Column(
             children: [
               ScannerDashboard(
                 checkedInCount: state.checkedInCount,
@@ -132,9 +140,25 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: Text(
-                  state.message ?? AppText.scanRegistrationPrompt,
-                  textAlign: TextAlign.center,
+                child: state.status == WatcherScanStatus.valid && currentScan != null
+                    ? Column(
+                        children: [
+                          const Text(
+                            'Pending check-in',
+                            style: TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            currentScan.displayName ?? 'Unknown attendee',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        state.message ?? AppText.scanRegistrationPrompt,
+                        textAlign: TextAlign.center,
+                      ),
                 ),
               ),
               Padding(
@@ -144,9 +168,11 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                   enabled: state.status == WatcherScanStatus.idle,
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
-                    labelText: 'Enter registration code',
-                    hintText: 'Paste the QR text here',
-                    border: const OutlineInputBorder(),
+                    labelText: AppText.enterRegistrationCode,
+                    hintText: AppText.pasteRegistrationCode,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     suffixIcon: IconButton(
                       tooltip: 'Validate registration code',
                       icon: const Icon(Icons.arrow_forward),
@@ -159,24 +185,95 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              if (state.status != WatcherScanStatus.idle)
-                FilledButton.icon(
-                  onPressed: state.status == WatcherScanStatus.checkingIn
-                      ? null
-                      : state.status == WatcherScanStatus.valid
-                      ? () => context.read<WatcherScanCubit>().checkIn()
-                      : context.read<WatcherScanCubit>().reset,
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: Text(
-                    state.status == WatcherScanStatus.valid
-                        ? AppText.checkIn
-                        : AppText.scanAgain,
+              if (pendingCount > 1)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        '$pendingCount attendees waiting',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 8),
+                      FilledButton(
+                        onPressed: state.status == WatcherScanStatus.checkingIn
+                            ? null
+                            : () => context.read<WatcherScanCubit>().checkInAll(),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text('Confirm all ($pendingCount)'),
+                      ),
+                    ],
+                  ),
+                ),
+              if (state.status == WatcherScanStatus.valid)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      FilledButton(
+                        onPressed: state.status == WatcherScanStatus.checkingIn
+                            ? null
+                            : () => context.read<WatcherScanCubit>().checkIn(),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(AppText.checkIn),
+                      ),
+                      const SizedBox(height: 8),
+                      FilledButton(
+                        onPressed: () => context.read<WatcherScanCubit>().reset(),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(AppText.scanAgain),
+                      ),
+                    ],
+                  ),
+                )
+              else if (state.status != WatcherScanStatus.idle)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: context.read<WatcherScanCubit>().reset,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text(AppText.scanAgain),
+                    ),
                   ),
                 ),
               const SizedBox(height: 20),
             ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

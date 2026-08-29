@@ -51,6 +51,12 @@ reactivate them. The cancelled registration QR therefore cannot be accepted
 as an active registration. Re-registration with a new per-registration QR
 token is reserved for the watcher validation slice.
 
+Event creators can optionally enable a seat limit while creating or editing an
+event. The configured `capacity` is stored in the event payload and enforced
+by the server-side registration RPC using the count of active registrations.
+The setting is disabled by default, and registrations are rejected once the
+active count reaches the configured capacity.
+
 A new Flutter project.
 
 ## Getting Started

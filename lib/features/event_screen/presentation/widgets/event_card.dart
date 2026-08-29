@@ -62,8 +62,18 @@ class EventCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: const Color(0xCC111827),
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.72),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.28),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Text(
                     event.date,
@@ -76,97 +86,34 @@ class EventCard extends StatelessWidget {
                 ),
               ),
 
-              if (onUpdate != null && onDelete != null)
-                Positioned(
-                  top: 54,
-                  right: 12,
-                  child: PopupMenuButton<String>(
-                    tooltip: AppText.manageEvent,
-                    onSelected: (value) {
-                      if (value == 'update') onUpdate!();
-                      if (value == 'delete') onDelete!();
-                    },
-                    itemBuilder: (context) => const [
-                      PopupMenuItem(
-                        value: 'update',
-                        child: Text(AppText.update),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Text(AppText.delete),
-                      ),
-                    ],
-                    child: const CircleAvatar(
-                      radius: 18,
-                      backgroundColor: Colors.white70,
-                      child: Icon(Icons.more_horiz, color: Colors.black87),
-                    ),
-                  ),
-                ),
+              // if (onUpdate != null && onDelete != null)
+              //   Positioned(
+              //     top: 54,
+              //     right: 12,
+              //     child: PopupMenuButton<String>(
+              //       tooltip: AppText.manageEvent,
+              //       onSelected: (value) {
+              //         if (value == 'update') onUpdate!();
+              //         if (value == 'delete') onDelete!();
+              //       },
+              //       itemBuilder: (context) => const [
+              //         PopupMenuItem(
+              //           value: 'update',
+              //           child: Text(AppText.update),
+              //         ),
+              //         PopupMenuItem(
+              //           value: 'delete',
+              //           child: Text(AppText.delete),
+              //         ),
+              //       ],
+              //       child: const CircleAvatar(
+              //         radius: 18,
+              //         backgroundColor: Colors.white70,
+              //         child: Icon(Icons.more_horiz, color: Colors.black87),
+              //       ),
+              //     ),
+              //   ),
 
-              // Floating Attending Avatars (Bottom Left Overlapping Border)
-              Positioned(
-                bottom: -16,
-                left: 16,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 22,
-                        width: (3 * 16.0) + 6.0,
-                        child: Stack(
-                          children: [
-                            // 🚀 FIXED: Added valid endpoint URL paths instead of 'https://pravatar.cc'
-                            Positioned(
-                              left: 0,
-                              child: _buildAvatar(
-                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqIGGrBSRv1I4gAHcESlYGtuN8r3SchvJZeoOMK6yDW23iC7BRAEfK0RE&s=10',
-                              ),
-                            ),
-                            Positioned(
-                              left: 16,
-                              child: _buildAvatar(
-                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAfNQXtUUS81yEEeZXXvY4Ux-48HfUCGQq_E1x6PISTyzhVfeGMLtMWjYy&s=10',
-                              ),
-                            ),
-                            Positioned(
-                              left: 32,
-                              child: _buildAvatar(
-                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMHIN_pWELurJc6QlHWpwVAQ47ADzg3MqBLRupl9r43wzqyIgbF0YeoSfj&s=10',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        '99+',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
 
@@ -225,6 +172,33 @@ class EventCard extends StatelessWidget {
                             ),
                           ),
                         ],
+
+                        if (event.attendeeCount > 0)
+                          Positioned(
+                            left: 12,
+                            bottom: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xCC111827),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.72),
+                                ),
+                              ),
+                              child: Text(
+                                '${event.attendeeCount} attending',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
                       ),
                     ],
                   ),
@@ -267,21 +241,4 @@ class EventCard extends StatelessWidget {
     );
   }
 
-  // 🚀 FIXED: Completed the broken method implementation at the end of your snippet
-  Widget _buildAvatar(String url) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 1.5),
-      ),
-      child: CircleAvatar(
-        radius: 11,
-        backgroundColor: Colors.grey[300],
-        backgroundImage: NetworkImage(url),
-        onBackgroundImageError: (exception, stackTrace) {
-          // Silent catch for network dropping
-        },
-      ),
-    );
-  }
 }

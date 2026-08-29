@@ -5,6 +5,7 @@ import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
+import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,8 +26,8 @@ class _MyEventScreenState extends State<MyEventScreen> {
     _loadEvents();
   }
 
-  void _loadEvents() {
-    context.read<EventScreenCubit>().load();
+  void _loadEvents({bool force = false}) {
+    context.read<EventScreenCubit>().load(force: force);
   }
 
   // 5. Trigger a reload when coming back from Create/Edit screen
@@ -39,7 +40,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
       await Navigator.of(context)
           .push(MaterialPageRoute(builder: (_) => const CategoryEventPage()));
     }
-    _loadEvents(); // Refresh data from backend when user navigates back
+    _loadEvents(force: true); // Refresh after a create/edit operation
   }
 
   Future<void> _confirmDelete(Event event) async {
@@ -81,7 +82,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
             child: Builder(
               builder: (context) {
                 if (state.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const EventListShimmer();
                 }
 
                 if (state.error != null) {

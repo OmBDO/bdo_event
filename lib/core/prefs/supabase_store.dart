@@ -16,7 +16,7 @@ abstract interface class EventStore {
 
   Future<List<Event>> loadRegistrations(String userId);
 
-  Future<void> writeRegistrations(String userId, List<Event> events);
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds);
 
   Future<void> activateRegistration(String userId, Event event);
 
@@ -170,29 +170,21 @@ class SupabaseStore implements EventStore {
   }
 
   @override
-  Future<void> writeRegistrations(String userId, List<Event> events) async {
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async {
+    if (eventIds.isEmpty) return const {};
     try {
-      await _logger.track(
-        'registrations.deleteForUser',
-        () => _client
-            .from(AppDatabase.eventRegistrationsTable)
-            .delete()
-            .eq(AppDatabase.userId, userId),
-        parameters: {'userId': userId},
+      final rows = await _logger.track(
+        'rpc.loadEventRegistrationCounts',
+        () => _client.rpc(
+          'load_event_registration_counts',
+          params: {'requested_event_ids': eventIds},
+        ),
+        parameters: {'eventIds': eventIds},
       );
-      if (events.isEmpty) return;
-      await _logger.track(
-        'registrations.insertBatch',
-        () => _client.from(AppDatabase.eventRegistrationsTable).insert([
-          for (final event in events)
-            {
-              AppDatabase.userId: userId,
-              AppDatabase.eventId: event.id,
-              AppDatabase.payload: event.toJson(),
-            },
-        ]),
-        parameters: {'userId': userId, 'count': events.length},
-      );
+      return {
+        for (final row in rows as List<dynamic>)
+          (row['eventId'] as String): (row['registrationCount'] as num).toInt(),
+      };
     } on Object {
       throw const LocalStorageException();
     }
@@ -212,6 +204,8 @@ class SupabaseStore implements EventStore {
         ),
         parameters: {'eventId': event.id, 'userId': userId},
       );
+    } on supabase.PostgrestException catch (error) {
+      throw LocalStorageException(error.message);
     } on Object {
       throw const LocalStorageException();
     }
@@ -447,5 +441,7 @@ class SupabaseStore implements EventStore {
 }
 
 class LocalStorageException implements Exception {
-  const LocalStorageException();
+  const LocalStorageException([this.message]);
+
+  final String? message;
 }

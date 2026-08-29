@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:ui' show ImageFilter;
 
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -153,6 +155,14 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
     'location': widget.event.location,
   });
 
+  String _manualCode(String token) {
+    final value = utf8
+        .encode('${widget.event.id}|$token')
+        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
+        .join();
+    return 'BDO1$value';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegisteredEventCubit, RegisteredEventState>(
@@ -243,6 +253,19 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         fontSize: 14,
                       ),
                     ),
+                    if (widget.event.startTime != null ||
+                        widget.event.endTime != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        '${widget.event.startTime ?? '--:--'} - ${widget.event.endTime ?? '--:--'}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF2D0C57),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 26),
                     Container(
                       padding: const EdgeInsets.all(14),
@@ -252,10 +275,32 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         border: Border.all(color: const Color(0xFFE8E1E1)),
                       ),
                       child: state.registrationToken == null
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 220,
                               height: 220,
-                              child: Center(child: CircularProgressIndicator()),
+                              child: ImageFiltered(
+                                imageFilter: ImageFilter.blur(
+                                  sigmaX: 5,
+                                  sigmaY: 5,
+                                ),
+                                child: Opacity(
+                                  opacity: 0.55,
+                                  child: QrImageView(
+                                    data: 'bdo-event-ticket-preparing',
+                                    version: QrVersions.auto,
+                                    size: 220,
+                                    eyeStyle: const QrEyeStyle(
+                                      eyeShape: QrEyeShape.square,
+                                      color: Color(0xFF2D0C57),
+                                    ),
+                                    dataModuleStyle: const QrDataModuleStyle(
+                                      dataModuleShape: QrDataModuleShape.square,
+                                      color: Color(0xFF2D0C57),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                  ),
+                                ),
+                              ),
                             )
                           : QrImageView(
                               data: _qrData(state.registrationToken!),
@@ -273,6 +318,78 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                             ),
                     ),
                     const SizedBox(height: 18),
+                    if (state.registrationToken != null) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          AppText.registrationCode,
+                          style: const TextStyle(
+                            color: Color(0xFF6F607A),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF8F2),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFF0C9C4)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: SelectableText(
+                                _manualCode(state.registrationToken!),
+                                style: const TextStyle(
+                                  color: Color(0xFF2D0C57),
+                                  fontFamily: 'monospace',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: AppText.copyRegistrationCode,
+                              icon: const Icon(Icons.copy_rounded),
+                              onPressed: () async {
+                                await Clipboard.setData(
+                                  ClipboardData(
+                                    text: _qrData(state.registrationToken!),
+                                  ),
+                                );
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(AppText.registrationCodeCopied),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Give this code to event staff if the QR code cannot be scanned.',
+                          style: TextStyle(
+                            color: Color(0xFF6F607A),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 10),
                     const Text(
                       AppText.showQrCode,
                       textAlign: TextAlign.center,
@@ -350,19 +467,23 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         onPressed: state.isCancelling
                             ? null
                             : _confirmCancellation,
-                        icon: state.isCancelling
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.delete_outline_rounded),
-                        label: Text(
-                          state.isCancelling
-                              ? AppText.cancelling
-                              : AppText.cancelRegistrationButton,
+                        icon: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: Icon(
+                            state.isCancelling
+                                ? Icons.flight_takeoff_rounded
+                                : Icons.delete_outline_rounded,
+                            key: ValueKey(state.isCancelling),
+                          ),
+                        ),
+                        label: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: Text(
+                            state.isCancelling
+                                ? 'Ticket is departing...'
+                                : AppText.cancelRegistrationButton,
+                            key: ValueKey(state.isCancelling),
+                          ),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFFB64234),
@@ -371,6 +492,17 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         ),
                       ),
                     ),
+                    if (state.error != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        state.error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFB64234),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -3,7 +3,9 @@ import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/features/calendar_screen/data/repositories/registration_service.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
+import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
+import 'package:bdo_event/features/event_detail_screen/data/repositories/registered_event_repository.dart';
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -23,44 +25,66 @@ void main() {
     );
   });
 
-  test(
-    'registration service rejects unavailable, full, and duplicate events',
-    () async {
-      final service = RegistrationService(store);
+  test('active registration repository enforces registration policy', () async {
+    final repository = RegisteredEventRepository(
+      dataSource: RegistrationRemoteDataSource(store),
+      authRepository: FakeAuthRepository(),
+    );
 
-      final unavailable = await service.register(
-        'user-1',
-        event.copyWith(isAvailable: false),
-      );
-      expect(
-        unavailable.error,
-        'This event is no longer available for registration',
-      );
+    final unavailable = await repository.registerEvent(
+      event.copyWith(isAvailable: false),
+    );
+    expect(unavailable, 'This event is no longer available for registration');
 
-      final full = await service.register(
-        'user-1',
-        event.copyWith(attendeeCount: 2),
-      );
-      expect(full.error, 'This event has reached its capacity');
+    final full = await repository.registerEvent(
+      event.copyWith(attendeeCount: 2),
+    );
+    expect(full, 'This event has reached its capacity');
 
-      final first = await service.register('user-1', event);
-      expect(first.error, isNull);
-      expect(first.events, hasLength(1));
+    expect(await repository.registerEvent(event), isNull);
+    expect(await repository.registerEvent(event), 'You are already registered for this event');
+  });
 
-      final duplicate = await service.register('user-1', event);
-      expect(duplicate.error, 'You are already registered for this event');
-    },
-  );
+  test('event JSON preserves an optional deadline as an instant', () {
+    final deadline = DateTime(2026, 9, 1, 14, 30);
+    final restored = Event.fromJson(
+      event.copyWith(registrationDeadline: deadline).toJson(),
+    );
 
-  test('registration service cancels a registered event', () async {
-    final service = RegistrationService(store);
-    await service.register('user-1', event);
+    expect(restored.registrationDeadline, deadline.toUtc());
+  });
 
-    final result = await service.cancel('user-1', event);
+  test('event JSON preserves event start and end times', () {
+    final restored = Event.fromJson(
+      event.copyWith(startTime: '09:30', endTime: '17:00').toJson(),
+    );
 
-    expect(result.error, isNull);
-    expect(result.events, isEmpty);
-    expect(await service.load('user-1'), isEmpty);
+    expect(restored.startTime, '09:30');
+    expect(restored.endTime, '17:00');
+  });
+
+  test('active registration repository rejects a passed deadline', () async {
+    final repository = RegisteredEventRepository(
+      dataSource: RegistrationRemoteDataSource(store),
+      authRepository: FakeAuthRepository(),
+    );
+
+    final error = await repository.registerEvent(
+      event.copyWith(registrationDeadline: DateTime.now().subtract(const Duration(minutes: 1))),
+    );
+
+    expect(error, 'Registration for this event has closed');
+  });
+
+  test('active registration repository revokes a registration', () async {
+    final repository = RegisteredEventRepository(
+      dataSource: RegistrationRemoteDataSource(store),
+      authRepository: FakeAuthRepository(),
+    );
+    await repository.registerEvent(event);
+
+    expect(await repository.cancelRegistration(event), isNull);
+    expect(await repository.isUserRegistered(event.id), isFalse);
   });
 
   test('event service preserves ownership metadata during updates', () async {
@@ -85,12 +109,68 @@ void main() {
     expect(updated.events.single.organizerName, 'Admin');
   });
 
+  test('event service loads active registration counts into events', () async {
+    final service = EventRemoteDataSource(store);
+    final user = User(
+      id: 'user-1',
+      displayName: 'Test User',
+      email: 'test@example.com',
+      createdAt: DateTime(2026),
+    );
+
+    await service.create(event, user);
+    await store.activateRegistration(user.id, event);
+
+    final loaded = await service.loadEvents();
+
+    expect(loaded.single.attendeeCount, 1);
+  });
+
   test('event service reports updates for missing events', () async {
     final result = await EventRemoteDataSource(store).update(event);
 
     expect(result.events, isEmpty);
     expect(result.error, 'Event could not be found');
   });
+}
+
+class FakeAuthRepository implements AuthRepositoryContract {
+  final User user = User(
+    id: 'user-1',
+    displayName: 'Test User',
+    email: 'test@example.com',
+    roles: {UserRole.user},
+    createdAt: DateTime(2026),
+  );
+
+  @override
+  User get currentUser => user;
+
+  @override
+  bool can(UserPermission permission) => user.hasPermission(permission);
+
+  @override
+  bool canUpdate(Event event) => false;
+
+  @override
+  bool canDelete(Event event) => false;
+
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole requestedRole,
+  }) async => null;
+
+  @override
+  Future<String?> login({required String email, required String password}) async => null;
+
+  @override
+  Future<void> logout() async {}
 }
 
 class InMemoryEventStore implements EventStore {
@@ -122,8 +202,14 @@ class InMemoryEventStore implements EventStore {
   ];
 
   @override
-  Future<void> writeRegistrations(String userId, List<Event> events) async {
-    registrations[userId] = [...events];
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async {
+    return {
+      for (final eventId in eventIds)
+        eventId: registrations.values
+            .expand((events) => events)
+            .where((event) => event.id == eventId)
+            .length,
+    };
   }
 
   @override

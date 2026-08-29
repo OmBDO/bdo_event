@@ -24,8 +24,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   final DeleteEvent _deleteEvent;
   final AuthRepositoryContract _authRepository;
 
-  Future<void> load() async {
+  Future<void> load({bool force = false}) async {
     if (isClosed) return;
+    if (!force && (state.hasLoaded || state.isLoading)) return;
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final events = await _loadEvents();
@@ -41,6 +42,7 @@ class EventScreenCubit extends Cubit<EventScreenState> {
                 .map((event) => event.id)
                 .toSet(),
             isLoading: false,
+            hasLoaded: true,
           ),
         );
       }
@@ -88,14 +90,41 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   }
 
   Future<String?> delete(Event event) async {
+    if (state.deletingEventIds.contains(event.id)) return null;
+    emit(
+      state.copyWith(
+        events: state.events.where((current) => current.id != event.id).toList(),
+        deletingEventIds: {...state.deletingEventIds, event.id},
+        clearError: true,
+      ),
+    );
     try {
       final result = await _deleteEvent(event);
       if (!isClosed) {
-        emit(state.copyWith(events: result.events, error: result.error));
+        final remainingDeletes = {...state.deletingEventIds}..remove(event.id);
+        final nextEvents = result.error == null
+            ? result.events
+            : [...state.events, event];
+        emit(
+          state.copyWith(
+            events: nextEvents,
+            deletingEventIds: remainingDeletes,
+            error: result.error,
+          ),
+        );
       }
       return result.error;
     } on Object {
-      if (!isClosed) emit(state.copyWith(error: AppText.unableToDeleteEvent));
+      if (!isClosed) {
+        final remainingDeletes = {...state.deletingEventIds}..remove(event.id);
+        emit(
+          state.copyWith(
+            events: [...state.events, event],
+            deletingEventIds: remainingDeletes,
+            error: AppText.unableToDeleteEvent,
+          ),
+        );
+      }
       return AppText.unableToDeleteEvent;
     }
   }

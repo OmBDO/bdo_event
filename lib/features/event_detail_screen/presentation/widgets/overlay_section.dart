@@ -5,6 +5,7 @@ import 'package:bdo_event/features/event_detail_screen/presentation/widgets/even
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -195,6 +196,24 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             ),
             const Gap(14),
 
+            if (widget.widget.event.startTime != null ||
+                widget.widget.event.endTime != null)
+              Row(
+                children: [
+                  Icon(Icons.schedule_outlined, color: widget.textGrey, size: 18),
+                  const Gap(8),
+                  Text(
+                    '${widget.widget.event.startTime ?? '--:--'} - ${widget.widget.event.endTime ?? '--:--'}',
+                    style: TextStyle(
+                      color: widget.primaryDark,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            const Gap(14),
+
             // Description Summary Details Text block
             Text(
               AppText.eventDetailDescription,
@@ -226,6 +245,9 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                     widget.event.id,
                   ),
                   builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const AttendeeSummaryShimmer();
+                    }
                     final attendees = snapshot.data ?? const <EventAttendee>[];
                     return Row(
                       children: [

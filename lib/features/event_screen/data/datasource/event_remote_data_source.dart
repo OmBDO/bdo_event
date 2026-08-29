@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
 abstract interface class EventDataSource {
   Future<List<Event>> loadEvents();
@@ -15,7 +16,16 @@ class EventRemoteDataSource implements EventDataSource {
   final EventStore _store;
 
   @override
-  Future<List<Event>> loadEvents() => _store.readCreatedEvents();
+  Future<List<Event>> loadEvents() async {
+    final events = await _store.readCreatedEvents();
+    final counts = await _store.loadRegistrationCounts(
+      events.map((event) => event.id).toList(),
+    );
+    return [
+      for (final event in events)
+        event.copyWith(attendeeCount: counts[event.id] ?? 0),
+    ];
+  }
 
   Future<List<Event>> load() => loadEvents();
 
@@ -46,6 +56,8 @@ class EventRemoteDataSource implements EventDataSource {
       id: event.id,
       title: event.title,
       date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
       location: event.location,
       locationId: event.locationId,
       locationAddress: event.locationAddress,
@@ -56,6 +68,7 @@ class EventRemoteDataSource implements EventDataSource {
       isAvailable: event.isAvailable,
       attendeeCount: event.attendeeCount,
       capacity: event.capacity,
+      registrationDeadline: event.registrationDeadline,
       organizerName: existing.organizerName,
       creatorId: existing.creatorId,
       createdAt: existing.createdAt,
@@ -78,6 +91,7 @@ class EventRemoteDataSource implements EventDataSource {
     } on LocalStorageException {
       return const EventOperationResult([], 'Unable to delete the event');
     }
+    await deleteStoredImage(event.imageUrl);
     return EventOperationResult(await loadEvents());
   }
 }
