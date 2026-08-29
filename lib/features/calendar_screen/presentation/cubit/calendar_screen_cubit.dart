@@ -1,4 +1,4 @@
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_state.dart';
 import 'package:bdo_event/features/calendar_screen/domain/usecases/load_registered_events.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,7 +10,7 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   }) : super(const CalendarScreenState());
 
   final LoadRegisteredEvents _loadRegisteredEvents;
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   Future<void> loadRegistrations() async {
     final userId = _authRepository.currentUser?.id;

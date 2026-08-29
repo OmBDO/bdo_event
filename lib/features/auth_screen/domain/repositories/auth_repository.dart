@@ -3,6 +3,12 @@ import 'package:bdo_event/core/model/user_model/user_model.dart';
 abstract interface class AuthRepositoryContract {
   User? get currentUser;
 
+  bool can(UserPermission permission);
+
+  bool canUpdate(Event event);
+
+  bool canDelete(Event event);
+
   Future<void> initialize();
 
   Future<String?> register({
