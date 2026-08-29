@@ -13,6 +13,11 @@ class AuthRemoteDataSource {
 
   supabase.User? get currentUser => _client.auth.currentUser;
 
+  Future<supabase.User?> refreshSession() async {
+    final response = await _client.auth.refreshSession();
+    return response.user;
+  }
+
   Future<supabase.AuthResponse> signUp({
     required String email,
     required String password,

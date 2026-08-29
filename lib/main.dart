@@ -32,6 +32,7 @@ Future<void> main() async {
   );
   configureDependencies();
   await getIt<AuthScreenCubit>().checkActiveSession();
+  getIt<ProfileScreenCubit>().refresh();
   await getIt<CalendarScreenCubit>().loadRegistrations();
   getIt<MainScreenCubit>().finishLoading();
   runApp(const MyApp());

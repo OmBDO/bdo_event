@@ -9,10 +9,13 @@ class AuthUserDto {
 
   User toEntity() {
     final metadata = user.userMetadata ?? const <String, dynamic>{};
-    final roles = (user.appMetadata['roles'] as List<dynamic>?)
-            ?.map(UserRole.fromStorage)
-            .toSet() ??
-        {UserRole.user};
+    final configuredRoles = user.appMetadata['roles'];
+    final roleValues = configuredRoles is List<dynamic>
+        ? configuredRoles
+        : configuredRoles == null
+        ? const <dynamic>[]
+        : [configuredRoles];
+    final roles = roleValues.map(UserRole.fromStorage).toSet();
     return User(
       id: user.id,
       displayName: metadata['display_name'] as String? ??
@@ -20,7 +23,7 @@ class AuthUserDto {
           user.email?.split('@').first ??
           'User',
       email: user.email ?? '',
-      roles: roles,
+      roles: roles.isEmpty ? {UserRole.user} : roles,
       createdAt: DateTime.tryParse(user.createdAt) ?? DateTime.now(),
       lastSignedInAt: user.lastSignInAt == null
           ? null
