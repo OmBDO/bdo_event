@@ -33,55 +33,6 @@ class _HeaderElementState extends State<HeaderElement> {
   );
 
   final List<Location> locations = [
-    const Location(
-      id: AppLocations.mumbaiZoneOneId,
-      name: AppLocations.mumbai,
-      city: AppLocations.mumbai,
-      country: AppLocations.india,
-      zone: AppLocations.zoneOne,
-    ),
-    const Location(
-      id: AppLocations.bangaloreEastId,
-      name: AppLocations.bangalore,
-      city: AppLocations.bangalore,
-      country: AppLocations.india,
-      zone: AppLocations.east,
-    ),
-    const Location(
-      id: AppLocations.kolkataNorthId,
-      name: AppLocations.kolkata,
-      city: AppLocations.kolkata,
-      country: AppLocations.india,
-      zone: AppLocations.north,
-    ),
-    const Location(
-      id: AppLocations.mumbaiZoneTwoId,
-      name: AppLocations.mumbai,
-      city: AppLocations.mumbai,
-      country: AppLocations.india,
-      zone: AppLocations.zoneTwo,
-    ),
-    const Location(
-      id: AppLocations.bangaloreWestId,
-      name: AppLocations.bangalore,
-      city: AppLocations.bangalore,
-      country: AppLocations.india,
-      zone: AppLocations.west,
-    ),
-    const Location(
-      id: AppLocations.kolkataSouthId,
-      name: AppLocations.kolkata,
-      city: AppLocations.kolkata,
-      country: AppLocations.india,
-      zone: AppLocations.south,
-    ),
-    const Location(
-      id: AppLocations.delhiNcrId,
-      name: AppLocations.delhi,
-      city: AppLocations.delhi,
-      country: AppLocations.india,
-      zone: AppLocations.ncr,
-    ),
     ...LocationCatalog.offices,
   ];
 
