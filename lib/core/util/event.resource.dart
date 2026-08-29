@@ -92,6 +92,8 @@ abstract final class AppText {
   static const registeredEvent = 'REGISTERED EVENT';
   static const myTicket = 'My ticket';
   static const cancelRegistrationQuestion = 'Cancel registration?';
+  static String cancelDescription(String input) =>
+      "Your registration for $input will be removed from My Events.\n\nNote: You can still able to register again, check terms on ⓘ.";
   static const keepRegistration = 'Keep registration';
   static const cancelEvent = 'Cancel event';
   static const aboutQrCode = 'About your QR code';

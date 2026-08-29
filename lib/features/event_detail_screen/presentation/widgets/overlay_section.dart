@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_location_map.dart';
@@ -5,7 +6,6 @@ import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
@@ -13,6 +13,7 @@ class OverlayCurveSection extends StatefulWidget {
   const OverlayCurveSection({
     super.key,
     required this.widget,
+    required this.event,
     required this.textGrey,
     required this.primaryDark,
     required this.mapBgColor,
@@ -20,6 +21,7 @@ class OverlayCurveSection extends StatefulWidget {
   });
 
   final EventDetailPage widget;
+  final Event event;
   final Color textGrey;
   final Color primaryDark;
   final Color mapBgColor;
@@ -37,9 +39,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
     final hasOverflow = attendees.length > visibleAttendees.length;
     final width = visibleAttendees.isEmpty
         ? 28.0
-        : (visibleAttendees.length - 1) * 16.0 +
-            28.0 +
-            (hasOverflow ? 16 : 0);
+        : (visibleAttendees.length - 1) * 16.0 + 28.0 + (hasOverflow ? 16 : 0);
 
     return SizedBox(
       width: width,
@@ -219,33 +219,12 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => EventAttendeesPage(event: widget.event),
-              child: Row(
-                children: [
-                  _buildAvatarStack(),
-                  const Gap(12),
-                  Text(
-                    widget.attendanceCount == null
-                        ? AppText.attend100Plus
-                        : '${widget.attendanceCount} ${AppText.attendees}',
-                    style: TextStyle(
-                      color: widget.primaryDark,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const Spacer(),
-                  CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 10,
-                      color: widget.primaryDark,
-                    ),
                   ),
                 ),
                 child: FutureBuilder<List<EventAttendee>>(
-                  future: getIt<EventStore>().loadEventAttendees(widget.event.id),
+                  future: getIt<EventStore>().loadEventAttendees(
+                    widget.event.id,
+                  ),
                   builder: (context, snapshot) {
                     final attendees = snapshot.data ?? const <EventAttendee>[];
                     return Row(
@@ -257,7 +236,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                               ? '${attendees.length} ${AppText.attendees}'
                               : AppText.attend100Plus,
                           style: TextStyle(
-                            color: primaryDark,
+                            color: widget.primaryDark, // Used widget.primaryDark consistently
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -269,7 +248,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 10,
-                            color: primaryDark,
+                            color: widget.primaryDark,
                           ),
                         ),
                       ],

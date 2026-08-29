@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/check_in_registration.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dashboard.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
@@ -18,7 +19,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
   }) : _validateRegistration = validateRegistration,
        _checkInRegistration = checkInRegistration,
        _loadScanDashboard = loadScanDashboard,
-      super(const WatcherScanState());
+       super(const WatcherScanState());
 
   final ValidateRegistration _validateRegistration;
   final CheckInRegistration _checkInRegistration;
@@ -97,8 +98,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
   Future<void> checkIn() async {
     final eventId = state.eventId;
     final token = state.registrationToken;
-    if (
-        eventId == null ||
+    if (eventId == null ||
         token == null ||
         state.status != WatcherScanStatus.valid ||
         isClosed) {
@@ -106,10 +106,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     }
     emit(state.copyWith(status: WatcherScanStatus.checkingIn));
     try {
-      final result = await _checkInRegistration(
-        token: token,
-        eventId: eventId,
-      );
+      final result = await _checkInRegistration(token: token, eventId: eventId);
       final updatedHistory = state.history.map((entry) {
         if (entry.registrationToken != token) return entry;
         return entry.copyWith(

@@ -55,6 +55,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: BlocBuilder<EventDetailCubit, EventDetailState>(
               builder: (context, state) => OverlayCurveSection(
                 widget: widget,
+                event: widget.event,
                 textGrey: textGrey,
                 primaryDark: primaryDark,
                 mapBgColor: mapBgColor,

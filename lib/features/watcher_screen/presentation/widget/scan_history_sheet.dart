@@ -1,3 +1,4 @@
+import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:flutter/material.dart';
 
@@ -6,12 +7,14 @@ class ScanHistorySheet extends StatelessWidget {
 
   final List<ScanHistoryEntry> history;
 
-  static Future<void> show(BuildContext context, List<ScanHistoryEntry> history) =>
-      showModalBottomSheet<void>(
-        context: context,
-        showDragHandle: true,
-        builder: (context) => ScanHistorySheet(history: history),
-      );
+  static Future<void> show(
+    BuildContext context,
+    List<ScanHistoryEntry> history,
+  ) => showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (context) => ScanHistorySheet(history: history),
+  );
 
   @override
   Widget build(BuildContext context) => SafeArea(
