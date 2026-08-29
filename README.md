@@ -27,9 +27,22 @@ administrator or trusted backend must review that request and assign the
 effective role in Supabase `app_metadata`; approving a request must never be
 implemented by the client.
 
-Run [supabase/schema.sql](supabase/schema.sql) in the Supabase SQL editor before
-using event creation or registration. Row-level security policies restrict
-event mutations to their creator and registrations to their owner.
+The database schema is tracked as the versioned migration
+[20260829000000_initial_schema.sql](supabase/migrations/20260829000000_initial_schema.sql).
+For a project with the Supabase CLI installed, initialize and link the local
+project once, then apply migrations with:
+
+```text
+supabase init
+supabase link --project-ref <your-project-ref>
+supabase db push
+```
+
+For local database development, use `supabase start` and `supabase db reset` to
+apply the migrations to the local Postgres instance. If the CLI is not
+available, run the migration file in the Supabase SQL editor before using event
+creation or registration. Row-level security policies restrict event mutations
+to their creator and registrations to their owner.
 
 Registration cancellation is persisted as a server-side `revoked` status.
 Revoked registrations are excluded from active registration queries, direct

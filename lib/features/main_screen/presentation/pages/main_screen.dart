@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
@@ -39,8 +41,24 @@ class _MainScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
-      builder: (context, profileState) =>
-          BlocBuilder<MainScreenCubit, MainScreenState>(
+      builder: (context, profileState) {
+        final user = profileState.user;
+        final canScan = user?.hasPermission(
+              UserPermission.scanRegistrations,
+            ) ??
+            false;
+        final canCreateEvents = user?.hasPermission(
+              UserPermission.createEvents,
+            ) ??
+            false;
+        developer.log(
+          'auth.frontendPermissions '
+          '{userId: ${user?.id}, roles: ${user?.roles.map((role) => role.storageValue).toList()}, '
+          'canCreateEvents: $canCreateEvents, canScan: $canScan}',
+          name: 'bdo_event.supabase',
+        );
+
+        return BlocBuilder<MainScreenCubit, MainScreenState>(
             builder: (context, state) => AnimatedSwitcher(
         duration: const Duration(milliseconds: 450),
         switchInCurve: Curves.easeOut,
@@ -57,20 +75,16 @@ class _MainScreenView extends StatelessWidget {
             : MainScreenShell(
                 key: const ValueKey('main-screen'),
                 destinations: mainScreenDestinations(
-                    canScan: profileState.user?.hasPermission(
-                      UserPermission.scanRegistrations,
-                      ) ??
-                      false,
-                    canCreateEvents: profileState.user?.hasPermission(
-                      UserPermission.createEvents,
-                      ) ??
-                      false,
+                    canScan: canScan,
+                    canCreateEvents: canCreateEvents,
                 ),
                 currentTab: state.currentTab,
                 onLogoutSelected: () => _logout(context),
               ),
             ),
           ),
+        );
+      },
     );
   }
 }

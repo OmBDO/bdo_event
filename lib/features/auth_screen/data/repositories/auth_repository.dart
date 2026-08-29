@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
@@ -15,26 +17,41 @@ class AuthRepository implements AuthRepositoryContract {
   final AuthRemoteDataSource _authDataSource;
   User? _currentUser;
 
+  @override
   User? get currentUser => _currentUser;
   String? get currentUserName => _currentUser?.displayName;
+  @override
   bool can(UserPermission permission) =>
       _currentUser?.hasPermission(permission) ?? false;
+  @override
   bool canUpdate(Event event) =>
       can(UserPermission.manageAllEvents) ||
       (event.creatorId == _currentUser?.id &&
           can(UserPermission.updateOwnEvents));
+  @override
   bool canDelete(Event event) =>
       can(UserPermission.manageAllEvents) ||
       (event.creatorId == _currentUser?.id &&
           can(UserPermission.deleteOwnEvents));
   bool canManage(Event event) => canUpdate(event);
 
+  @override
   Future<void> initialize() async {
     final authUser = _authDataSource.currentUser;
     if (authUser == null) return;
-    _currentUser = await _mapUser(authUser);
+
+    supabase.User userForMapping = authUser;
+    try {
+      userForMapping = await _authDataSource.refreshSession() ?? authUser;
+    } on supabase.AuthException {
+      // Continue with the persisted session when a refresh is unavailable.
+    }
+
+    _currentUser = await _mapUser(userForMapping);
+    _logUserClaims('session restored', userForMapping, _currentUser!);
   }
 
+  @override
   Future<String?> register({
     required String name,
     required String email,
@@ -56,6 +73,7 @@ class AuthRepository implements AuthRepositoryContract {
     return null;
   }
 
+  @override
   Future<String?> login({
     required String email,
     required String password,
@@ -68,6 +86,7 @@ class AuthRepository implements AuthRepositoryContract {
       final user = response.user;
       if (user == null) return AppText.emailOrPasswordIncorrect;
       _currentUser = await _mapUser(user);
+      _logUserClaims('login succeeded', user, _currentUser!);
     } on supabase.AuthException catch (error) {
       return mapAuthError(error, signingUp: false);
     } on Object {
@@ -76,6 +95,7 @@ class AuthRepository implements AuthRepositoryContract {
     return null;
   }
 
+  @override
   Future<void> logout() async {
     _currentUser = null;
     await _authDataSource.signOut();
@@ -116,5 +136,23 @@ class AuthRepository implements AuthRepositoryContract {
       user: authUser,
       notificationsEnabled: notificationsEnabled,
     ).toEntity();
+  }
+
+  void _logUserClaims(
+    String source,
+    supabase.User authUser,
+    User mappedUser,
+  ) {
+    developer.log(
+      'auth.userClaims $source '
+      '{userId: ${authUser.id}, '
+      'email: ${authUser.email}, '
+      'appMetadata.roles: ${authUser.appMetadata['roles']}, '
+      'userMetadata.requested_role: '
+      '${authUser.userMetadata?['requested_role']}, '
+      'mappedRoles: ${mappedUser.roles.map((role) => role.storageValue).toList()}, '
+      'displayName: ${mappedUser.displayName}}',
+      name: 'bdo_event.supabase',
+    );
   }
 }

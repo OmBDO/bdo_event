@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:bdo_event/core/common/configuration_error_app/configuration_error_app.dart';
 
 /// Handles application environment discovery and setup security checks.
 class DotEnvInitialization {

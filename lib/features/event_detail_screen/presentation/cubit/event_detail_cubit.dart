@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/registration_use_cases.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +18,7 @@ class EventDetailCubit extends Cubit<EventDetailState> {
   final RegisterForEvent _registerForEvent;
   final CancelEventRegistration _cancelEventRegistration;
   final EventStore _eventStore;
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   Future<void> checkRegistration(Event event) async {
     final registered = await _registerForEvent.isUserRegistered(event.id);
@@ -62,15 +62,34 @@ class EventDetailCubit extends Cubit<EventDetailState> {
     required bool registeredAfter,
   }) async {
     if (state.isSubmitting) return AppText.updateInProgress;
+    if (isClosed) return AppText.updateInProgress;
     emit(state.copyWith(isSubmitting: true, clearError: true));
-    final error = await action(event);
-    emit(
-      state.copyWith(
-        isSubmitting: false,
-        isRegistered: error == null ? registeredAfter : state.isRegistered,
-        error: error,
-      ),
-    );
-    return error;
+    try {
+      final error = await action(event);
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            isSubmitting: false,
+            isRegistered: error == null ? registeredAfter : state.isRegistered,
+            error: error,
+          ),
+        );
+      }
+      return error;
+    } on Object {
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            isSubmitting: false,
+            error: registeredAfter
+                ? AppText.unableToSaveRegistration
+                : AppText.unableToCancelRegistration,
+          ),
+        );
+      }
+      return registeredAfter
+          ? AppText.unableToSaveRegistration
+          : AppText.unableToCancelRegistration;
+    }
   }
 }

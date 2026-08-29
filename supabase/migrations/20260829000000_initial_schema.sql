@@ -307,6 +307,11 @@ create policy "Users can delete their registrations"
   to authenticated
   using (auth.uid() = user_id);
 
+-- Data API grants are separate from RLS. Keep row access restricted by the
+-- policies above while explicitly exposing the table to signed-in clients.
+grant usage on schema public to authenticated;
+grant select, delete on table public.event_registrations to authenticated;
+
 create policy "Users can view their role requests"
   on public.role_requests for select
   to authenticated
@@ -328,3 +333,5 @@ create index if not exists events_creator_id_idx
 
 create index if not exists event_registrations_event_id_idx
   on public.event_registrations (event_id);
+
+notify pgrst, 'reload schema';

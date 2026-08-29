@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,9 +12,10 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     : super(const WatcherScanState());
 
   final EventStore _eventStore;
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   Future<void> validate(String rawValue) async {
+    if (state.status != WatcherScanStatus.idle || isClosed) return;
     if (!_authRepository.can(UserPermission.scanRegistrations)) {
       emit(
         state.copyWith(
@@ -76,7 +77,13 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
   Future<void> checkIn() async {
     final eventId = state.eventId;
     final token = state.registrationToken;
-    if (eventId == null || token == null) return;
+    if (
+        eventId == null ||
+        token == null ||
+        state.status != WatcherScanStatus.valid ||
+        isClosed) {
+      return;
+    }
     emit(state.copyWith(status: WatcherScanStatus.checkingIn));
     try {
       final result = await _eventStore.checkInRegistration(
