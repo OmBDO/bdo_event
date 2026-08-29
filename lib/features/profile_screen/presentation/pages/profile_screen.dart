@@ -5,6 +5,7 @@ import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_scr
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
@@ -230,6 +231,8 @@ class _ProfileScreenView extends StatelessWidget {
 
   Future<void> _logout(BuildContext context) async {
     await context.read<AuthScreenCubit>().logout();
+    if (!context.mounted) return;
+    context.read<WatcherScanCubit>().clearState();
   }
 
   void _showInfoDialog(

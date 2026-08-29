@@ -86,6 +86,33 @@ class EventCard extends StatelessWidget {
                 ),
               ),
 
+              if (event.attendeeCount > 0)
+                Positioned(
+                  left: 12,
+                  bottom: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xCC111827),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.72),
+                      ),
+                    ),
+                    child: Text(
+                      '${event.attendeeCount} attending',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+
               // if (onUpdate != null && onDelete != null)
               //   Positioned(
               //     top: 54,
@@ -172,33 +199,6 @@ class EventCard extends StatelessWidget {
                             ),
                           ),
                         ],
-
-                        if (event.attendeeCount > 0)
-                          Positioned(
-                            left: 12,
-                            bottom: 12,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xCC111827),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.72),
-                                ),
-                              ),
-                              child: Text(
-                                '${event.attendeeCount} attending',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ),
                       ),
                     ],
                   ),

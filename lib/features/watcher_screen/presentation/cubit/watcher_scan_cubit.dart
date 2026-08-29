@@ -83,7 +83,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
               status: 'Ready to check in',
             ),
             ...state.history,
-          ].take(20).toList(),
+          ],
         ),
       );
       await _loadDashboard(result['event_id'] as String);
@@ -146,16 +146,33 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
               : 'Unavailable',
         );
       }).toList();
+      final nextPending = updatedHistory
+          .where((entry) => entry.status == 'Ready to check in')
+          .firstOrNull;
       emit(
-        state.copyWith(
-          status: WatcherScanStatus.valid,
-          history: updatedHistory,
-          message: switch (result) {
-            'checked_in' => AppText.checkedIn,
-            'already_checked_in' => AppText.alreadyCheckedIn,
-            _ => AppText.checkInUnavailable,
-          },
-        ),
+        nextPending == null
+            ? state.copyWith(
+                status: WatcherScanStatus.idle,
+                history: updatedHistory,
+                clearResult: true,
+                message: switch (result) {
+                  'checked_in' => AppText.checkedIn,
+                  'already_checked_in' => AppText.alreadyCheckedIn,
+                  _ => AppText.checkInUnavailable,
+                },
+              )
+            : state.copyWith(
+                status: WatcherScanStatus.valid,
+                eventId: nextPending.eventId,
+                registrationToken: nextPending.registrationToken,
+                userId: nextPending.userId,
+                history: updatedHistory,
+                message: switch (result) {
+                  'checked_in' => AppText.checkedIn,
+                  'already_checked_in' => AppText.alreadyCheckedIn,
+                  _ => AppText.checkInUnavailable,
+                },
+              ),
       );
       await _loadDashboard(eventId);
     } on Object {
@@ -175,6 +192,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     if (pending.isEmpty || state.status == WatcherScanStatus.checkingIn) return;
 
     emit(state.copyWith(status: WatcherScanStatus.checkingIn));
+    var failedCount = 0;
     for (final entry in pending) {
       final eventId = entry.eventId;
       if (eventId == null) continue;
@@ -191,20 +209,34 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
         }).toList();
         emit(state.copyWith(history: updatedHistory));
       } on Object {
-        // Keep failed entries pending so the watcher can retry them.
+        failedCount++;
       }
     }
+    final remainingPending = state.history
+        .where((entry) => entry.status == 'Ready to check in')
+        .firstOrNull;
     if (!isClosed) {
       emit(
-        state.copyWith(
-          status: WatcherScanStatus.idle,
-          clearResult: true,
-          message: AppText.checkedIn,
-        ),
+        remainingPending == null
+            ? state.copyWith(
+                status: WatcherScanStatus.idle,
+                clearResult: true,
+                message: AppText.checkedIn,
+              )
+            : state.copyWith(
+                status: WatcherScanStatus.valid,
+                eventId: remainingPending.eventId,
+                registrationToken: remainingPending.registrationToken,
+                userId: remainingPending.userId,
+                message: failedCount > 0
+                    ? AppText.unableToCheckIn
+                    : AppText.checkInUnavailable,
+              ),
       );
     }
-    final eventId = pending.first.eventId;
-    if (eventId != null) await _loadDashboard(eventId);
+    for (final eventId in pending.map((entry) => entry.eventId).nonNulls.toSet()) {
+      await _loadDashboard(eventId);
+    }
   }
 
   String _checkInStatus(String result) => switch (result) {
@@ -220,6 +252,8 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       clearMessage: true,
     ),
   );
+
+  void clearState() => emit(const WatcherScanState());
 
   Future<void> _loadDashboard(String eventId) async {
     try {
