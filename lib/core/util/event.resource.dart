@@ -198,6 +198,7 @@ abstract final class AppText {
   static const unableToCancelRegistration = 'Unable to cancel the registration';
   static const updateInProgress = 'An update is already in progress';
   static const unableToSaveEvent = 'Unable to save the event';
+    static const unableToUploadEventImage = 'Unable to upload the event image';
   static const unableToLoadEvents = 'Unable to load events';
   static const unableToUpdateEvent = 'Unable to update the event';
   static const unableToDeleteEvent = 'Unable to delete the event';

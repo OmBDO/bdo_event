@@ -1,6 +1,8 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
 import 'package:bdo_event/core/common/calendar_element/element/calendar_element.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
+import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_state.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/widgets/search_bar_widget.dart';
@@ -98,7 +100,11 @@ class _CalendarScreenView extends StatelessWidget {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) =>
-                                      RegisteredEventPage(event: event),
+                                        BlocProvider(
+                                          create: (_) =>
+                                              getIt<RegisteredEventCubit>(),
+                                          child: RegisteredEventPage(event: event),
+                                        ),
                                 ),
                               );
                             },

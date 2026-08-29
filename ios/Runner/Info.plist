@@ -4,6 +4,8 @@
 	<dict>
 		<key>NSCameraUsageDescription</key>
 		<string>Camera access is required to scan event registration QR codes.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Photo library access is required to choose an image for an event.</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>CFBundleDevelopmentRegion</key>

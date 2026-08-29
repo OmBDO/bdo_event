@@ -2,7 +2,6 @@ import 'dart:developer' as developer;
 
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
-import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/loading_screen/presentation/pages/loading_screen.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
@@ -11,7 +10,6 @@ import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_shell.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
-import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,9 +31,7 @@ class _MainScreenView extends StatelessWidget {
     if (!context.mounted) return;
     context.read<CalendarScreenCubit>().clearState();
     context.read<EventScreenCubit>().clearState();
-    context.read<EventDetailCubit>().clearState();
     context.read<ProfileScreenCubit>().clearState();
-    context.read<RegisteredEventCubit>().clearState();
   }
 
   @override

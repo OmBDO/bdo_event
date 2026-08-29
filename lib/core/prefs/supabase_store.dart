@@ -16,8 +16,6 @@ abstract interface class EventStore {
 
   Future<List<Event>> loadRegistrations(String userId);
 
-  Future<void> writeRegistrations(String userId, List<Event> events);
-
   Future<void> activateRegistration(String userId, Event event);
 
   Future<void> revokeRegistration(String userId, String eventId);
@@ -164,35 +162,6 @@ class SupabaseStore implements EventStore {
       return rows
           .map((row) => Event.fromJson(_payload(row[AppDatabase.payload])))
           .toList();
-    } on Object {
-      throw const LocalStorageException();
-    }
-  }
-
-  @override
-  Future<void> writeRegistrations(String userId, List<Event> events) async {
-    try {
-      await _logger.track(
-        'registrations.deleteForUser',
-        () => _client
-            .from(AppDatabase.eventRegistrationsTable)
-            .delete()
-            .eq(AppDatabase.userId, userId),
-        parameters: {'userId': userId},
-      );
-      if (events.isEmpty) return;
-      await _logger.track(
-        'registrations.insertBatch',
-        () => _client.from(AppDatabase.eventRegistrationsTable).insert([
-          for (final event in events)
-            {
-              AppDatabase.userId: userId,
-              AppDatabase.eventId: event.id,
-              AppDatabase.payload: event.toJson(),
-            },
-        ]),
-        parameters: {'userId': userId, 'count': events.length},
-      );
     } on Object {
       throw const LocalStorageException();
     }
