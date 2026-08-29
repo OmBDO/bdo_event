@@ -2,6 +2,7 @@
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/core/common/dropdown_list/element/location_dropdown.dart';
 import 'package:bdo_event/core/model/location_model/location_model.dart';
+import 'package:bdo_event/core/model/location_model/location_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -81,6 +82,7 @@ class _HeaderElementState extends State<HeaderElement> {
       country: AppLocations.india,
       zone: AppLocations.ncr,
     ),
+    ...LocationCatalog.offices,
   ];
 
   void onNotificationClick() {
