@@ -132,21 +132,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
         content: Text(_isEditing ? AppText.eventUpdated : AppText.eventCreated),
       ),
     );
-    if (_isEditing) {
-      Navigator.of(context).pop();
-      return;
-    }
-    _formKey.currentState!.reset();
-    _titleController.clear();
-    _dateController.clear();
-    _locationController.clear();
-    _locationSearchController.clear();
-    _descriptionController.clear();
-    setState(() {
-      _selectedImagePath = null;
-      _selectedLocation = null;
-      _selectedCoordinates = null;
-    });
+    Navigator.of(context).pop();
   }
 
   Future<void> _pickDate() async {
@@ -413,7 +399,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             ? AppText.updateEvent
                             : AppText.createEvent,
                         isLoading: _isSaving,
-                        onPressed: () => _isSaving ? null : _submit,
+                        onPressed: _submit,
                       ),
                     ],
                   ),
