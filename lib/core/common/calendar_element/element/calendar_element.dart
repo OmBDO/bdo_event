@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 
 class CalendarElement extends StatefulWidget {
   const CalendarElement({super.key});
@@ -15,12 +16,12 @@ class _CalendarElementState extends State<CalendarElement> {
   DateTime? _selectedDay;
 
   final Map<DateTime, List<String>> _festivals = {
-    DateTime(2026, 5, 1): ['May Day / Labour Day'],
-    DateTime(2026, 8, 30): ['Tech Meetup Festival'],
-    DateTime(2026, 9, 2): ['Company Hackathon'],
-    DateTime(2026, 9, 5): ['Team Building Mela'],
-    DateTime(2026, 11, 8): ['Diwali'],
-    DateTime(2026, 9, 14): ['Ganesh Chaturthi / Ganapati'],
+    DateTime(2026, 5, 1): [AppText.mayDayLabourDay],
+    DateTime(2026, 8, 30): [AppText.techMeetupFestival],
+    DateTime(2026, 9, 2): [AppText.companyHackathon],
+    DateTime(2026, 9, 5): [AppText.teamBuildingMela],
+    DateTime(2026, 11, 8): [AppText.diwaliFestival],
+    DateTime(2026, 9, 14): [AppText.ganeshChaturthiGanapati],
   };
 
   List<String> _getFestivalsForDay(DateTime day) {

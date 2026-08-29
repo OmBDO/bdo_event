@@ -4,39 +4,48 @@
 /// API, Firebase, or SSO provider can therefore replace local authentication
 /// without changing the rest of the application.
 enum UserRole {
-  attendee,
-  organizer,
-  administrator;
+  user,
+  admin,
+  watcher;
 
   String get storageValue => name;
 
   static UserRole fromStorage(Object? value) {
     return UserRole.values.firstWhere(
       (role) => role.storageValue == value,
-      orElse: () => UserRole.attendee,
+      orElse: () => UserRole.user,
     );
   }
 }
 
 enum UserPermission {
   registerForEvents,
+  scanRegistrations,
   createEvents,
   updateOwnEvents,
   deleteOwnEvents,
+  viewEventAttendees,
   manageAllEvents,
   manageUsers,
 }
 
 extension UserRolePermissions on UserRole {
   Set<UserPermission> get permissions => switch (this) {
-    UserRole.attendee => {UserPermission.registerForEvents},
-    UserRole.organizer => {
+    UserRole.user => {UserPermission.registerForEvents},
+    UserRole.admin => {
       UserPermission.registerForEvents,
+      UserPermission.scanRegistrations,
       UserPermission.createEvents,
       UserPermission.updateOwnEvents,
       UserPermission.deleteOwnEvents,
+      UserPermission.viewEventAttendees,
+      UserPermission.manageAllEvents,
+      UserPermission.manageUsers,
     },
-    UserRole.administrator => UserPermission.values.toSet(),
+    UserRole.watcher => {
+      UserPermission.registerForEvents,
+      UserPermission.scanRegistrations,
+    },
   };
 }
 
@@ -58,7 +67,7 @@ class User {
     required this.id,
     required this.displayName,
     required this.email,
-    this.roles = const {UserRole.attendee},
+    this.roles = const {UserRole.user},
     this.photoUrl,
     this.phoneNumber,
     this.bio,
@@ -72,7 +81,7 @@ class User {
   bool hasPermission(UserPermission permission) =>
       roles.any((role) => role.permissions.contains(permission));
 
-  bool get isAdministrator => roles.contains(UserRole.administrator);
+  bool get isAdministrator => roles.contains(UserRole.admin);
 
   User copyWith({
     String? displayName,
@@ -105,7 +114,7 @@ class User {
     displayName:
         json['displayName'] as String? ?? json['name'] as String? ?? '',
     email: json['email'] as String,
-    roles: ((json['roles'] as List<dynamic>?) ?? const ['attendee'])
+    roles: ((json['roles'] as List<dynamic>?) ?? const ['user'])
         .map(UserRole.fromStorage)
         .toSet(),
     photoUrl: json['photoUrl'] as String?,

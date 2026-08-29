@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 
 class LocationDropdown extends StatefulWidget {
   final Location selectedValue;
@@ -107,7 +108,7 @@ class _LocationDropdownState extends State<LocationDropdown> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'Location',
+                    AppText.location,
                     style: TextStyle(
                       color: Color(0xFFFF5E00),
                       fontSize: 11,

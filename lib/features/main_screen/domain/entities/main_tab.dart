@@ -1,0 +1,1 @@
+enum MainTab { events, registrations, createEvent, watcher, profile }
