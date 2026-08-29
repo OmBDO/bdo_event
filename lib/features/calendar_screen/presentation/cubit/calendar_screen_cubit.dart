@@ -7,9 +7,7 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   CalendarScreenCubit({
     required this._loadRegisteredEvents,
     required this._authRepository,
-  }) : super(const CalendarScreenState()) {
-    loadRegistrations();
-  }
+  }) : super(const CalendarScreenState());
 
   final LoadRegisteredEvents _loadRegisteredEvents;
   final AuthRepository _authRepository;

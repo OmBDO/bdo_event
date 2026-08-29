@@ -6,6 +6,7 @@ import 'package:bdo_event/features/loading_screen/presentation/pages/loading_scr
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/features/main_screen/presentation/pages/main_screen.dart';
+import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -31,6 +32,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 onAuthenticated: () {
                   cubit.authenticationSucceeded();
                   context.read<ProfileScreenCubit>().refresh();
+                  context.read<CalendarScreenCubit>().loadRegistrations();
                 },
               );
             case AuthStep.signUp:
