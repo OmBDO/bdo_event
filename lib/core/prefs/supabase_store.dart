@@ -86,7 +86,6 @@ class SupabaseStore implements EventStore {
   }
 
   @override
-  @override
   Future<void> createEvent(Event event) async {
     try {
       await _logger.track(
