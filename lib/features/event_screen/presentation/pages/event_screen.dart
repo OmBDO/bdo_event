@@ -88,60 +88,55 @@ class _EventPageViewState extends State<_EventPageView> {
                 ),
               ),
             ),
-            // Inside your SliverList / ListView builder block:
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final cardData = currentTabList[index];
+            if (currentTabList.isEmpty)
+              _buildEmptyState(state.selectedTab)
+            else
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final cardData = currentTabList[index];
 
-                // 🚀 THE MORPHING FIX: OpenContainer handles the premium expansion transition
-                return OpenContainer(
-                  transitionType: ContainerTransitionType.fade,
-                  transitionDuration: const Duration(milliseconds: 350),
-                  openColor: Colors.transparent,
-                  closedColor: Colors.transparent,
-                  closedElevation: 0,
-                  openElevation: 0,
-                  closedShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  openShape: const RoundedRectangleBorder(),
-                  tappable: false,
+                  return OpenContainer(
+                    transitionType: ContainerTransitionType.fade,
+                    transitionDuration: const Duration(milliseconds: 350),
+                    openColor: Colors.transparent,
+                    closedColor: Colors.transparent,
+                    closedElevation: 0,
+                    openElevation: 0,
+                    closedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    openShape: const RoundedRectangleBorder(),
+                    tappable: false,
 
-                  // 1. Define the screen the card will morph into
-                  openBuilder: (context, closeContainer) {
-                    return EventDetailPage(
-                      event: cardData.copyWith(
-                        isAvailable: state.selectedTab != 2,
-                      ),
-                    );
-                  },
+                    openBuilder: (context, closeContainer) {
+                      return EventDetailPage(event: cardData);
+                    },
 
-                  // 2. Define the small card before it gets clicked
-                  closedBuilder: (context, openContainer) {
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: openContainer,
-                        child: EventCard(
-                          event: cardData,
-                          onUpdate: context.read<EventScreenCubit>().canUpdate(cardData)
-                              ? () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        CreateEventPage(event: cardData),
-                                  ),
-                                )
-                              : null,
-                          onDelete: context.read<EventScreenCubit>().canDelete(cardData)
-                              ? () => _confirmDelete(cardData)
-                              : null,
+                    closedBuilder: (context, openContainer) {
+                      return Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: openContainer,
+                          child: EventCard(
+                            event: cardData,
+                            onUpdate: context.read<EventScreenCubit>().canUpdate(cardData)
+                                ? () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          CreateEventPage(event: cardData),
+                                    ),
+                                  )
+                                : null,
+                            onDelete: context.read<EventScreenCubit>().canDelete(cardData)
+                                ? () => _confirmDelete(cardData)
+                                : null,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
-              }, childCount: currentTabList.length),
-            ),
+                      );
+                    },
+                  );
+                }, childCount: currentTabList.length),
+              ),
 
             ValueListenableBuilder<double>(
               valueListenable: FooterHeightTracker.heightNotifier,
@@ -154,6 +149,62 @@ class _EventPageViewState extends State<_EventPageView> {
           ],
         );
       },
+    );
+  }
+
+  SliverToBoxAdapter _buildEmptyState(int selectedTab) {
+    final tabTitle = switch (selectedTab) {
+      1 => 'My Events',
+      2 => 'Past Events',
+      _ => 'Upcoming Events',
+    };
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 34, 24, 80),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 30, 24, 28),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF4F7F6),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0xFFDCE7E3)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDDEDE7),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Icon(
+                  Icons.event_available_rounded,
+                  size: 38,
+                  color: Color(0xFF276653),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Text(
+                'A quiet moment',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: const Color(0xFF173D34),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '$tabTitle will appear here when there is something to explore.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF667A74),
+                  height: 1.45,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

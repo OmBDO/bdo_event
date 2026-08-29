@@ -122,6 +122,7 @@ void configureDependencies() {
   getIt.registerSingleton<EventScreenCubit>(
     EventScreenCubit(
       loadEvents: getIt(),
+      loadRegisteredEvents: getIt(),
       createEvent: getIt(),
       updateEvent: getIt(),
       deleteEvent: getIt(),

@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/features/calendar_screen/domain/usecases/load_registered_events.dart';
 import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:bdo_event/core/util/event.resource.dart';
 class EventScreenCubit extends Cubit<EventScreenState> {
   EventScreenCubit({
     required this._loadEvents,
+    this._loadRegisteredEvents,
     required this._createEvent,
     required this._updateEvent,
     required this._deleteEvent,
@@ -16,6 +18,7 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   }) : super(const EventScreenState());
 
   final LoadEvents _loadEvents;
+  final LoadRegisteredEvents? _loadRegisteredEvents;
   final CreateEvent _createEvent;
   final UpdateEvent _updateEvent;
   final DeleteEvent _deleteEvent;
@@ -26,8 +29,20 @@ class EventScreenCubit extends Cubit<EventScreenState> {
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final events = await _loadEvents();
+      final userId = _authRepository.currentUser?.id;
+      final registeredEvents = userId == null || _loadRegisteredEvents == null
+          ? const <Event>[]
+          : await _loadRegisteredEvents!(userId);
       if (!isClosed) {
-        emit(state.copyWith(events: events, isLoading: false));
+        emit(
+          state.copyWith(
+            events: events,
+            registeredEventIds: registeredEvents
+                .map((event) => event.id)
+                .toSet(),
+            isLoading: false,
+          ),
+        );
       }
     } on Object {
       if (!isClosed) {
