@@ -211,6 +211,14 @@ abstract final class AppText {
   static const noMatchingEvents = 'No matching events found';
   static const searchFestivalsOrEvents = 'Search festivals or events...';
   static const noNewNotifications = 'No new notifications';
+    static const notifications = 'Notifications';
+    static const noNotifications = 'No notifications yet';
+    static const unableToLoadNotifications = 'Unable to load notifications';
+    static const unableToUpdateArrival = 'Unable to update arrival status';
+    static const arrivalConfirmation = 'Will you attend this event?';
+    static const attending = 'I will attend';
+    static const notAttending = 'I cannot attend';
+    static const arrivalConfirmed = 'Arrival status updated';
   static const pleaseWait = 'Please wait';
 }
 

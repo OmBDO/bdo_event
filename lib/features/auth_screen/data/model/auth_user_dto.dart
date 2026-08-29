@@ -23,6 +23,10 @@ class AuthUserDto {
           'User',
       email: user.email ?? '',
       roles: roles.isEmpty ? {UserRole.user} : roles,
+        photoUrl:
+          metadata['photo_url'] as String? ??
+          metadata['avatar_url'] as String? ??
+          metadata['picture'] as String?,
       createdAt: DateTime.tryParse(user.createdAt) ?? DateTime.now(),
       lastSignedInAt: user.lastSignInAt == null
           ? null
