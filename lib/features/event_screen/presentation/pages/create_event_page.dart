@@ -11,7 +11,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+
 import 'dart:convert';
+
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
@@ -107,7 +109,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
       imageUrl: _selectedImagePath!,
       description: _descriptionController.text.trim(),
       locationId: _selectedLocation?.id,
-      locationAddress: _selectedLocation?.address ?? _locationController.text.trim(),
+      locationAddress:
+          _selectedLocation?.address ?? _locationController.text.trim(),
       latitude: _selectedCoordinates?.latitude,
       longitude: _selectedCoordinates?.longitude,
       createdAt: DateTime.now(),
@@ -167,10 +170,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
       'limit': '1',
     });
     try {
-      final response = await http.get(uri, headers: {'User-Agent': 'bdo-event'});
+      final response = await http.get(
+        uri,
+        headers: {'User-Agent': 'bdo-event'},
+      );
       if (response.statusCode != 200) return;
       final results = jsonDecode(response.body) as List<dynamic>;
-      if (results.isEmpty || !mounted || requestId != _locationSearchRequest) return;
+      if (results.isEmpty || !mounted || requestId != _locationSearchRequest)
+        return;
       final result = results.first as Map<String, dynamic>;
       final coordinates = LatLng(
         double.parse(result['lat'] as String),
@@ -300,7 +307,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                         label: AppText.location,
                         icon: Icons.location_on_outlined,
                         value: _selectedLocation,
-                        validator: (value) => value == null &&
+                        validator: (value) =>
+                            value == null &&
                                 _locationController.text.trim().isEmpty
                             ? AppText.enterEventLocation
                             : null,
@@ -325,7 +333,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                         onChanged: (location) {
                           setState(() {
                             _selectedLocation = location;
-                            _selectedCoordinates = location?.latitude != null &&
+                            _selectedCoordinates =
+                                location?.latitude != null &&
                                     location?.longitude != null
                                 ? LatLng(
                                     location!.latitude!,
@@ -404,7 +413,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             ? AppText.updateEvent
                             : AppText.createEvent,
                         isLoading: _isSaving,
-                        onPressed: _isSaving ? null : _submit,
+                        onPressed: () => _isSaving ? null : _submit,
                       ),
                     ],
                   ),
@@ -471,7 +480,9 @@ class _LocationPickerSection extends StatelessWidget {
                   userAgentPackageName: 'com.bdo.event',
                 ),
                 const RichAttributionWidget(
-                  attributions: [TextSourceAttribution('OpenStreetMap contributors')],
+                  attributions: [
+                    TextSourceAttribution('OpenStreetMap contributors'),
+                  ],
                 ),
                 if (coordinates != null)
                   MarkerLayer(

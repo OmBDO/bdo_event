@@ -43,14 +43,10 @@ class _MainScreenView extends StatelessWidget {
     return BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
       builder: (context, profileState) {
         final user = profileState.user;
-        final canScan = user?.hasPermission(
-              UserPermission.scanRegistrations,
-            ) ??
-            false;
-        final canCreateEvents = user?.hasPermission(
-              UserPermission.createEvents,
-            ) ??
-            false;
+        final canScan =
+            user?.hasPermission(UserPermission.scanRegistrations) ?? false;
+        final canCreateEvents =
+            user?.hasPermission(UserPermission.createEvents) ?? false;
         developer.log(
           'auth.frontendPermissions '
           '{userId: ${user?.id}, roles: ${user?.roles.map((role) => role.storageValue).toList()}, '
@@ -59,29 +55,28 @@ class _MainScreenView extends StatelessWidget {
         );
 
         return BlocBuilder<MainScreenCubit, MainScreenState>(
-            builder: (context, state) => AnimatedSwitcher(
-        duration: const Duration(milliseconds: 450),
-        switchInCurve: Curves.easeOut,
-        switchOutCurve: Curves.easeIn,
-        transitionBuilder: (child, animation) => FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
-            child: child,
-          ),
-        ),
-        child: state.status == MainScreenStatus.loading
-            ? const LoadingScreen(key: ValueKey('loading-screen'))
-            : MainScreenShell(
-                key: const ValueKey('main-screen'),
-                destinations: mainScreenDestinations(
-                    canScan: canScan,
-                    canCreateEvents: canCreateEvents,
-                ),
-                currentTab: state.currentTab,
-                onLogoutSelected: () => _logout(context),
+          builder: (context, state) => AnimatedSwitcher(
+            duration: const Duration(milliseconds: 450),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
+                child: child,
               ),
             ),
+            child: state.status == MainScreenStatus.loading
+                ? const LoadingScreen(key: ValueKey('loading-screen'))
+                : MainScreenShell(
+                    key: const ValueKey('main-screen'),
+                    destinations: mainScreenDestinations(
+                      canScan: canScan,
+                      canCreateEvents: canCreateEvents,
+                    ),
+                    currentTab: state.currentTab,
+                    onLogoutSelected: () => _logout(context),
+                  ),
           ),
         );
       },
