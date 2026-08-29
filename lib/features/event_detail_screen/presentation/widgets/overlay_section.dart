@@ -1,5 +1,10 @@
+import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_location_map.dart';
+import 'package:bdo_event/core/model/user_model/event_attendee.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -8,6 +13,7 @@ class OverlayCurveSection extends StatefulWidget {
   const OverlayCurveSection({
     super.key,
     required this.widget,
+    required this.event,
     required this.textGrey,
     required this.primaryDark,
     required this.mapBgColor,
@@ -15,6 +21,7 @@ class OverlayCurveSection extends StatefulWidget {
   });
 
   final EventDetailPage widget;
+  final Event event;
   final Color textGrey;
   final Color primaryDark;
   final Color mapBgColor;
@@ -27,49 +34,49 @@ class OverlayCurveSection extends StatefulWidget {
 class _OverlayCurveSectionState extends State<OverlayCurveSection> {
   bool _isExpanded = false;
   // Multi-Avatar Layering GeneratorWidget
-  SizedBox _buildAvatarStack() {
-    const avatarColors = [Colors.teal, Colors.indigo, Colors.deepOrange];
+  Widget _buildAvatarStack(List<EventAttendee> attendees) {
+    final visibleAttendees = attendees.take(4).toList();
+    final hasOverflow = attendees.length > visibleAttendees.length;
+    final width = visibleAttendees.isEmpty
+        ? 28.0
+        : (visibleAttendees.length - 1) * 16.0 + 28.0 + (hasOverflow ? 16 : 0);
+
     return SizedBox(
-      width: 76,
+      width: width,
       height: 28,
       child: Stack(
         children: [
-          ...List.generate(avatarColors.length, (index) {
+          ...visibleAttendees.asMap().entries.map((entry) {
             return Positioned(
-              left: index * 16.0,
+              left: entry.key * 16.0,
+              child: EventAttendeeAvatar(attendee: entry.value),
+            );
+          }),
+          if (hasOverflow)
+            Positioned(
+              left: visibleAttendees.length * 16.0,
               child: CircleAvatar(
                 radius: 14,
-                backgroundColor: Colors.white,
-                child: CircleAvatar(
-                  radius: 13,
-                  backgroundColor: avatarColors[index],
-                  child: const Icon(
-                    Icons.person_rounded,
-                    color: Colors.white,
-                    size: 15,
+                backgroundColor: Colors.amber.shade100,
+                child: Text(
+                  _roundedCount(attendees.length),
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber,
                   ),
                 ),
               ),
-            );
-          }),
-          Positioned(
-            left: avatarColors.length * 16.0,
-            child: CircleAvatar(
-              radius: 14,
-              backgroundColor: Colors.amber.shade100,
-              child: const Text(
-                "99+",
-                style: TextStyle(
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.amber,
-                ),
-              ),
             ),
-          ),
         ],
       ),
     );
+  }
+
+  String _roundedCount(int count) {
+    if (count < 10) return '$count';
+    final unit = count < 100 ? 10 : 100;
+    return '${(count ~/ unit) * unit}+';
   }
 
   @override
@@ -207,31 +214,47 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                 color: const Color(0xFFF3F7F9),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Row(
-                children: [
-                  _buildAvatarStack(),
-                  const Gap(12),
-                  Text(
-                    widget.attendanceCount == null
-                        ? AppText.attend100Plus
-                        : '${widget.attendanceCount} ${AppText.attendees}',
-                    style: TextStyle(
-                      color: widget.primaryDark,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => EventAttendeesPage(event: widget.event),
                   ),
-                  const Spacer(),
-                  CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 10,
-                      color: widget.primaryDark,
-                    ),
+                ),
+                child: FutureBuilder<List<EventAttendee>>(
+                  future: getIt<EventStore>().loadEventAttendees(
+                    widget.event.id,
                   ),
-                ],
+                  builder: (context, snapshot) {
+                    final attendees = snapshot.data ?? const <EventAttendee>[];
+                    return Row(
+                      children: [
+                        _buildAvatarStack(attendees),
+                        const Gap(12),
+                        Text(
+                          snapshot.hasData
+                              ? '${attendees.length} ${AppText.attendees}'
+                              : AppText.attend100Plus,
+                          style: TextStyle(
+                            color: widget.primaryDark, // Used widget.primaryDark consistently
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Spacer(),
+                        CircleAvatar(
+                          radius: 14,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 10,
+                            color: widget.primaryDark,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
             const Gap(16),

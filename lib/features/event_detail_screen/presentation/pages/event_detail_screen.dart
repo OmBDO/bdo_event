@@ -1,4 +1,5 @@
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/background_decoration.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_detail_header.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/bottom_event_register_section.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
@@ -43,6 +44,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: BackgroundDecoration(widget: widget),
           ),
 
+          EventDetailHeader(event: widget.event),
+
           // 2. Main Overlapping Rounded Bottom Content Sheet
           Positioned(
             top: MediaQuery.of(context).size.height * 0.35,
@@ -52,6 +55,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: BlocBuilder<EventDetailCubit, EventDetailState>(
               builder: (context, state) => OverlayCurveSection(
                 widget: widget,
+                event: widget.event,
                 textGrey: textGrey,
                 primaryDark: primaryDark,
                 mapBgColor: mapBgColor,

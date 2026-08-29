@@ -1,5 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/model/user_model/event_attendee.dart';
+import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/features/calendar_screen/data/repositories/registration_service.dart';
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
@@ -155,4 +157,25 @@ class InMemoryEventStore implements EventStore {
 
   @override
   Future<int> loadAttendanceCount(String eventId) async => 0;
+
+  @override
+  Future<int> loadCheckedInCount(String eventId) async => 0;
+
+  @override
+  Future<List<EventAttendee>> loadEventAttendees(String eventId) async => [];
+
+  @override
+  Future<List<AppNotification>> loadNotifications() async => [];
+
+  @override
+  Future<int> loadUnreadNotificationCount() async => 0;
+
+  @override
+  Future<void> markNotificationRead(String notificationId) async {}
+
+  @override
+  Future<void> updateArrivalStatus({
+    required String eventId,
+    required ArrivalStatus status,
+  }) async {}
 }

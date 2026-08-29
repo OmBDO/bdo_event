@@ -1,4 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/model/user_model/event_attendee.dart';
+import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_logger.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -33,6 +35,21 @@ abstract interface class EventStore {
   });
 
   Future<int> loadAttendanceCount(String eventId);
+
+  Future<int> loadCheckedInCount(String eventId);
+
+  Future<List<EventAttendee>> loadEventAttendees(String eventId);
+
+  Future<List<AppNotification>> loadNotifications();
+
+  Future<int> loadUnreadNotificationCount();
+
+  Future<void> markNotificationRead(String notificationId);
+
+  Future<void> updateArrivalStatus({
+    required String eventId,
+    required ArrivalStatus status,
+  });
 }
 
 class SupabaseStore implements EventStore {
@@ -291,6 +308,114 @@ class SupabaseStore implements EventStore {
         parameters: {'eventId': eventId},
       );
       return (result as num).toInt();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<int> loadCheckedInCount(String eventId) async {
+    try {
+      final result = await _logger.track(
+        'rpc.loadEventCheckInCount',
+        () => _client.rpc(
+          'load_event_check_in_count',
+          params: {'requested_event_id': eventId},
+        ),
+        parameters: {'eventId': eventId},
+      );
+      return (result as num).toInt();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<List<EventAttendee>> loadEventAttendees(String eventId) async {
+    try {
+      final rows = await _logger.track(
+        'rpc.loadEventAttendees',
+        () => _client.rpc(
+          'load_event_attendees',
+          params: {'requested_event_id': eventId},
+        ),
+        parameters: {'eventId': eventId},
+      );
+      return (rows as List<dynamic>)
+          .map((row) => EventAttendee.fromJson(row as Map<String, dynamic>))
+          .toList();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<List<AppNotification>> loadNotifications() async {
+    try {
+      final rows = await _logger.track(
+        'rpc.loadUserNotifications',
+        () => _client.rpc('load_user_notifications'),
+      );
+      return (rows as List<dynamic>)
+          .map((row) => AppNotification.fromJson(row as Map<String, dynamic>))
+          .toList();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<int> loadUnreadNotificationCount() async {
+    try {
+      final result = await _logger.track(
+        'rpc.countUserUnreadNotifications',
+        () => _client.rpc('count_user_unread_notifications'),
+      );
+      return (result as num).toInt();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<void> markNotificationRead(String notificationId) async {
+    try {
+      await _logger.track(
+        'rpc.markNotificationRead',
+        () => _client.rpc(
+          'mark_notification_read',
+          params: {
+            'requested_notification_id': int.parse(notificationId),
+          },
+        ),
+        parameters: {'notificationId': notificationId},
+      );
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<void> updateArrivalStatus({
+    required String eventId,
+    required ArrivalStatus status,
+  }) async {
+    try {
+      await _logger.track(
+        'rpc.updateArrivalStatus',
+        () => _client.rpc(
+          'update_event_arrival_status',
+          params: {
+            'requested_event_id': eventId,
+            'requested_status': switch (status) {
+              ArrivalStatus.attending => 'attending',
+              ArrivalStatus.notAttending => 'not_attending',
+              ArrivalStatus.pending => 'pending',
+            },
+          },
+        ),
+        parameters: {'eventId': eventId, 'status': status.name},
+      );
     } on Object {
       throw const LocalStorageException();
     }
