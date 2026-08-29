@@ -3,12 +3,13 @@ import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart
 import 'package:bdo_event/core/common/dropdown_list/element/location_dropdown.dart';
 import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:bdo_event/core/model/location_model/location_catalog.dart';
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
-import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/notification_count_formatter.dart';
+import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class HeaderElement extends StatefulWidget {
   final int currentScreenIndex;
@@ -38,6 +39,7 @@ class _HeaderElementState extends State<HeaderElement> {
   void _refreshUnreadCount() {
     _unreadCountFuture = getIt<EventStore>().loadUnreadNotificationCount();
   }
+
   Location selectedLocation = const Location(
     id: AppLocations.mumbaiZoneOneId,
     name: AppLocations.mumbai,
@@ -158,15 +160,19 @@ class _HeaderElementState extends State<HeaderElement> {
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                  ),
+                    ),
                     Positioned(
                       top: -4,
                       right: -4,
                       child: FutureBuilder<int>(
                         future: _unreadCountFuture,
                         builder: (context, snapshot) {
-                          final count = snapshot.data ?? 0;
-                          if (count == 0) return const SizedBox.shrink();
+                          final badgeText = formatNotificationCount(
+                            snapshot.data ?? 0,
+                          );
+                          if (badgeText.isEmpty) {
+                            return const SizedBox.shrink();
+                          }
                           return Container(
                             constraints: const BoxConstraints(minWidth: 18),
                             height: 18,
@@ -174,11 +180,14 @@ class _HeaderElementState extends State<HeaderElement> {
                             decoration: BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1.5),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.5,
+                              ),
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              count > 99 ? '99+' : '$count',
+                              badgeText,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 9,

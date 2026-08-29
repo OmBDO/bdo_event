@@ -13,6 +13,7 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   late Future<List<AppNotification>> _notificationsFuture;
+  final Set<String> _readRequested = <String>{};
 
   @override
   void initState() {
@@ -47,7 +48,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Future<void> _markRead(AppNotification notification) async {
-    if (notification.isRead) return;
+    if (notification.isRead || !_readRequested.add(notification.id)) return;
     await getIt<EventStore>().markNotificationRead(notification.id);
   }
 

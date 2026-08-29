@@ -6,8 +6,7 @@ create table if not exists public.event_arrivals (
   status text not null default 'pending'
     check (status in ('pending', 'attending', 'not_attending')),
   confirmed_at timestamptz,
-  updated_at timestamptz not null default now(),
-  unique (event_id, user_id)
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists public.notifications (
@@ -185,5 +184,5 @@ where jobname = 'event-arrival-reminders';
 select cron.schedule(
   'event-arrival-reminders',
   '0 9 * * *',
-  $$select public.create_event_reminders();$$
+  $cron$select public.create_event_reminders();$cron$
 );
