@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event.resource.dart';
 
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key});
@@ -18,7 +19,7 @@ class BrandMark extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         const Text(
-          'BDO Events',
+          AppText.brandName,
           style: TextStyle(
             color: Color(0xFF2D0C57),
             fontSize: 20,

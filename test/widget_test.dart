@@ -10,31 +10,35 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('role permissions keep event management scoped', () {
-    final attendee = User(
-      id: 'attendee-1',
-      displayName: 'Attendee',
-      email: 'attendee@example.com',
+    final user = User(
+      id: 'user-1',
+      displayName: 'User',
+      email: 'user@example.com',
       createdAt: DateTime(2026),
     );
-    final organizer = User(
-      id: 'organizer-1',
-      displayName: 'Organizer',
-      email: 'organizer@example.com',
-      roles: {UserRole.organizer},
+    final watcher = User(
+      id: 'watcher-1',
+      displayName: 'Watcher',
+      email: 'watcher@example.com',
+      roles: {UserRole.watcher},
       createdAt: DateTime(2026),
     );
-    final administrator = User(
+    final admin = User(
       id: 'admin-1',
       displayName: 'Admin',
       email: 'admin@example.com',
-      roles: {UserRole.administrator},
+      roles: {UserRole.admin},
       createdAt: DateTime(2026),
     );
 
-    expect(attendee.hasPermission(UserPermission.registerForEvents), isTrue);
-    expect(attendee.hasPermission(UserPermission.createEvents), isFalse);
-    expect(organizer.hasPermission(UserPermission.updateOwnEvents), isTrue);
-    expect(organizer.hasPermission(UserPermission.manageAllEvents), isFalse);
-    expect(administrator.hasPermission(UserPermission.manageUsers), isTrue);
+    expect(user.hasPermission(UserPermission.registerForEvents), isTrue);
+    expect(user.hasPermission(UserPermission.createEvents), isFalse);
+    expect(user.hasPermission(UserPermission.scanRegistrations), isFalse);
+    expect(watcher.hasPermission(UserPermission.registerForEvents), isTrue);
+    expect(watcher.hasPermission(UserPermission.scanRegistrations), isTrue);
+    expect(watcher.hasPermission(UserPermission.createEvents), isFalse);
+    expect(admin.hasPermission(UserPermission.createEvents), isTrue);
+    expect(admin.hasPermission(UserPermission.scanRegistrations), isTrue);
+    expect(admin.hasPermission(UserPermission.manageUsers), isTrue);
   });
 }
