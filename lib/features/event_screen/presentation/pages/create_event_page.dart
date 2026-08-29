@@ -262,7 +262,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (start == null || end == null) return 'Choose a start and end time';
     final startMinutes = start.hour * 60 + start.minute;
     final endMinutes = end.hour * 60 + end.minute;
-    return endMinutes > startMinutes ? null : 'End time must be after start time';
+    return endMinutes > startMinutes
+        ? null
+        : 'End time must be after start time';
   }
 
   Future<void> _pickRegistrationDeadline() async {
@@ -344,363 +346,369 @@ class _CreateEventPageState extends State<CreateEventPage> {
         if (!didPop) _cancel();
       },
       child: Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: () {
-                    _cancel();
-                  },
-                  icon: Icon(Icons.arrow_back),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _isEditing
-                            ? AppText.updateEventEyebrow
-                            : AppText.createEventEyebrow,
-                        style: TextStyle(
-                          color: Color(0xFFB14F36),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _isEditing
-                            ? AppText.updateYourEvent
-                            : AppText.bringPeopleTogether,
-                        style: TextStyle(
-                          color: Color(0xFF2D0C57),
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        AppText.eventDetailsPrompt,
-                        style: TextStyle(
-                          color: Color(0xFF6F607A),
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      GestureDetector(
-                        onTap: _pickImage,
-                        child: Container(
-                          height: 170,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.72),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white),
-                          ),
-                          child: _selectedImagePath == null
-                              ? const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.add_photo_alternate_outlined,
-                                      size: 36,
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(AppText.addEventImage),
-                                  ],
-                                )
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: EventImage(
-                                    path: _selectedImagePath!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _titleController,
-                        label: AppText.eventTitle,
-                        icon: Icons.celebration_outlined,
-                        validator: (value) =>
-                            value == null || value.trim().isEmpty
-                            ? AppText.enterEventTitle
-                            : null,
-                      ),
-                      const SizedBox(height: 16),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final compact = constraints.maxWidth < 520;
-                          final fields = [
-                            AppTextField(
-                              controller: _dateController,
-                              label: AppText.eventDate,
-                              icon: Icons.calendar_today_outlined,
-                              readOnly: true,
-                              onTap: _pickDate,
-                              validator: (value) =>
-                                  value == null || value.isEmpty
-                                  ? AppText.chooseEventDate
-                                  : null,
-                            ),
-                            AppTextField(
-                              controller: _startTimeController,
-                              label: 'Start time',
-                              icon: Icons.schedule_outlined,
-                              readOnly: true,
-                              onTap: () => _pickTime(_startTimeController),
-                              validator: (value) => value == null || value.isEmpty
-                                  ? 'Choose a start time'
-                                  : null,
-                            ),
-                            AppTextField(
-                              controller: _endTimeController,
-                              label: 'End time',
-                              icon: Icons.schedule_outlined,
-                              readOnly: true,
-                              onTap: () => _pickTime(_endTimeController),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Choose an end time';
-                                }
-                                return _validateTimeRange();
-                              },
-                            ),
-                          ];
-                          return compact
-                              ? Column(
-                                  children: [
-                                    fields[0],
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        Expanded(child: fields[1]),
-                                        const SizedBox(width: 12),
-                                        Expanded(child: fields[2]),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                              : Row(
-                                  children: [
-                                    Expanded(child: fields[0]),
-                                    const SizedBox(width: 12),
-                                    Expanded(child: fields[1]),
-                                    const SizedBox(width: 12),
-                                    Expanded(child: fields[2]),
-                                  ],
-                                );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Limit seats',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                          Switch(
-                            value: _seatLimitEnabled,
-                            onChanged: (enabled) => setState(
-                              () => _seatLimitEnabled = enabled,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          SizedBox(
-                            width: 96,
-                            child: TextFormField(
-                              controller: _capacityController,
-                              enabled: _seatLimitEnabled,
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.done,
-                              validator: (value) {
-                                if (!_seatLimitEnabled) return null;
-                                final capacity = int.tryParse(value?.trim() ?? '');
-                                return capacity == null || capacity < 1
-                                    ? 'Enter a positive number'
-                                    : null;
-                              },
-                              decoration: const InputDecoration(
-                                labelText: 'Seats',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Registration deadline',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                          Switch(
-                            value: _registrationDeadlineEnabled,
-                            onChanged: (enabled) => setState(() {
-                              _registrationDeadlineEnabled = enabled;
-                              if (!enabled) {
-                                _registrationDeadline = null;
-                                _registrationDeadlineController.clear();
-                              }
-                            }),
-                          ),
-                        ],
-                      ),
-                      if (_registrationDeadlineEnabled) ...[
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _registrationDeadlineController,
-                          readOnly: true,
-                          onTap: _pickRegistrationDeadline,
-                          validator: (_) {
-                            if (_registrationDeadline == null) {
-                              return 'Choose a registration deadline';
-                            }
-                            if (!_registrationDeadline!.isAfter(DateTime.now())) {
-                              return 'Deadline must be in the future';
-                            }
-                            return null;
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Deadline date and time',
-                            prefixIcon: Icon(Icons.schedule_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      AppDropDownField<Location>(
-                        label: AppText.location,
-                        icon: Icons.location_on_outlined,
-                        value: _selectedLocation,
-                        validator: (value) =>
-                            value == null &&
-                                _locationController.text.trim().isEmpty
-                            ? AppText.enterEventLocation
-                            : null,
-                        items: [
-                          const DropdownMenuItem<Location>(
-                            value: null,
-                            child: Row(
-                              children: [
-                                Icon(Icons.location_searching_rounded),
-                                SizedBox(width: 12),
-                                Text('Select location'),
-                              ],
-                            ),
-                          ),
-                          ..._officeLocations.map(
-                            (location) => DropdownMenuItem<Location>(
-                              value: location,
-                              child: Text(location.displayName),
-                            ),
-                          ),
-                        ],
-                        onChanged: (location) {
-                          setState(() {
-                            _selectedLocation = location;
-                            _selectedCoordinates =
-                                location?.latitude != null &&
-                                    location?.longitude != null
-                                ? LatLng(
-                                    location!.latitude!,
-                                    location.longitude!,
-                                  )
-                                : null;
-                            _locationController.text = location == null
-                                ? ''
-                                : location.address ?? location.displayName;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      _LocationPickerSection(
-                        searchController: _locationSearchController,
-                        coordinates: _selectedCoordinates,
-                        locationLocked: _selectedLocation != null,
-                        onSearch: _searchLocation,
-                        onTap: (coordinates) {
-                          setState(() {
-                            _selectedCoordinates = coordinates;
-                            _selectedLocation = null;
-                            _locationController.text =
-                                '${coordinates.latitude.toStringAsFixed(5)}, '
-                                '${coordinates.longitude.toStringAsFixed(5)}';
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      AppTextField(
-                        controller: _descriptionController,
-                        label: AppText.description,
-                        icon: Icons.notes_outlined,
-                        maxLines: 4,
-                        validator: (value) =>
-                            value == null || value.trim().length < 10
-                            ? AppText.addAtLeastTenCharacters
-                            : null,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      AppDropDownField<EventCategory>(
-                        label: AppText.selectCategory,
-                        icon: Icons.category_outlined,
-                        value: _selectedCategory,
-                        validator: (value) =>
-                            value == null ? AppText.pleaseSelectCategory : null,
-                        items: _categories.map((category) {
-                          return DropdownMenuItem<EventCategory>(
-                            value: category,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  category.icon,
-                                  color: category.color,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 12),
-                                Text(category.name),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedCategory = newValue;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 24),
-
-                      AppButton(
-                        label: _isSaving
-                            ? AppText.savingEvent
-                            : _isEditing
-                            ? AppText.updateEvent
-                            : AppText.createEvent,
-                        isLoading: _isSaving,
-                        onPressed: _submit,
-                      ),
-                    ],
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      _cancel();
+                    },
+                    icon: Icon(Icons.arrow_back),
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _isEditing
+                              ? AppText.updateEventEyebrow
+                              : AppText.createEventEyebrow,
+                          style: TextStyle(
+                            color: Color(0xFFB14F36),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _isEditing
+                              ? AppText.updateYourEvent
+                              : AppText.bringPeopleTogether,
+                          style: TextStyle(
+                            color: Color(0xFF2D0C57),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          AppText.eventDetailsPrompt,
+                          style: TextStyle(
+                            color: Color(0xFF6F607A),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            height: 170,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.72),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white),
+                            ),
+                            child: _selectedImagePath == null
+                                ? const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.add_photo_alternate_outlined,
+                                        size: 36,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(AppText.addEventImage),
+                                    ],
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: EventImage(
+                                      path: _selectedImagePath!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          controller: _titleController,
+                          label: AppText.eventTitle,
+                          icon: Icons.celebration_outlined,
+                          validator: (value) =>
+                              value == null || value.trim().isEmpty
+                              ? AppText.enterEventTitle
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final compact = constraints.maxWidth < 520;
+                            final fields = [
+                              AppTextField(
+                                controller: _dateController,
+                                label: AppText.eventDate,
+                                icon: Icons.calendar_today_outlined,
+                                readOnly: true,
+                                onTap: _pickDate,
+                                validator: (value) =>
+                                    value == null || value.isEmpty
+                                    ? AppText.chooseEventDate
+                                    : null,
+                              ),
+                              AppTextField(
+                                controller: _startTimeController,
+                                label: 'Start time',
+                                icon: Icons.schedule_outlined,
+                                readOnly: true,
+                                onTap: () => _pickTime(_startTimeController),
+                                validator: (value) =>
+                                    value == null || value.isEmpty
+                                    ? 'Choose a start time'
+                                    : null,
+                              ),
+                              AppTextField(
+                                controller: _endTimeController,
+                                label: 'End time',
+                                icon: Icons.schedule_outlined,
+                                readOnly: true,
+                                onTap: () => _pickTime(_endTimeController),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Choose an end time';
+                                  }
+                                  return _validateTimeRange();
+                                },
+                              ),
+                            ];
+                            return compact
+                                ? Column(
+                                    children: [
+                                      fields[0],
+                                      const SizedBox(height: 12),
+                                      Row(
+                                        children: [
+                                          Expanded(child: fields[1]),
+                                          const SizedBox(width: 12),
+                                          Expanded(child: fields[2]),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    children: [
+                                      Expanded(child: fields[0]),
+                                      const SizedBox(width: 12),
+                                      Expanded(child: fields[1]),
+                                      const SizedBox(width: 12),
+                                      Expanded(child: fields[2]),
+                                    ],
+                                  );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Limit seats',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                            Switch(
+                              value: _seatLimitEnabled,
+                              onChanged: (enabled) =>
+                                  setState(() => _seatLimitEnabled = enabled),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 96,
+                              child: TextFormField(
+                                controller: _capacityController,
+                                enabled: _seatLimitEnabled,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.done,
+                                validator: (value) {
+                                  if (!_seatLimitEnabled) return null;
+                                  final capacity = int.tryParse(
+                                    value?.trim() ?? '',
+                                  );
+                                  return capacity == null || capacity < 1
+                                      ? 'Enter a positive number'
+                                      : null;
+                                },
+                                decoration: const InputDecoration(
+                                  labelText: 'Seats',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Registration deadline',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ),
+                            Switch(
+                              value: _registrationDeadlineEnabled,
+                              onChanged: (enabled) => setState(() {
+                                _registrationDeadlineEnabled = enabled;
+                                if (!enabled) {
+                                  _registrationDeadline = null;
+                                  _registrationDeadlineController.clear();
+                                }
+                              }),
+                            ),
+                          ],
+                        ),
+                        if (_registrationDeadlineEnabled) ...[
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _registrationDeadlineController,
+                            readOnly: true,
+                            onTap: _pickRegistrationDeadline,
+                            validator: (_) {
+                              if (_registrationDeadline == null) {
+                                return 'Choose a registration deadline';
+                              }
+                              if (!_registrationDeadline!.isAfter(
+                                DateTime.now(),
+                              )) {
+                                return 'Deadline must be in the future';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'Deadline date and time',
+                              prefixIcon: Icon(Icons.schedule_outlined),
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        AppDropDownField<Location>(
+                          label: AppText.location,
+                          icon: Icons.location_on_outlined,
+                          value: _selectedLocation,
+                          validator: (value) =>
+                              value == null &&
+                                  _locationController.text.trim().isEmpty
+                              ? AppText.enterEventLocation
+                              : null,
+                          items: [
+                            const DropdownMenuItem<Location>(
+                              value: null,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.location_searching_rounded),
+                                  SizedBox(width: 12),
+                                  Text('Select location'),
+                                ],
+                              ),
+                            ),
+                            ..._officeLocations.map(
+                              (location) => DropdownMenuItem<Location>(
+                                value: location,
+                                child: Text(location.displayName),
+                              ),
+                            ),
+                          ],
+                          onChanged: (location) {
+                            setState(() {
+                              _selectedLocation = location;
+                              _selectedCoordinates =
+                                  location?.latitude != null &&
+                                      location?.longitude != null
+                                  ? LatLng(
+                                      location!.latitude!,
+                                      location.longitude!,
+                                    )
+                                  : null;
+                              _locationController.text = location == null
+                                  ? ''
+                                  : location.address ?? location.displayName;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _LocationPickerSection(
+                          searchController: _locationSearchController,
+                          coordinates: _selectedCoordinates,
+                          locationLocked: _selectedLocation != null,
+                          onSearch: _searchLocation,
+                          onTap: (coordinates) {
+                            setState(() {
+                              _selectedCoordinates = coordinates;
+                              _selectedLocation = null;
+                              _locationController.text =
+                                  '${coordinates.latitude.toStringAsFixed(5)}, '
+                                  '${coordinates.longitude.toStringAsFixed(5)}';
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        AppTextField(
+                          controller: _descriptionController,
+                          label: AppText.description,
+                          icon: Icons.notes_outlined,
+                          maxLines: 4,
+                          validator: (value) =>
+                              value == null || value.trim().length < 10
+                              ? AppText.addAtLeastTenCharacters
+                              : null,
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        AppDropDownField<EventCategory>(
+                          label: AppText.selectCategory,
+                          icon: Icons.category_outlined,
+                          value: _selectedCategory,
+                          validator: (value) => value == null
+                              ? AppText.pleaseSelectCategory
+                              : null,
+                          items: _categories.map((category) {
+                            return DropdownMenuItem<EventCategory>(
+                              value: category,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    category.icon,
+                                    color: category.color,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(category.name),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedCategory = newValue;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 24),
+
+                        AppButton(
+                          label: _isSaving
+                              ? AppText.savingEvent
+                              : _isEditing
+                              ? AppText.updateEvent
+                              : AppText.createEvent,
+                          isLoading: _isSaving,
+                          onPressed: _submit,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -719,6 +727,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     return null;
   }
 }
+
 class _LocationPickerSection extends StatelessWidget {
   const _LocationPickerSection({
     required this.searchController,
@@ -807,7 +816,6 @@ class _LocationPickerSection extends StatelessWidget {
           style: TextStyle(color: Colors.black54, fontSize: 12),
         ),
       ],
-      ),
     );
   }
 }
