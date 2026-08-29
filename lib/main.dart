@@ -24,6 +24,7 @@ Future<void> main() async {
     runApp(const ConfigurationErrorApp());
     return;
   }
+  // ignore: deprecated_member_use
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
   configureDependencies();
   getIt<AuthScreenCubit>().checkActiveSession();

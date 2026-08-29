@@ -8,22 +8,20 @@ import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_sca
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WatcherScanCubit extends Cubit<WatcherScanState> {
-  WatcherScanCubit({
-    required EventStore eventStore,
-    required AuthRepository authRepository,
-  })  : _eventStore = eventStore,
-        _authRepository = authRepository,
-        super(const WatcherScanState());
+  WatcherScanCubit({required this._eventStore, required this._authRepository})
+    : super(const WatcherScanState());
 
   final EventStore _eventStore;
   final AuthRepository _authRepository;
 
   Future<void> validate(String rawValue) async {
     if (!_authRepository.can(UserPermission.scanRegistrations)) {
-      emit(state.copyWith(
-        status: WatcherScanStatus.failure,
-        message: AppText.watcherAccessRequired,
-      ));
+      emit(
+        state.copyWith(
+          status: WatcherScanStatus.failure,
+          message: AppText.watcherAccessRequired,
+        ),
+      );
       return;
     }
 
@@ -33,10 +31,12 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
           payload['type'] != AppIdentifiers.qrRegistrationType ||
           payload['eventId'] is! String ||
           payload['token'] is! String) {
-        emit(state.copyWith(
-          status: WatcherScanStatus.invalid,
-          message: AppText.invalidRegistrationQr,
-        ));
+        emit(
+          state.copyWith(
+            status: WatcherScanStatus.invalid,
+            message: AppText.invalidRegistrationQr,
+          ),
+        );
         return;
       }
 
@@ -46,24 +46,30 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
         eventId: payload['eventId'] as String,
       );
       if (result == null) {
-        emit(state.copyWith(
-          status: WatcherScanStatus.invalid,
-          message: AppText.invalidRegistrationQr,
-        ));
+        emit(
+          state.copyWith(
+            status: WatcherScanStatus.invalid,
+            message: AppText.invalidRegistrationQr,
+          ),
+        );
         return;
       }
-      emit(state.copyWith(
-        status: WatcherScanStatus.valid,
-        eventId: result['event_id'] as String?,
-        registrationToken: payload['token'] as String,
-        userId: result['user_id'] as String?,
-        message: AppText.registrationValid,
-      ));
+      emit(
+        state.copyWith(
+          status: WatcherScanStatus.valid,
+          eventId: result['event_id'] as String?,
+          registrationToken: payload['token'] as String,
+          userId: result['user_id'] as String?,
+          message: AppText.registrationValid,
+        ),
+      );
     } on Object {
-      emit(state.copyWith(
-        status: WatcherScanStatus.failure,
-        message: AppText.invalidRegistrationQr,
-      ));
+      emit(
+        state.copyWith(
+          status: WatcherScanStatus.failure,
+          message: AppText.invalidRegistrationQr,
+        ),
+      );
     }
   }
 
@@ -77,19 +83,23 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
         token: token,
         eventId: eventId,
       );
-      emit(state.copyWith(
-        status: WatcherScanStatus.valid,
-        message: switch (result) {
-          'checked_in' => AppText.checkedIn,
-          'already_checked_in' => AppText.alreadyCheckedIn,
-          _ => AppText.checkInUnavailable,
-        },
-      ));
+      emit(
+        state.copyWith(
+          status: WatcherScanStatus.valid,
+          message: switch (result) {
+            'checked_in' => AppText.checkedIn,
+            'already_checked_in' => AppText.alreadyCheckedIn,
+            _ => AppText.checkInUnavailable,
+          },
+        ),
+      );
     } on Object {
-      emit(state.copyWith(
-        status: WatcherScanStatus.failure,
-        message: AppText.unableToCheckIn,
-      ));
+      emit(
+        state.copyWith(
+          status: WatcherScanStatus.failure,
+          message: AppText.unableToCheckIn,
+        ),
+      );
     }
   }
 

@@ -15,7 +15,7 @@ class EventScreenState {
     this.isLoading = false,
     this.isSaving = false,
     this.error,
-  );
+  });
 
   List<Event> get currentTabEvents {
     if (selectedTab == 0) return events;

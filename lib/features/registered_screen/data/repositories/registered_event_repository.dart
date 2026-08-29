@@ -3,8 +3,7 @@ import 'package:bdo_event/features/registered_screen/data/datasource/registered_
 import 'package:bdo_event/features/registered_screen/domain/repositories/registered_event_repository.dart';
 
 class RegisteredEventRepository implements RegisteredEventRepositoryContract {
-    RegisteredEventRepository({required RegisteredEventRemoteDataSource dataSource})
-            : _dataSource = dataSource;
+  RegisteredEventRepository({required this._dataSource});
 
   final RegisteredEventRemoteDataSource _dataSource;
 

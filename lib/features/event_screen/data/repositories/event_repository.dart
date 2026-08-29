@@ -9,9 +9,8 @@ import 'package:bdo_event/core/util/event.resource.dart';
 class EventRepository implements EventRepositoryContract {
   EventRepository({
     required EventDataSource dataSource,
-    required AuthRepository authRepository,
-  }) : _eventDataSource = dataSource,
-       _authRepository = authRepository;
+    required this._authRepository,
+  }) : _eventDataSource = dataSource;
 
   final EventDataSource _eventDataSource;
   final AuthRepository _authRepository;

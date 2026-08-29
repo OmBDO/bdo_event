@@ -21,28 +21,34 @@ void main() {
     );
   });
 
-  test('registration service rejects unavailable, full, and duplicate events', () async {
-    final service = RegistrationService(store);
+  test(
+    'registration service rejects unavailable, full, and duplicate events',
+    () async {
+      final service = RegistrationService(store);
 
-    final unavailable = await service.register(
-      'user-1',
-      event.copyWith(isAvailable: false),
-    );
-    expect(unavailable.error, 'This event is no longer available for registration');
+      final unavailable = await service.register(
+        'user-1',
+        event.copyWith(isAvailable: false),
+      );
+      expect(
+        unavailable.error,
+        'This event is no longer available for registration',
+      );
 
-    final full = await service.register(
-      'user-1',
-      event.copyWith(attendeeCount: 2),
-    );
-    expect(full.error, 'This event has reached its capacity');
+      final full = await service.register(
+        'user-1',
+        event.copyWith(attendeeCount: 2),
+      );
+      expect(full.error, 'This event has reached its capacity');
 
-    final first = await service.register('user-1', event);
-    expect(first.error, isNull);
-    expect(first.events, hasLength(1));
+      final first = await service.register('user-1', event);
+      expect(first.error, isNull);
+      expect(first.events, hasLength(1));
 
-    final duplicate = await service.register('user-1', event);
-    expect(duplicate.error, 'You are already registered for this event');
-  });
+      final duplicate = await service.register('user-1', event);
+      expect(duplicate.error, 'You are already registered for this event');
+    },
+  );
 
   test('registration service cancels a registered event', () async {
     final service = RegistrationService(store);
@@ -83,7 +89,6 @@ void main() {
     expect(result.events, isEmpty);
     expect(result.error, 'Event could not be found');
   });
-
 }
 
 class InMemoryEventStore implements EventStore {

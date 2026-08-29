@@ -27,9 +27,8 @@ class _ProfileScreenView extends StatelessWidget {
           previous.errorMessage != current.errorMessage &&
           current.errorMessage != null,
       listener: (context, state) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(state.errorMessage!)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(state.errorMessage!)));
       },
       builder: (context, state) {
         final user = state.user;
@@ -49,7 +48,8 @@ class _ProfileScreenView extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 54,
-                            backgroundColor: const Color(0xFFE96B47).withValues(alpha: 0.1),
+                            backgroundColor: const Color(0xFFE96B47)
+                                .withValues(alpha: 0.1),
                             child: const CircleAvatar(
                               radius: 50,
                               backgroundImage: NetworkImage(
@@ -60,7 +60,11 @@ class _ProfileScreenView extends StatelessWidget {
                           const CircleAvatar(
                             radius: 18,
                             backgroundColor: Color(0xFFE96B47),
-                            child: Icon(Icons.edit_rounded, color: Colors.white, size: 16),
+                            child: Icon(
+                              Icons.edit_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            ),
                           ),
                         ],
                       ),
@@ -97,7 +101,8 @@ class _ProfileScreenView extends StatelessWidget {
                     onTap: () => _showInfoDialog(
                       context,
                       title: AppText.profileDetails,
-                      message: 'Your signed-in name is ${user?.displayName ?? 'not available'} and the email is ${user?.email ?? 'not available'}.',
+                      message:
+                          'Your signed-in name is ${user?.displayName ?? 'not available'} and the email is ${user?.email ?? 'not available'}.',
                     ),
                   ),
                   _settingsTile(
@@ -130,7 +135,9 @@ class _ProfileScreenView extends StatelessWidget {
                     title: AppText.pushNotifications,
                     subtitle: AppText.festivalUpdateAlerts,
                     value: state.isNotificationEnabled,
-                    onChanged: context.read<ProfileScreenCubit>().updateNotificationPreference,
+                    onChanged: context
+                        .read<ProfileScreenCubit>()
+                        .updateNotificationPreference,
                   ),
                   _settingsToggle(
                     icon: Icons.dark_mode_outlined,
@@ -138,7 +145,9 @@ class _ProfileScreenView extends StatelessWidget {
                     title: AppText.darkThemeMode,
                     subtitle: AppText.darkModeInterface,
                     value: state.isDarkModeEnabled,
-                    onChanged: context.read<ProfileScreenCubit>().toggleDarkMode,
+                    onChanged: context
+                        .read<ProfileScreenCubit>()
+                        .toggleDarkMode,
                   ),
                   _settingsTile(
                     icon: Icons.language_rounded,
@@ -185,13 +194,25 @@ class _ProfileScreenView extends StatelessWidget {
                     onPressed: () => _logout(context),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.black54,
-                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      backgroundColor: const Color(0xFFB1D4FA).withValues(alpha: 0.6),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      backgroundColor: const Color(0xFFB1D4FA)
+                          .withValues(alpha: 0.6),
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     icon: const Icon(Icons.logout_rounded, size: 20),
-                    label: const Text(AppText.logout, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    label: const Text(
+                      AppText.logout,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ),
                 ValueListenableBuilder<double>(
@@ -211,14 +232,21 @@ class _ProfileScreenView extends StatelessWidget {
     await context.read<AuthScreenCubit>().logout();
   }
 
-  void _showInfoDialog(BuildContext context, {required String title, required String message}) {
+  void _showInfoDialog(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text(AppText.close)),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(AppText.close),
+          ),
         ],
       ),
     );
@@ -227,7 +255,15 @@ class _ProfileScreenView extends StatelessWidget {
 
 Widget _sectionHeader(String title) => Container(
   padding: const EdgeInsets.only(left: 24, bottom: 8, top: 8),
-  child: Text(title, style: const TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 0.3)),
+  child: Text(
+    title,
+    style: const TextStyle(
+      color: Colors.black,
+      fontSize: 15,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.3,
+    ),
+  ),
 );
 
 Widget _settingsGroup(List<Widget> children) => Container(
@@ -235,11 +271,20 @@ Widget _settingsGroup(List<Widget> children) => Container(
   decoration: BoxDecoration(
     color: Colors.white,
     borderRadius: BorderRadius.circular(20),
-    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 12, offset: const Offset(0, 4))],
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.02),
+        blurRadius: 12,
+        offset: const Offset(0, 4),
+      ),
+    ],
   ),
   child: ClipRRect(
     borderRadius: BorderRadius.circular(20),
-    child: Material(color: Colors.transparent, child: Column(children: children)),
+    child: Material(
+      color: Colors.transparent,
+      child: Column(children: children),
+    ),
   ),
 );
 
@@ -255,7 +300,11 @@ Widget _settingsTile({
   leading: _settingsIcon(icon, color),
   title: _settingsTitle(title),
   subtitle: _settingsSubtitle(subtitle),
-  trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black26, size: 14),
+  trailing: const Icon(
+    Icons.arrow_forward_ios_rounded,
+    color: Colors.black26,
+    size: 14,
+  ),
 );
 
 Widget _settingsToggle({
@@ -273,22 +322,34 @@ Widget _settingsToggle({
   trailing: Switch.adaptive(
     value: value,
     onChanged: onChanged,
+    // ignore: deprecated_member_use
     activeColor: const Color(0xFFE96B47),
   ),
 );
 
 Widget _settingsIcon(IconData icon, Color color) => Container(
   padding: const EdgeInsets.all(8),
-  decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+  decoration: BoxDecoration(
+    color: color.withValues(alpha: 0.1),
+    shape: BoxShape.circle,
+  ),
   child: Icon(icon, color: color, size: 20),
 );
 
 Widget _settingsTitle(String title) => Text(
   title,
-  style: const TextStyle(color: Color(0xFF2D0C57), fontWeight: FontWeight.w600, fontSize: 15),
+  style: const TextStyle(
+    color: Color(0xFF2D0C57),
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+  ),
 );
 
 Widget _settingsSubtitle(String subtitle) => Text(
   subtitle,
-  style: const TextStyle(color: Color(0xFF9586A8), fontSize: 12, fontWeight: FontWeight.w400),
+  style: const TextStyle(
+    color: Color(0xFF9586A8),
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+  ),
 );

@@ -5,18 +5,12 @@ import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
-    SignUpCubit({required AuthRepository authRepository})
-      : _authRepository = authRepository,
-        super(const SignUpState());
+  SignUpCubit({required this._authRepository}) : super(const SignUpState());
 
   final AuthRepository _authRepository;
 
-  void showError(String message) => emit(
-        state.copyWith(
-          isSubmitting: false,
-          error: message,
-        ),
-      );
+  void showError(String message) =>
+      emit(state.copyWith(isSubmitting: false, error: message));
 
   Future<String?> submit({
     required String name,

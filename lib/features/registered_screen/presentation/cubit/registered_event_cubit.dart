@@ -8,14 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisteredEventCubit extends Cubit<RegisteredEventState> {
   RegisteredEventCubit({
-    required CancelRegisteredEvent cancelRegisteredEvent,
-    required AuthRepository authRepository,
-    required EventStore eventStore,
-  })
-      : _cancelRegisteredEvent = cancelRegisteredEvent,
-        _authRepository = authRepository,
-        _eventStore = eventStore,
-        super(const RegisteredEventState());
+    required this._cancelRegisteredEvent,
+    required this._authRepository,
+    required this._eventStore,
+  }) : super(const RegisteredEventState());
 
   final CancelRegisteredEvent _cancelRegisteredEvent;
   final AuthRepository _authRepository;
@@ -32,7 +28,12 @@ class RegisteredEventCubit extends Cubit<RegisteredEventState> {
       }
     } on Object {
       if (!isClosed) {
-        emit(state.copyWith(isLoadingToken: false, error: AppText.unableToLoadTicket));
+        emit(
+          state.copyWith(
+            isLoadingToken: false,
+            error: AppText.unableToLoadTicket,
+          ),
+        );
       }
     }
   }

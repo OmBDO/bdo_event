@@ -111,7 +111,7 @@ void configureDependencies() {
       authRepository: getIt(),
     ),
   );
-  getIt.registerSingleton<MainScreenCubit>(MainScreenCubit.new());
+  getIt.registerSingleton<MainScreenCubit>(MainScreenCubit());
   getIt.registerSingleton<ProfileScreenCubit>(
     ProfileScreenCubit(authRepository: getIt()),
   );

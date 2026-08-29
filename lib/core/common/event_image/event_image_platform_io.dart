@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<String> storePickedImage(XFile image) async {
   final documentsDirectory = await getApplicationDocumentsDirectory();

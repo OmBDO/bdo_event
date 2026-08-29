@@ -8,11 +8,7 @@ import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthRepository {
-  AuthRepository({
-    required SupabaseStore store,
-    required AuthRemoteDataSource authDataSource,
-  })  : _store = store,
-        _authDataSource = authDataSource;
+  AuthRepository({required this._store, required this._authDataSource});
 
   final SupabaseStore _store;
   final AuthRemoteDataSource _authDataSource;
@@ -64,10 +60,10 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-        final response = await _authDataSource.signIn(
-          email: email.trim().toLowerCase(),
-          password: password,
-        );
+      final response = await _authDataSource.signIn(
+        email: email.trim().toLowerCase(),
+        password: password,
+      );
       final user = response.user;
       if (user == null) return AppText.emailOrPasswordIncorrect;
       _currentUser = await _mapUser(user);
@@ -112,8 +108,9 @@ class AuthRepository {
   }
 
   Future<User> _mapUser(supabase.User authUser) async {
-    final notificationsEnabled =
-        await _store.readNotificationPreference(authUser.id);
+    final notificationsEnabled = await _store.readNotificationPreference(
+      authUser.id,
+    );
     return AuthUserDto(
       user: authUser,
       notificationsEnabled: notificationsEnabled,
