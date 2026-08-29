@@ -31,7 +31,8 @@ Future<void> main() async {
     publishableKey: env.supabaseAnonKey,
   );
   configureDependencies();
-  getIt<AuthScreenCubit>().checkActiveSession();
+  await getIt<AuthScreenCubit>().checkActiveSession();
+  await getIt<CalendarScreenCubit>().loadRegistrations();
   runApp(const MyApp());
 }
 
