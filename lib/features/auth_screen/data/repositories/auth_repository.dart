@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
@@ -41,6 +43,7 @@ class AuthRepository implements AuthRepositoryContract {
     }
 
     _currentUser = await _mapUser(userForMapping);
+    _logUserClaims('session restored', userForMapping, _currentUser!);
   }
 
   Future<String?> register({
@@ -76,6 +79,7 @@ class AuthRepository implements AuthRepositoryContract {
       final user = response.user;
       if (user == null) return AppText.emailOrPasswordIncorrect;
       _currentUser = await _mapUser(user);
+      _logUserClaims('login succeeded', user, _currentUser!);
     } on supabase.AuthException catch (error) {
       return mapAuthError(error, signingUp: false);
     } on Object {
@@ -124,5 +128,23 @@ class AuthRepository implements AuthRepositoryContract {
       user: authUser,
       notificationsEnabled: notificationsEnabled,
     ).toEntity();
+  }
+
+  void _logUserClaims(
+    String source,
+    supabase.User authUser,
+    User mappedUser,
+  ) {
+    developer.log(
+      'auth.userClaims $source '
+      '{userId: ${authUser.id}, '
+      'email: ${authUser.email}, '
+      'appMetadata.roles: ${authUser.appMetadata['roles']}, '
+      'userMetadata.requested_role: '
+      '${authUser.userMetadata?['requested_role']}, '
+      'mappedRoles: ${mappedUser.roles.map((role) => role.storageValue).toList()}, '
+      'displayName: ${mappedUser.displayName}}',
+      name: 'bdo_event.supabase',
+    );
   }
 }
