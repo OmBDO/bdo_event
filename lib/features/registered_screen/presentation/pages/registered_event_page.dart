@@ -5,6 +5,7 @@ import 'package:bdo_event/features/registered_screen/presentation/cubit/register
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -273,6 +274,78 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                             ),
                     ),
                     const SizedBox(height: 18),
+                    if (state.registrationToken != null) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          AppText.registrationCode,
+                          style: const TextStyle(
+                            color: Color(0xFF6F607A),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF8F2),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFF0C9C4)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: SelectableText(
+                                _qrData(state.registrationToken!),
+                                style: const TextStyle(
+                                  color: Color(0xFF2D0C57),
+                                  fontFamily: 'monospace',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: AppText.copyRegistrationCode,
+                              icon: const Icon(Icons.copy_rounded),
+                              onPressed: () async {
+                                await Clipboard.setData(
+                                  ClipboardData(
+                                    text: _qrData(state.registrationToken!),
+                                  ),
+                                );
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(AppText.registrationCodeCopied),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Give this code to event staff if the QR code cannot be scanned.',
+                          style: TextStyle(
+                            color: Color(0xFF6F607A),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 10),
                     const Text(
                       AppText.showQrCode,
                       textAlign: TextAlign.center,

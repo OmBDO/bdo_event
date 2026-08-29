@@ -100,6 +100,9 @@ abstract final class AppText {
   static const whyQrCode = 'Why is there a QR code?';
   static const gotIt = 'Got it';
   static const showQrCode = 'Show this QR code at the event entrance';
+    static const registrationCode = 'Registration code for manual entry';
+    static const copyRegistrationCode = 'Copy registration code';
+    static const registrationCodeCopied = 'Registration code copied';
   static const registrationConfirmed = 'Registration confirmed';
   static const cancellation = 'CANCELLATION';
   static const needToChangePlans = 'Need to change your plans?';
@@ -183,6 +186,8 @@ abstract final class AppText {
   static const checkInUnavailable = 'This registration cannot be checked in';
   static const scanRegistration = 'Scan registration';
   static const scanRegistrationPrompt = 'Scan a registration QR code';
+    static const enterRegistrationCode = 'Enter registration code from My Ticket';
+    static const pasteRegistrationCode = 'Paste the code shown below the QR';
   static const scanAgain = 'Scan again';
   static const notRegistered = 'You are not registered for this event';
   static const registrationCancelled =

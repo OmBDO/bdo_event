@@ -16,7 +16,7 @@ class ScannerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
     child: Row(
       children: [
         Expanded(

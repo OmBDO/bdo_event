@@ -96,8 +96,8 @@ class _CalendarScreenView extends StatelessWidget {
                         return Material(
                           color: Colors.transparent,
                           child: ListTile(
-                            onTap: () {
-                              Navigator.of(context).push(
+                            onTap: () async {
+                              await Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) =>
                                         BlocProvider(
@@ -107,6 +107,11 @@ class _CalendarScreenView extends StatelessWidget {
                                         ),
                                 ),
                               );
+                              if (context.mounted) {
+                                await context
+                                    .read<CalendarScreenCubit>()
+                                    .loadRegistrations();
+                              }
                             },
                             title: Text(
                               event.title,
