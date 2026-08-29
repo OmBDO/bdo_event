@@ -40,6 +40,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   String? _selectedImagePath;
   Location? _selectedLocation;
   LatLng? _selectedCoordinates;
+  EventCategory? _selectedCategory;
   final _locationSearchController = TextEditingController();
   bool _isSaving = false;
   int _locationSearchRequest = 0;
@@ -52,6 +53,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   void initState() {
     super.initState();
     final event = widget.event;
+    _selectedCategory = _categoryMatching(widget.catagory ?? event?.catagory);
     if (event != null) {
       _titleController.text = event.title;
       _dateController.text = event.date;
@@ -114,7 +116,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
       latitude: _selectedCoordinates?.latitude,
       longitude: _selectedCoordinates?.longitude,
       createdAt: DateTime.now(),
-      catagory: widget.catagory,
+      catagory: _selectedCategory,
     );
     final error = await context.read<EventScreenCubit>().save(
       event,
@@ -365,7 +367,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       AppDropDownField<EventCategory>(
                         label: AppText.selectCategory,
                         icon: Icons.category_outlined,
-                        value: widget.catagory,
+                        value: _selectedCategory,
                         validator: (value) =>
                             value == null ? AppText.pleaseSelectCategory : null,
                         items: _categories.map((category) {
@@ -386,7 +388,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                         }).toList(),
                         onChanged: (newValue) {
                           setState(() {
-                            widget.catagory = newValue;
+                            _selectedCategory = newValue;
                           });
                         },
                       ),
@@ -413,8 +415,17 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   static const _officeLocations = LocationCatalog.offices;
-}
 
+  EventCategory? _categoryMatching(EventCategory? category) {
+    if (category == null) return null;
+    for (final option in _categories) {
+      if (option.name.toLowerCase() == category.name.toLowerCase()) {
+        return option;
+      }
+    }
+    return null;
+  }
+}
 class _LocationPickerSection extends StatelessWidget {
   const _LocationPickerSection({
     required this.searchController,

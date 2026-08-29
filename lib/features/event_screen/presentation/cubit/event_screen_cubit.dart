@@ -90,7 +90,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   Future<String?> delete(Event event) async {
     try {
       final result = await _deleteEvent(event);
-      if (!isClosed) emit(state.copyWith(error: result.error));
+      if (!isClosed) {
+        emit(state.copyWith(events: result.events, error: result.error));
+      }
       return result.error;
     } on Object {
       if (!isClosed) emit(state.copyWith(error: AppText.unableToDeleteEvent));

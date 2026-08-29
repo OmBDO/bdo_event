@@ -16,6 +16,9 @@ class MyEventScreen extends StatefulWidget {
 }
 
 class _MyEventScreenState extends State<MyEventScreen> {
+  Event? _eventBeingDragged;
+  bool _isDeleteTargetHovered = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +40,34 @@ class _MyEventScreenState extends State<MyEventScreen> {
           .push(MaterialPageRoute(builder: (_) => const CategoryEventPage()));
     }
     _loadEvents(); // Refresh data from backend when user navigates back
+  }
+
+  Future<void> _confirmDelete(Event event) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(AppText.deleteEventQuestion),
+        content: Text(
+          AppText.deleteEventDescription.replaceFirst('{eventTitle}', event.title),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text(AppText.keepEvent),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text(AppText.delete),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete != true || !mounted) return;
+
+    final error = await context.read<EventScreenCubit>().delete(event);
+    if (!mounted || error == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
   }
 
   @override
@@ -102,7 +133,41 @@ class _MyEventScreenState extends State<MyEventScreen> {
                   itemCount: events.length,
                   itemBuilder: (context, index) {
                     final event = events[index];
-                    return Card(
+                    return LongPressDraggable<Event>(
+                      data: event,
+                      delay: const Duration(milliseconds: 250),
+                      onDragStarted: () =>
+                          setState(() => _eventBeingDragged = event),
+                      onDraggableCanceled: (_, __) {
+                        if (mounted) setState(() => _eventBeingDragged = null);
+                      },
+                      onDragEnd: (_) {
+                        if (mounted) {
+                          setState(() {
+                            _eventBeingDragged = null;
+                            _isDeleteTargetHovered = false;
+                          });
+                        }
+                      },
+                      feedback: Material(
+                        color: Colors.transparent,
+                        child: SizedBox(
+                          width: MediaQuery.sizeOf(context).width - 32,
+                          child: Card(
+                            elevation: 8,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Text(
+                                event.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      child: Card(
                       margin: const EdgeInsets.only(bottom: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -191,6 +256,38 @@ class _MyEventScreenState extends State<MyEventScreen> {
                           ),
                         ),
                       ),
+                      ),
+                      childWhenDragging: Opacity(
+                        opacity: 0.35,
+                        child: Card(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 2,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => _navigateToCreateOrEdit(event),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    event.title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const Icon(Icons.chevron_right, color: Colors.grey),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      ),
                     );
                   },
                 );
@@ -200,10 +297,48 @@ class _MyEventScreenState extends State<MyEventScreen> {
           Positioned(
             bottom: 110,
             right: 20,
-            child: FloatingActionButton(
-              onPressed: () => _navigateToCreateOrEdit(),
-              backgroundColor: Colors.black87,
-              child: const Icon(Icons.add, color: Colors.white),
+            child: DragTarget<Event>(
+              onWillAcceptWithDetails: (details) {
+                if (_eventBeingDragged == null) return false;
+                setState(() => _isDeleteTargetHovered = true);
+                return true;
+              },
+              onLeave: (_) {
+                if (mounted) setState(() => _isDeleteTargetHovered = false);
+              },
+              onAcceptWithDetails: (details) async {
+                final event = details.data;
+                setState(() {
+                  _eventBeingDragged = null;
+                  _isDeleteTargetHovered = false;
+                });
+                await _confirmDelete(event);
+              },
+              builder: (context, candidateData, rejectedData) {
+                final isDeleteMode = _eventBeingDragged != null;
+                return FloatingActionButton(
+                  onPressed: isDeleteMode
+                      ? () async {
+                          final event = _eventBeingDragged;
+                          if (event == null) return;
+                          setState(() {
+                            _eventBeingDragged = null;
+                            _isDeleteTargetHovered = false;
+                          });
+                          await _confirmDelete(event);
+                        }
+                      : () => _navigateToCreateOrEdit(),
+                  backgroundColor: isDeleteMode
+                      ? (_isDeleteTargetHovered
+                            ? Colors.red.shade800
+                            : Colors.red)
+                      : Colors.black87,
+                  child: Icon(
+                    isDeleteMode ? Icons.delete_outline : Icons.add,
+                    color: Colors.white,
+                  ),
+                );
+              },
             ),
           ),
         ],
