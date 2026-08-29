@@ -22,7 +22,7 @@ class _ProfileScreenView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ProfileScreenCubit, ProfileScreenState>(
+    return BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
       listenWhen: (previous, current) =>
           previous.errorMessage != current.errorMessage &&
           current.errorMessage != null,
@@ -31,10 +31,9 @@ class _ProfileScreenView extends StatelessWidget {
           SnackBar(content: Text(state.errorMessage!)),
         );
       },
-          builder: (context, state) {
-            final user = state.user;
-            return SafeArea(
-        builder: (context, state) => SafeArea(
+      builder: (context, state) {
+        final user = state.user;
+        return SafeArea(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,9 +202,8 @@ class _ProfileScreenView extends StatelessWidget {
               ],
             ),
           ),
-          );
-        },
-      ),
+        );
+      },
     );
   }
 
