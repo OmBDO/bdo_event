@@ -21,6 +21,11 @@ import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_regi
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
+import 'package:bdo_event/features/watcher_screen/data/datasource/watcher_remote_data_source.dart';
+import 'package:bdo_event/features/watcher_screen/data/repositories/watcher_repository.dart';
+import 'package:bdo_event/features/watcher_screen/domain/usecases/check_in_registration.dart';
+import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dashboard.dart';
+import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -96,8 +101,11 @@ void main() {
   test('scanner ignores a second QR validation while the first is pending', () async {
     final resultCompleter = Completer<Map<String, dynamic>?>();
     final store = FakeEventStore()..validationResult = resultCompleter.future;
+    final repository = WatcherRepository(WatcherRemoteDataSourceImpl(store));
     final cubit = WatcherScanCubit(
-      eventStore: store,
+      validateRegistration: ValidateRegistration(repository),
+      checkInRegistration: CheckInRegistration(repository),
+      loadScanDashboard: LoadScanDashboard(repository),
       authRepository: FakeAuthRepository(roles: {UserRole.watcher}),
     );
     final qr = jsonEncode({
@@ -262,6 +270,9 @@ class FakeEventStore implements EventStore {
 
   @override
   Future<int> loadAttendanceCount(String eventId) async => 0;
+
+  @override
+  Future<int> loadCheckedInCount(String eventId) async => 0;
 
   @override
   Future<List<EventAttendee>> loadEventAttendees(String eventId) async => [];

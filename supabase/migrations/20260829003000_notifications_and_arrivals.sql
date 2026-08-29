@@ -98,28 +98,37 @@ security definer
 set search_path = public
 as $$
 declare
-  registration_token uuid;
+  current_registration_token uuid;
 begin
   if requested_status not in ('attending', 'not_attending') then
     raise exception 'Invalid arrival status';
   end if;
 
   select registration.registration_token
-    into registration_token
+    into current_registration_token
   from public.event_registrations as registration
   where registration.event_id = requested_event_id
     and registration.user_id = auth.uid()
     and registration.status = 'active'
   limit 1;
 
-  if registration_token is null then
+  if current_registration_token is null then
     raise exception 'Active registration required';
   end if;
+
+  delete from public.event_arrivals
+  where event_id = requested_event_id
+    and user_id = auth.uid()
+    and event_arrivals.registration_token <> current_registration_token;
 
   insert into public.event_arrivals (
     registration_token, event_id, user_id, status, confirmed_at
   ) values (
-    registration_token, requested_event_id, auth.uid(), requested_status, now()
+    current_registration_token,
+    requested_event_id,
+    auth.uid(),
+    requested_status,
+    now()
   )
   on conflict (registration_token) do update
     set status = excluded.status,
@@ -138,6 +147,10 @@ as $$
 declare
   inserted_count integer;
 begin
+  if auth.uid() is not null then
+    raise exception 'Internal function only';
+  end if;
+
   insert into public.notifications (
     user_id, event_id, notification_type, title, message, event_date
   )

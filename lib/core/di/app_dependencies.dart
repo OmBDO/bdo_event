@@ -31,6 +31,12 @@ import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_regi
 import 'package:bdo_event/features/registered_screen/domain/repositories/registered_event_repository.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
+import 'package:bdo_event/features/watcher_screen/data/datasource/watcher_remote_data_source.dart';
+import 'package:bdo_event/features/watcher_screen/data/repositories/watcher_repository.dart';
+import 'package:bdo_event/features/watcher_screen/domain/repositories/watcher_repository_contract.dart';
+import 'package:bdo_event/features/watcher_screen/domain/usecases/check_in_registration.dart';
+import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dashboard.dart';
+import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
@@ -43,6 +49,21 @@ void configureDependencies() {
     () => SupabaseStore(logger: getIt()),
   );
   getIt.registerLazySingleton<EventStore>(() => getIt<SupabaseStore>());
+  getIt.registerLazySingleton<WatcherRemoteDataSource>(
+    () => WatcherRemoteDataSourceImpl(getIt<EventStore>()),
+  );
+  getIt.registerLazySingleton<WatcherRepositoryContract>(
+    () => WatcherRepository(getIt<WatcherRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<ValidateRegistration>(
+    () => ValidateRegistration(getIt<WatcherRepositoryContract>()),
+  );
+  getIt.registerLazySingleton<CheckInRegistration>(
+    () => CheckInRegistration(getIt<WatcherRepositoryContract>()),
+  );
+  getIt.registerLazySingleton<LoadScanDashboard>(
+    () => LoadScanDashboard(getIt<WatcherRepositoryContract>()),
+  );
   getIt.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSource(logger: getIt()),
   );
@@ -141,6 +162,11 @@ void configureDependencies() {
     ),
   );
   getIt.registerSingleton<WatcherScanCubit>(
-    WatcherScanCubit(eventStore: getIt(), authRepository: getIt()),
+    WatcherScanCubit(
+      validateRegistration: getIt(),
+      checkInRegistration: getIt(),
+      loadScanDashboard: getIt(),
+      authRepository: getIt(),
+    ),
   );
 }
