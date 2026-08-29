@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
@@ -19,33 +19,62 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   final CreateEvent _createEvent;
   final UpdateEvent _updateEvent;
   final DeleteEvent _deleteEvent;
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   Future<void> load() async {
+    if (isClosed) return;
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final events = await _loadEvents();
-      emit(state.copyWith(events: events, isLoading: false));
+      if (!isClosed) {
+        emit(state.copyWith(events: events, isLoading: false));
+      }
     } on Object {
-      emit(state.copyWith(isLoading: false, error: AppText.unableToLoadEvents));
+      if (!isClosed) {
+        emit(
+          state.copyWith(isLoading: false, error: AppText.unableToLoadEvents),
+        );
+      }
     }
   }
 
   Future<String?> save(Event event, {required bool isEditing}) async {
     final user = _authRepository.currentUser;
     if (user == null) return AppText.pleaseSignInToManageEvents;
+    if (isClosed) return AppText.unableToSaveEvent;
     emit(state.copyWith(isSaving: true, clearError: true));
-    final result = isEditing
-        ? await _updateEvent(event)
-        : await _createEvent(event, user);
-    emit(state.copyWith(isSaving: false, error: result.error));
-    return result.error;
+    try {
+      final result = isEditing
+          ? await _updateEvent(event)
+          : await _createEvent(event, user);
+      if (!isClosed) {
+        emit(state.copyWith(isSaving: false, error: result.error));
+      }
+      return result.error;
+    } on Object {
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            isSaving: false,
+            error: isEditing
+                ? AppText.unableToUpdateEvent
+                : AppText.unableToSaveEvent,
+          ),
+        );
+      }
+      return isEditing ? AppText.unableToUpdateEvent : AppText.unableToSaveEvent;
+    }
   }
 
   Future<String?> delete(Event event) async {
-    final result = await _deleteEvent(event);
-    emit(state.copyWith(error: result.error));
-    return result.error;
+    try {
+      final result = await _deleteEvent(event);
+      if (!isClosed) emit(state.copyWith(error: result.error));
+      return result.error;
+    } on Object {
+      if (!isClosed) emit(state.copyWith(error: AppText.unableToDeleteEvent));
+      return AppText.unableToDeleteEvent;
+    }
   }
 
   bool canUpdate(Event event) => _authRepository.canUpdate(event);
