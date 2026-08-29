@@ -185,7 +185,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              if (pendingCount > 1)
+              if (pendingCount > 0)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(

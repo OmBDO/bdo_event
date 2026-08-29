@@ -363,7 +363,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                               onPressed: () async {
                                 await Clipboard.setData(
                                   ClipboardData(
-                                    text: _qrData(state.registrationToken!),
+                                    text: _manualCode(state.registrationToken!),
                                   ),
                                 );
                                 if (!mounted) return;
