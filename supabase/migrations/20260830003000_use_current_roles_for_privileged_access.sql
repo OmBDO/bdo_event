@@ -43,7 +43,7 @@ begin
   end if;
 
   return query
-    select registration.event_id,
+        select registration.event_id,
            registration.user_id,
            registration.status,
            registration.created_at

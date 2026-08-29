@@ -171,6 +171,8 @@ abstract final class AppText {
   static const eventNoLongerAvailable =
       'This event is no longer available for registration';
   static const eventAtCapacity = 'This event has reached its capacity';
+    static const registrationDeadlinePassed =
+            'Registration for this event has closed';
   static const alreadyRegistered = 'You are already registered for this event';
   static const registrationRevoked =
       'This registration was cancelled and cannot be reactivated';

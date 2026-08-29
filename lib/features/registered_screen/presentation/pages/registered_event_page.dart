@@ -155,6 +155,14 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
     'location': widget.event.location,
   });
 
+  String _manualCode(String token) {
+    final value = utf8
+        .encode('${widget.event.id}|$token')
+        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
+        .join();
+    return 'BDO1$value';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegisteredEventCubit, RegisteredEventState>(
@@ -245,6 +253,19 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         fontSize: 14,
                       ),
                     ),
+                    if (widget.event.startTime != null ||
+                        widget.event.endTime != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        '${widget.event.startTime ?? '--:--'} - ${widget.event.endTime ?? '--:--'}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFF2D0C57),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 26),
                     Container(
                       padding: const EdgeInsets.all(14),
@@ -325,7 +346,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           children: [
                             Expanded(
                               child: SelectableText(
-                                _qrData(state.registrationToken!),
+                                _manualCode(state.registrationToken!),
                                 style: const TextStyle(
                                   color: Color(0xFF2D0C57),
                                   fontFamily: 'monospace',

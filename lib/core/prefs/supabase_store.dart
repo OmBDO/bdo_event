@@ -16,6 +16,8 @@ abstract interface class EventStore {
 
   Future<List<Event>> loadRegistrations(String userId);
 
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds);
+
   Future<void> activateRegistration(String userId, Event event);
 
   Future<void> revokeRegistration(String userId, String eventId);
@@ -168,6 +170,27 @@ class SupabaseStore implements EventStore {
   }
 
   @override
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async {
+    if (eventIds.isEmpty) return const {};
+    try {
+      final rows = await _logger.track(
+        'rpc.loadEventRegistrationCounts',
+        () => _client.rpc(
+          'load_event_registration_counts',
+          params: {'requested_event_ids': eventIds},
+        ),
+        parameters: {'eventIds': eventIds},
+      );
+      return {
+        for (final row in rows as List<dynamic>)
+          (row['eventId'] as String): (row['registrationCount'] as num).toInt(),
+      };
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
   Future<void> activateRegistration(String userId, Event event) async {
     try {
       await _logger.track(
@@ -181,6 +204,8 @@ class SupabaseStore implements EventStore {
         ),
         parameters: {'eventId': event.id, 'userId': userId},
       );
+    } on supabase.PostgrestException catch (error) {
+      throw LocalStorageException(error.message);
     } on Object {
       throw const LocalStorageException();
     }
@@ -416,5 +441,7 @@ class SupabaseStore implements EventStore {
 }
 
 class LocalStorageException implements Exception {
-  const LocalStorageException();
+  const LocalStorageException([this.message]);
+
+  final String? message;
 }

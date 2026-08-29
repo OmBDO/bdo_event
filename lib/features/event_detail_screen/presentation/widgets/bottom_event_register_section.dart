@@ -32,6 +32,9 @@ class BottomEventRegisterSection extends StatelessWidget {
     final cubit = context.read<EventDetailCubit>();
     final bool isFull =
         event.capacity != null && event.attendeeCount >= event.capacity!;
+    final bool isPastRegistrationDeadline =
+      event.registrationDeadline != null &&
+      !DateTime.now().isBefore(event.registrationDeadline!);
 
     return BlocBuilder<EventDetailCubit, EventDetailState>(
       bloc: cubit,
@@ -65,7 +68,7 @@ class BottomEventRegisterSection extends StatelessWidget {
             );
             if (!context.mounted) return;
             cubit.checkRegistration(event);
-            context.read<EventScreenCubit>().load();
+            context.read<EventScreenCubit>().load(force: true);
             context.read<CalendarScreenCubit>().loadRegistrations();
           };
         } else if (!event.isAvailable) {
@@ -78,6 +81,11 @@ class BottomEventRegisterSection extends StatelessWidget {
           statusColor = Colors.red.shade700;
           buttonText = AppText.fullyBooked;
           buttonAction = null;
+        } else if (isPastRegistrationDeadline) {
+          statusText = AppText.registrationClosed;
+          statusColor = textGrey;
+          buttonText = AppText.registrationClosed;
+          buttonAction = null;
         } else {
           // Action mapping: Fires real booking updates through the secondary repository
           buttonAction = () async {
@@ -85,7 +93,7 @@ class BottomEventRegisterSection extends StatelessWidget {
             if (!context.mounted) return;
 
             if (error == null) {
-              context.read<EventScreenCubit>().load();
+              context.read<EventScreenCubit>().load(force: true);
               context.read<CalendarScreenCubit>().loadRegistrations();
             }
 

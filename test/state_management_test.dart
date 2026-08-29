@@ -309,6 +309,10 @@ class FakeEventStore implements EventStore {
   Future<List<Event>> loadRegistrations(String userId) async => const [];
 
   @override
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async =>
+      const {};
+
+  @override
   Future<void> activateRegistration(String userId, Event event) async {}
 
   @override

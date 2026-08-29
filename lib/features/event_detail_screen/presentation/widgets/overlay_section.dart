@@ -196,6 +196,24 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             ),
             const Gap(14),
 
+            if (widget.widget.event.startTime != null ||
+                widget.widget.event.endTime != null)
+              Row(
+                children: [
+                  Icon(Icons.schedule_outlined, color: widget.textGrey, size: 18),
+                  const Gap(8),
+                  Text(
+                    '${widget.widget.event.startTime ?? '--:--'} - ${widget.widget.event.endTime ?? '--:--'}',
+                    style: TextStyle(
+                      color: widget.primaryDark,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            const Gap(14),
+
             // Description Summary Details Text block
             Text(
               AppText.eventDetailDescription,

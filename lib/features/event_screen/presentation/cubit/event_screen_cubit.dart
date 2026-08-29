@@ -24,8 +24,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   final DeleteEvent _deleteEvent;
   final AuthRepositoryContract _authRepository;
 
-  Future<void> load() async {
+  Future<void> load({bool force = false}) async {
     if (isClosed) return;
+    if (!force && (state.hasLoaded || state.isLoading)) return;
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final events = await _loadEvents();
@@ -41,6 +42,7 @@ class EventScreenCubit extends Cubit<EventScreenState> {
                 .map((event) => event.id)
                 .toSet(),
             isLoading: false,
+            hasLoaded: true,
           ),
         );
       }
