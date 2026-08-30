@@ -43,7 +43,9 @@ class EventReminderNotificationService {
     return _permissionService.request();
   }
 
-  Future<void> scheduleTestNotification({Duration delay = const Duration(seconds: 5)}) {
+  Future<void> scheduleTestNotification({
+    Duration delay = const Duration(seconds: 5),
+  }) {
     final scheduledDate = tz.TZDateTime.now(tz.local).add(delay);
     return _plugin.zonedSchedule(
       0,
@@ -61,8 +63,6 @@ class EventReminderNotificationService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
@@ -96,8 +96,6 @@ class EventReminderNotificationService {
       ),
       payload: _eventReminderPayload,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
     return true;
   }
@@ -114,11 +112,7 @@ class EventReminderNotificationService {
   Future<void> reconcileLastEventReminders({
     required bool enabled,
     required Duration leadTime,
-  }) => _reconcile(
-    _lastRegisteredEvents,
-    enabled: enabled,
-    leadTime: leadTime,
-  );
+  }) => _reconcile(_lastRegisteredEvents, enabled: enabled, leadTime: leadTime);
 
   Future<void> _reconcile(
     List<Event> events, {
@@ -137,7 +131,10 @@ class EventReminderNotificationService {
     }
     for (final event in events) {
       try {
-        final scheduled = await scheduleEventReminder(event, leadTime: leadTime);
+        final scheduled = await scheduleEventReminder(
+          event,
+          leadTime: leadTime,
+        );
         if (scheduled) {
           scheduledIds.add(EventReminderPolicy.notificationIdFor(event.id));
         }

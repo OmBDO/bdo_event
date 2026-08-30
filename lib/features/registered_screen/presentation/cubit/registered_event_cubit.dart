@@ -18,7 +18,7 @@ class RegisteredEventCubit extends Cubit<RegisteredEventState> {
   final CancelRegisteredEvent _cancelRegisteredEvent;
   final AuthRepositoryContract _authRepository;
   final EventStore _eventStore;
-  final EventReminderNotificationService _reminderNotifications;
+  final EventReminderNotificationService? _reminderNotifications;
   int _tokenRequestId = 0;
 
   Future<void> loadToken(String eventId) async {
@@ -48,8 +48,11 @@ class RegisteredEventCubit extends Cubit<RegisteredEventState> {
   }
 
   Future<void> _cancelReminder(String eventId) async {
+    final reminderNotifications = _reminderNotifications;
+    if (reminderNotifications == null) return;
+
     try {
-      await _reminderNotifications.cancelEventReminder(eventId);
+      await reminderNotifications.cancelEventReminder(eventId);
     } on Object {
       return;
     }

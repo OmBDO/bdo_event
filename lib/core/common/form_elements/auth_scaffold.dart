@@ -50,7 +50,7 @@ class AuthScaffold extends StatelessWidget {
                   children: [
                     Text(
                       eyebrow,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: theme.colorScheme.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
@@ -60,7 +60,7 @@ class AuthScaffold extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: theme.colorScheme.onSurface,
                         fontSize: 30,
                         fontWeight: FontWeight.w800,
@@ -69,8 +69,10 @@ class AuthScaffold extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 15,
                         height: 1.4,
                       ),
@@ -83,9 +85,7 @@ class AuthScaffold extends StatelessWidget {
                           alpha: isDarkMode ? 0.96 : 0.84,
                         ),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: theme.colorScheme.surface,
-                        ),
+                        border: Border.all(color: theme.colorScheme.surface),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(

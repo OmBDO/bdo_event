@@ -93,6 +93,7 @@ void main() {
         cancelRegisteredEvent: CancelRegisteredEvent(repository),
         authRepository: FakeAuthRepository(),
         eventStore: FakeEventStore(),
+        reminderNotifications: null,
       );
 
       final cancelled = await cubit.cancel(event);
@@ -275,6 +276,12 @@ class FakeAuthRepository implements AuthRepositoryContract {
     required String email,
   }) {
     // TODO: implement updateProfile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> updateNotificationPreference(bool enable) {
+    // TODO: implement updateNotificationPreference
     throw UnimplementedError();
   }
 }

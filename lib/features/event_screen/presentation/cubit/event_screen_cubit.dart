@@ -17,11 +17,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
     required this._updateEvent,
     required this._deleteEvent,
     required this._authRepository,
-     RecentEventStore? recentEventStore,
-    SharedPreferences? preferences,
-  }) : _preferences = preferences,
-       _recentEventStore = recentEventStore,
-       super(const EventScreenState());
+    this._recentEventStore,
+    this._preferences,
+  }) : super(const EventScreenState());
 
   final LoadEvents _loadEvents;
   final LoadRegisteredEvents? _loadRegisteredEvents;
@@ -42,7 +40,7 @@ class EventScreenCubit extends Cubit<EventScreenState> {
       final userId = _authRepository.currentUser?.id;
       final registeredEvents = userId == null || _loadRegisteredEvents == null
           ? const <Event>[]
-          : await _loadRegisteredEvents!(userId);
+          : await _loadRegisteredEvents(userId);
       if (!isClosed) {
         emit(
           state.copyWith(
@@ -50,13 +48,11 @@ class EventScreenCubit extends Cubit<EventScreenState> {
             registeredEventIds: registeredEvents
                 .map((event) => event.id)
                 .toSet(),
-            savedEventIds: _preferences?.getStringList(_savedEventIdsKey)
-                ?.toSet() ??
-              const {},
-            recentEventIds: _recentEventStore?.readIds(
-                  userId: userId,
-                ) ??
-                const [],
+            savedEventIds:
+                _preferences?.getStringList(_savedEventIdsKey)?.toSet() ??
+                const {},
+            recentEventIds:
+                _recentEventStore?.readIds(userId: userId) ?? const [],
             isLoading: false,
             hasLoaded: true,
           ),
@@ -101,7 +97,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
           ),
         );
       }
-      return isEditing ? AppText.unableToUpdateEvent : AppText.unableToSaveEvent;
+      return isEditing
+          ? AppText.unableToUpdateEvent
+          : AppText.unableToSaveEvent;
     }
   }
 
@@ -109,7 +107,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
     if (state.deletingEventIds.contains(event.id)) return null;
     emit(
       state.copyWith(
-        events: state.events.where((current) => current.id != event.id).toList(),
+        events: state.events
+            .where((current) => current.id != event.id)
+            .toList(),
         deletingEventIds: {...state.deletingEventIds, event.id},
         clearError: true,
       ),

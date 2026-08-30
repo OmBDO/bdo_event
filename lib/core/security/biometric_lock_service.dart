@@ -2,7 +2,7 @@ import 'package:local_auth/local_auth.dart';
 
 class BiometricLockService {
   BiometricLockService([LocalAuthentication? authentication])
-      : _authentication = authentication ?? LocalAuthentication();
+    : _authentication = authentication ?? LocalAuthentication();
 
   final LocalAuthentication _authentication;
 
@@ -18,7 +18,7 @@ class BiometricLockService {
   Future<bool> unlock() async {
     if (!await isAvailable()) return false;
     try {
-      return _authentication.authenticate(
+      return await _authentication.authenticate(
         localizedReason: 'Authenticate to open your event account',
         options: const AuthenticationOptions(
           biometricOnly: true,

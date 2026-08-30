@@ -31,4 +31,6 @@ abstract interface class AuthRepositoryContract {
   Future<void> logout();
 
   Future<String?> logoutEverywhere();
+
+  Future<String?> updateNotificationPreference(bool enable);
 }

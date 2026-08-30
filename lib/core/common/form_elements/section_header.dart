@@ -20,7 +20,7 @@ class SectionHeader extends StatelessWidget {
       children: [
         Text(
           subtitle,
-          style: const TextStyle(
+          style: TextStyle(
             color: theme.colorScheme.primary,
             fontSize: 12,
             fontWeight: FontWeight.w800,
@@ -30,7 +30,7 @@ class SectionHeader extends StatelessWidget {
         const SizedBox(height: 10),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: theme.colorScheme.onSurface,
             fontSize: 30,
             fontWeight: FontWeight.w800,

@@ -37,9 +37,9 @@ class ProfilePreferencesLocalDataSourceImpl
         _preferences?.getBool(_watcherVibrationKey) ?? true,
     watcherSoundVolume: _preferences?.getDouble(_watcherSoundVolumeKey) ?? 1.0,
     isWatcherAutoOpenNextEnabled:
-      _preferences?.getBool(_watcherAutoOpenNextKey) ?? true,
+        _preferences?.getBool(_watcherAutoOpenNextKey) ?? true,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      _preferences?.getBool(_watcherKeepHistoryKey) ?? false,
+        _preferences?.getBool(_watcherKeepHistoryKey) ?? false,
     isEventRemindersEnabled:
         _preferences?.getBool(_eventRemindersEnabledKey) ?? true,
     eventReminderLeadTimeMinutes:
@@ -51,48 +51,42 @@ class ProfilePreferencesLocalDataSourceImpl
   @override
   Future<void> save(ProfilePreferencesModel preferences) async {
     if (_preferences == null) return;
-    await _preferences!.setBool(
-      _darkModeKey,
-      preferences.isDarkModeEnabled,
-    );
-    await _preferences!.setBool(
-      _largeTextKey,
-      preferences.isLargeTextEnabled,
-    );
-    await _preferences!.setBool(
+    await _preferences.setBool(_darkModeKey, preferences.isDarkModeEnabled);
+    await _preferences.setBool(_largeTextKey, preferences.isLargeTextEnabled);
+    await _preferences.setBool(
       _highContrastKey,
       preferences.isHighContrastEnabled,
     );
-    await _preferences!.setBool(
+    await _preferences.setBool(
       _watcherVoiceMutedKey,
       preferences.isWatcherVoiceMuted,
     );
-    await _preferences!.setBool(
+    await _preferences.setBool(
       _watcherVibrationKey,
       preferences.isWatcherVibrationEnabled,
     );
-    await _preferences!.setDouble(
+    await _preferences.setDouble(
       _watcherSoundVolumeKey,
       preferences.watcherSoundVolume,
     );
-    await _preferences!.setBool(
+    await _preferences.setBool(
       _watcherAutoOpenNextKey,
       preferences.isWatcherAutoOpenNextEnabled,
     );
-    await _preferences!.setBool(
+    await _preferences.setBool(
       _watcherKeepHistoryKey,
       preferences.isWatcherKeepHistoryVisibleAfterCheckIn,
     );
-    await _preferences!.setBool(
+    await _preferences.setBool(
       _eventRemindersEnabledKey,
       preferences.isEventRemindersEnabled,
     );
-    await _preferences!.setInt(
+    await _preferences.setInt(
       _eventReminderLeadTimeKey,
       preferences.eventReminderLeadTimeMinutes,
     );
-    await _preferences!.setString(_dateFormatKey, preferences.dateFormat);
-    await _preferences!.setBool(
+    await _preferences.setString(_dateFormatKey, preferences.dateFormat);
+    await _preferences.setBool(
       _biometricLockKey,
       preferences.isBiometricLockEnabled,
     );

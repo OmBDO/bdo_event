@@ -202,6 +202,12 @@ class FakeAuthRepository implements AuthRepositoryContract {
     // TODO: implement updateProfile
     throw UnimplementedError();
   }
+
+  @override
+  Future<String?> updateNotificationPreference(bool enable) {
+    // TODO: implement updateNotificationPreference
+    throw UnimplementedError();
+  }
 }
 
 class InMemoryEventStore implements EventStore {

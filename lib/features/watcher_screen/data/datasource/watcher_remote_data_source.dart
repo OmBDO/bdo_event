@@ -38,9 +38,6 @@ class WatcherRemoteDataSourceImpl implements WatcherRemoteDataSource {
       _store.loadCheckedInCount(eventId),
       _store.loadAttendanceCount(eventId),
     ]);
-    return ScanDashboard(
-      checkedInCount: counts[0] as int,
-      expectedCount: counts[1] as int,
-    );
+    return ScanDashboard(checkedInCount: counts[0], expectedCount: counts[1]);
   }
 }
