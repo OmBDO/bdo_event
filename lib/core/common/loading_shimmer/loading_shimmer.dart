@@ -31,11 +31,17 @@ class _AppShimmerState extends State<AppShimmer>
       shaderCallback: (bounds) => LinearGradient(
         begin: Alignment(-1.5 + (_controller.value * 3), -0.2),
         end: Alignment(-0.5 + (_controller.value * 3), 0.2),
-        colors: const [
-          Color(0xFFFFDCC8),
-          Color(0xFFFFF8F2),
-          Color(0xFFFFCDB5),
-        ],
+        colors: Theme.of(context).brightness == Brightness.dark
+            ? [
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+                Theme.of(context).colorScheme.surface,
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+              ]
+            : const [
+                Color(0xFFFFDCC8),
+                Color(0xFFFFF8F2),
+                Color(0xFFFFCDB5),
+              ],
       ).createShader(bounds),
       child: child,
     ),
@@ -55,7 +61,7 @@ class EventListShimmer extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFE9DB),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -64,7 +70,7 @@ class EventListShimmer extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFD5C0),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -102,7 +108,7 @@ class NotificationListShimmer extends StatelessWidget {
         height: 142,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFE9DB),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -180,7 +186,7 @@ class _ShimmerLine extends StatelessWidget {
     width: width,
     height: height,
     decoration: BoxDecoration(
-      color: const Color(0xFFFFD5C0),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.18),
       borderRadius: BorderRadius.circular(height / 2),
     ),
   );
@@ -195,8 +201,8 @@ class _ShimmerCircle extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: size,
     height: size,
-    decoration: const BoxDecoration(
-      color: Color(0xFFFFD5C0),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.18),
       shape: BoxShape.circle,
     ),
   );

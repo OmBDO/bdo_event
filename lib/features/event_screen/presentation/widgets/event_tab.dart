@@ -14,6 +14,7 @@ class EventTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       width: double.maxFinite,
       height: 40,
@@ -29,15 +30,17 @@ class EventTab extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: selectedTab == index ? Colors.black : Colors.white,
+                color: selectedTab == index
+                  ? theme.colorScheme.secondary
+                  : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 titles[index],
                 style: TextStyle(
-                  color: selectedTab == index
-                      ? Colors.white
-                      : Colors.grey.shade700,
+                    color: selectedTab == index
+                      ? theme.colorScheme.onSecondary
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),

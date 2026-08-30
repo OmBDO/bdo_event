@@ -10,6 +10,7 @@ import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/event_card.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/event_tab.dart';
+import 'package:bdo_event/features/event_screen/presentation/widgets/recent_event_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -52,7 +53,9 @@ class _EventPageViewState extends State<_EventPageView> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text(AppText.delete),
           ),
         ],
@@ -69,6 +72,10 @@ class _EventPageViewState extends State<_EventPageView> {
     return BlocBuilder<EventScreenCubit, EventScreenState>(
       builder: (context, state) {
         final currentTabList = state.currentTabEvents;
+        final recentEvents = state.recentEventIds
+          .map((id) => state.events.where((event) => event.id == id).firstOrNull)
+          .whereType<Event>()
+          .toList();
 
         return CustomScrollView(
           controller: AppScrollTracker.eventScrollController,
@@ -90,8 +97,47 @@ class _EventPageViewState extends State<_EventPageView> {
                 ),
               ),
             ),
+            if (state.selectedTab == 0 && recentEvents.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 0, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Recently viewed',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 166,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: recentEvents.length,
+                          itemBuilder: (context, index) {
+                            final event = recentEvents[index];
+                            return RecentEventTile(
+                              event: event,
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => BlocProvider(
+                                    create: (_) => getIt<EventDetailCubit>(),
+                                    child: EventDetailPage(event: event),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             if (currentTabList.isEmpty)
-              _buildEmptyState(state.selectedTab)
+              _buildEmptyState(context, state.selectedTab)
             else
               SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
@@ -135,6 +181,10 @@ class _EventPageViewState extends State<_EventPageView> {
                             onDelete: context.read<EventScreenCubit>().canDelete(cardData)
                                 ? () => _confirmDelete(cardData)
                                 : null,
+                            isSaved: state.savedEventIds.contains(cardData.id),
+                            onSave: () => context
+                              .read<EventScreenCubit>()
+                              .toggleSavedEvent(cardData),
                           ),
                         ),
                       );
@@ -157,7 +207,7 @@ class _EventPageViewState extends State<_EventPageView> {
     );
   }
 
-  SliverToBoxAdapter _buildEmptyState(int selectedTab) {
+  SliverToBoxAdapter _buildEmptyState(BuildContext context, int selectedTab) {
     final tabTitle = switch (selectedTab) {
       1 => 'My Events',
       2 => 'Past Events',
@@ -170,9 +220,11 @@ class _EventPageViewState extends State<_EventPageView> {
         child: Container(
           padding: const EdgeInsets.fromLTRB(24, 30, 24, 28),
           decoration: BoxDecoration(
-            color: const Color(0xFFF4F7F6),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: const Color(0xFFDCE7E3)),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
           ),
           child: Column(
             children: [
@@ -180,20 +232,20 @@ class _EventPageViewState extends State<_EventPageView> {
                 width: 76,
                 height: 76,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDDEDE7),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.event_available_rounded,
                   size: 38,
-                  color: Color(0xFF276653),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 22),
               Text(
                 'A quiet moment',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: const Color(0xFF173D34),
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -202,7 +254,9 @@ class _EventPageViewState extends State<_EventPageView> {
                 '$tabTitle will appear here when there is something to explore.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF667A74),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(
+                    alpha: 0.7,
+                  ),
                   height: 1.45,
                 ),
               ),

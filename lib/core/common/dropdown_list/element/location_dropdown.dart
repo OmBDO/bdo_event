@@ -35,16 +35,19 @@ class _LocationDropdownState extends State<LocationDropdown> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return PopupMenuButton<Location>(
       key: _menuKey,
       position: PopupMenuPosition.under,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(maxHeight: 190, minWidth: 220),
-      color: Colors.white,
+      color: theme.colorScheme.surface,
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
+        side: BorderSide(
+          color: theme.colorScheme.outline.withValues(alpha: 0.4),
+        ),
       ),
       onSelected: (location) {
         setState(() => _isMenuOpen = false);
@@ -65,7 +68,7 @@ class _LocationDropdownState extends State<LocationDropdown> {
                 height: 1,
                 indent: 20,
                 endIndent: 12,
-                color: Colors.grey.withValues(alpha: 0.15),
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.7),
               ),
               itemBuilder: (context, index) {
                 final location = widget.items[index];
@@ -76,17 +79,17 @@ class _LocationDropdownState extends State<LocationDropdown> {
                     contentPadding: const EdgeInsets.only(left: 20, right: 12),
                     leading: Icon(
                       Icons.circle_outlined,
-                      color: Colors.black54,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 10,
                     ),
                     horizontalTitleGap: 6,
                     minLeadingWidth: 0,
                     title: Text(
                       location.displayName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     subtitle: location.address == null
@@ -95,9 +98,11 @@ class _LocationDropdownState extends State<LocationDropdown> {
                             location.address!,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: Colors.black54,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
                           ),
                     onTap: () => _selectLocation(location),
@@ -118,10 +123,10 @@ class _LocationDropdownState extends State<LocationDropdown> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     AppText.location,
                     style: TextStyle(
-                      color: Color(0xFFFF5E00),
+                      color: theme.colorScheme.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
@@ -130,8 +135,8 @@ class _LocationDropdownState extends State<LocationDropdown> {
                     widget.selectedValue.displayName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.black87,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -143,9 +148,9 @@ class _LocationDropdownState extends State<LocationDropdown> {
               turns: _isMenuOpen ? 0.5 : 0.0,
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeInOut,
-              child: const Icon(
+              child: Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: Colors.black54,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 size: 20,
               ),
             ),

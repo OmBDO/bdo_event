@@ -7,9 +7,16 @@ import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_s
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_state.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/widgets/search_bar_widget.dart';
 import 'package:bdo_event/features/registered_screen/presentation/pages/registered_event_page.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/main_screen/domain/entities/main_tab.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
+import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
+import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -24,13 +31,26 @@ class CalendarScreen extends StatelessWidget {
   }
 }
 
-class _CalendarScreenView extends StatelessWidget {
+class _CalendarScreenView extends StatefulWidget {
   const _CalendarScreenView();
+
+  @override
+  State<_CalendarScreenView> createState() => _CalendarScreenViewState();
+}
+
+class _CalendarScreenViewState extends State<_CalendarScreenView> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<EventScreenCubit>().load();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CalendarScreenCubit, CalendarScreenState>(
-      builder: (context, state) => SafeArea(
+      builder: (context, state) {
+        final eventState = context.watch<EventScreenCubit>().state;
+        return SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(top: 70),
@@ -51,7 +71,35 @@ class _CalendarScreenView extends StatelessWidget {
                       curve: Curves.easeInOut,
                       child: isKeyboardOpen
                           ? const SizedBox.shrink()
-                          : const CalendarElement(),
+                          : CalendarElement(
+                              events: eventState.events,
+                              onEventTap: (event) async {
+                                final isRegistered = eventState.registeredEventIds
+                                    .contains(event.id);
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => isRegistered
+                                        ? BlocProvider(
+                                            create: (_) =>
+                                                getIt<RegisteredEventCubit>(),
+                                            child: RegisteredEventPage(
+                                              event: event,
+                                            ),
+                                          )
+                                        : BlocProvider(
+                                            create: (_) =>
+                                                getIt<EventDetailCubit>(),
+                                            child: EventDetailPage(event: event),
+                                          ),
+                                  ),
+                                );
+                                if (context.mounted) {
+                                  await context
+                                      .read<CalendarScreenCubit>()
+                                      .loadRegistrations();
+                                }
+                              },
+                            ),
                     );
                   },
                 ),
@@ -71,15 +119,18 @@ class _CalendarScreenView extends StatelessWidget {
                     }).toList();
 
                     if (visibleEvents.isEmpty) {
+                      final theme = Theme.of(context);
                       final hasRegistrations = state.events.isNotEmpty;
                       return Container(
                         margin: const EdgeInsets.fromLTRB(16, 12, 16, 28),
                         padding: const EdgeInsets.fromLTRB(24, 30, 24, 26),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.88),
+                          color: theme.colorScheme.surface.withValues(
+                            alpha: 0.88,
+                          ),
                           borderRadius: BorderRadius.circular(26),
                           border: Border.all(
-                            color: const Color(0xFFD9E5F0),
+                            color: theme.colorScheme.outlineVariant,
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -95,7 +146,7 @@ class _CalendarScreenView extends StatelessWidget {
                               width: 74,
                               height: 74,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE5F0FA),
+                                color: theme.colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(24),
                               ),
                               child: Icon(
@@ -103,7 +154,7 @@ class _CalendarScreenView extends StatelessWidget {
                                     ? Icons.search_off_rounded
                                     : Icons.event_available_rounded,
                                 size: 36,
-                                color: const Color(0xFF3B6989),
+                                color: theme.colorScheme.primary,
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -112,8 +163,8 @@ class _CalendarScreenView extends StatelessWidget {
                                   ? 'No events found'
                                   : 'Your calendar is ready',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Color(0xFF173D59),
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -124,8 +175,10 @@ class _CalendarScreenView extends StatelessWidget {
                                   ? AppText.noMatchingEvents
                                   : 'Registered events will appear here so you can find every ticket in one place.',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Color(0xFF667A86),
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.7,
+                                ),
                                 fontSize: 14,
                                 height: 1.45,
                               ),
@@ -139,8 +192,8 @@ class _CalendarScreenView extends StatelessWidget {
                                 icon: const Icon(Icons.explore_outlined),
                                 label: const Text('Explore events'),
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFF173D59),
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: theme.colorScheme.primary,
+                                  foregroundColor: theme.colorScheme.onPrimary,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 18,
                                     vertical: 13,
@@ -190,7 +243,7 @@ class _CalendarScreenView extends StatelessWidget {
                               ),
                             ),
                             subtitle: Text(
-                              '${event.date} • ${event.location}',
+                              '${formatEventDate(event.date, context.watch<ProfileScreenCubit>().state.dateFormat)} • ${event.location}',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
@@ -228,7 +281,8 @@ class _CalendarScreenView extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      );
+      },
     );
   }
 }

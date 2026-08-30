@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
+import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/prefs/recent_event_store.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
@@ -21,18 +24,23 @@ class _EventDetailPageState extends State<EventDetailPage> {
   @override
   void initState() {
     super.initState();
+    getIt<RecentEventStore>().record(
+      widget.event,
+      userId: getIt<AuthRepositoryContract>().currentUser?.id,
+    );
     context.read<EventDetailCubit>().checkRegistration(widget.event);
     context.read<EventDetailCubit>().loadAttendanceCount(widget.event);
   }
 
   @override
   Widget build(BuildContext context) {
-    const primaryDark = Color(0xFF111111);
-    const textGrey = Color(0xFF7A7A7A);
-    const mapBgColor = Color(0xFFE2EFF2);
+    final theme = Theme.of(context);
+    final primaryDark = theme.colorScheme.primary;
+    final textGrey = theme.colorScheme.onSurface.withValues(alpha: 0.65);
+    final mapBgColor = theme.colorScheme.surfaceContainerHighest;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       body: Stack(
         children: [
           // 1. Background Cover Image Asset & Overlay Control Chevrons

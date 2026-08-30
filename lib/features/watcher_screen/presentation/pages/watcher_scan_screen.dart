@@ -11,6 +11,8 @@ import 'package:bdo_event/features/watcher_screen/presentation/widget/scan_histo
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_dashboard.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_icon_button.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_target_overlay.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
 class WatcherScanScreen extends StatefulWidget {
@@ -36,11 +38,14 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
   Future<void> _configureSpeech() async {
     await _speech.setLanguage('en-IN');
     await _speech.setSpeechRate(0.5);
-    await _speech.setVolume(1.0);
+    await _speech.setVolume(
+      context.read<ProfileScreenCubit>().state.watcherSoundVolume,
+    );
     await _speech.setPitch(1.0);
   }
 
   Future<void> _announce(String message) async {
+    if (context.read<ProfileScreenCubit>().state.isWatcherVoiceMuted) return;
     await _speech.stop();
     await _speech.speak(message);
   }
@@ -56,30 +61,61 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<WatcherScanCubit, WatcherScanState>(
+    return BlocListener<ProfileScreenCubit, ProfileScreenState>(
       listenWhen: (previous, current) =>
-          (previous.message != current.message && current.message != null) ||
-          (previous.status != current.status &&
-              current.status == WatcherScanStatus.valid),
+          previous.watcherSoundVolume != current.watcherSoundVolume,
       listener: (context, state) {
-        if (state.status == WatcherScanStatus.valid) {
-          HapticFeedback.mediumImpact();
-        }
-        if (state.message != null) {
-          _announce(state.message!);
-        }
+        _speech.setVolume(state.watcherSoundVolume);
       },
-      child: BlocBuilder<WatcherScanCubit, WatcherScanState>(
-        builder: (context, state) {
+      child: BlocListener<WatcherScanCubit, WatcherScanState>(
+        listenWhen: (previous, current) =>
+            (previous.message != current.message && current.message != null) ||
+            (previous.status != current.status &&
+                current.status == WatcherScanStatus.valid),
+        listener: (context, state) {
+          if (state.status == WatcherScanStatus.valid) {
+            _manualEntryController.clear();
+            if (context
+                .read<ProfileScreenCubit>()
+                .state
+                .isWatcherVibrationEnabled) {
+              HapticFeedback.mediumImpact();
+            }
+          }
+          if (state.message != null) {
+            _announce(state.message!);
+          }
+        },
+        child: BlocBuilder<WatcherScanCubit, WatcherScanState>(
+          builder: (context, state) {
           final currentScan = state.history
               .where((entry) => entry.status == 'Ready to check in')
               .firstOrNull;
-          final pendingCount = state.history
-              .where((entry) => entry.status == 'Ready to check in')
-              .length;
 
           return Scaffold(
-            appBar: AppBar(title: const Text(AppText.scanRegistration)),
+            appBar: AppBar(
+              title: const Text(AppText.scanRegistration),
+              actions: [
+                BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
+                  builder: (context, profileState) {
+                    final isMuted = profileState.isWatcherVoiceMuted;
+                    return IconButton(
+                      tooltip: isMuted
+                          ? 'Unmute scanning voice'
+                          : AppText.muteScanningVoice,
+                      icon: Icon(
+                        isMuted
+                            ? Icons.volume_off_outlined
+                            : Icons.volume_up_outlined,
+                      ),
+                      onPressed: () => context
+                          .read<ProfileScreenCubit>()
+                          .toggleWatcherVoiceMuted(!isMuted),
+                    );
+                  },
+                ),
+              ],
+            ),
             body: Column(
               children: [
                 ScannerDashboard(
@@ -87,7 +123,18 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                   expectedCount: state.expectedCount,
                   historyCount: state.history.length,
                   onHistoryPressed: () =>
-                      ScanHistorySheet.show(context, state.history),
+                      ScanHistorySheet.show(
+                      context,
+                      state.history,
+                      autoOpenNext: context
+                        .read<ProfileScreenCubit>()
+                        .state
+                        .isWatcherAutoOpenNextEnabled,
+                      keepHistoryVisibleAfterCheckIn: context
+                          .read<ProfileScreenCubit>()
+                          .state
+                          .isWatcherKeepHistoryVisibleAfterCheckIn,
+                      ),
                 ),
                 Expanded(
                   child: Stack(
@@ -185,38 +232,6 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                if (pendingCount > 0)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          '$pendingCount attendees waiting',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(height: 8),
-                        FilledButton(
-                          onPressed:
-                              state.status == WatcherScanStatus.checkingIn
-                                  ? null
-                                  : () => context
-                                        .read<WatcherScanCubit>()
-                                        .checkInAll(),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size.fromHeight(50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text('Confirm all ($pendingCount)'),
-                        ),
-                      ],
-                    ),
-                  ),
                 if (state.status == WatcherScanStatus.valid)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
@@ -229,7 +244,12 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                                   ? null
                                   : () => context
                                         .read<WatcherScanCubit>()
-                                        .checkIn(),
+                                        .checkIn(
+                                          autoOpenNext: context
+                                              .read<ProfileScreenCubit>()
+                                              .state
+                                              .isWatcherAutoOpenNextEnabled,
+                                        ),
                           style: FilledButton.styleFrom(
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
@@ -280,7 +300,8 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
               ],
             ),
           );
-        },
+          },
+        ),
       ),
     );
   }

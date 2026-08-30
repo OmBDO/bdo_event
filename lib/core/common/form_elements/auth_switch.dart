@@ -14,6 +14,7 @@ class AuthSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Wrap(
         alignment: WrapAlignment.center, // Centers items horizontally
@@ -25,7 +26,9 @@ class AuthSwitch extends StatelessWidget {
           Text(
             prompt,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0xFF6F607A)),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            ),
           ),
           TextButton(
             onPressed: onTap,

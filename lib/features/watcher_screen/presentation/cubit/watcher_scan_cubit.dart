@@ -9,6 +9,7 @@ import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dash
 import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/registration_code_codec.dart';
 
 class WatcherScanCubit extends Cubit<WatcherScanState> {
   WatcherScanCubit({
@@ -78,7 +79,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
             ScanHistoryEntry(
               registrationToken: payload['token'] as String,
               userId: result['user_id'] as String?,
-              displayName: result['display_name'] as String?,
+              displayName: _displayName(result),
               eventId: result['event_id'] as String?,
               status: 'Ready to check in',
             ),
@@ -97,34 +98,27 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     }
   }
 
+  String? _displayName(Map<String, dynamic> result) {
+    final value = result['display_name'];
+    if (value is! String || value.trim().isEmpty) return null;
+    return value.trim();
+  }
+
   Map<String, dynamic>? _decodeRegistrationValue(String rawValue) {
     try {
       final payload = jsonDecode(rawValue);
       return payload is Map<String, dynamic> ? payload : null;
     } on FormatException {
-      if (!rawValue.startsWith('BDO1')) return null;
-      try {
-        final encoded = rawValue.substring(4);
-        if (encoded.isEmpty || encoded.length.isOdd) return null;
-        final bytes = <int>[];
-        for (var index = 0; index < encoded.length; index += 2) {
-          bytes.add(int.parse(encoded.substring(index, index + 2), radix: 16));
-        }
-        final decoded = utf8.decode(bytes);
-        final separator = decoded.lastIndexOf('|');
-        if (separator <= 0 || separator == decoded.length - 1) return null;
-        return {
+      final decoded = RegistrationCodeCodec.decode(rawValue);
+      if (decoded == null) return null;
+      return {
           'type': AppIdentifiers.qrRegistrationType,
-          'eventId': decoded.substring(0, separator),
-          'token': decoded.substring(separator + 1),
+          ...decoded,
         };
-      } on FormatException {
-        return null;
-      }
     }
   }
 
-  Future<void> checkIn() async {
+  Future<void> checkIn({bool autoOpenNext = true}) async {
     final eventId = state.eventId;
     final token = state.registrationToken;
     if (eventId == null ||
@@ -150,7 +144,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
           .where((entry) => entry.status == 'Ready to check in')
           .firstOrNull;
       emit(
-        nextPending == null
+        nextPending == null || !autoOpenNext
             ? state.copyWith(
                 status: WatcherScanStatus.idle,
                 history: updatedHistory,
@@ -185,7 +179,28 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     }
   }
 
-  Future<void> checkInAll() async {
+  Future<void> checkInEntry(
+    ScanHistoryEntry entry, {
+    bool autoOpenNext = true,
+  }) async {
+    if (entry.status != 'Ready to check in' ||
+        entry.eventId == null ||
+        state.status == WatcherScanStatus.checkingIn ||
+        isClosed) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        status: WatcherScanStatus.valid,
+        eventId: entry.eventId,
+        registrationToken: entry.registrationToken,
+        userId: entry.userId,
+      ),
+    );
+    await checkIn(autoOpenNext: autoOpenNext);
+  }
+
+  Future<void> checkInAll({bool autoOpenNext = true}) async {
     final pending = state.history
         .where((entry) => entry.status == 'Ready to check in')
         .toList();
@@ -217,7 +232,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
         .firstOrNull;
     if (!isClosed) {
       emit(
-        remainingPending == null
+        remainingPending == null || !autoOpenNext
             ? state.copyWith(
                 status: WatcherScanStatus.idle,
                 clearResult: true,

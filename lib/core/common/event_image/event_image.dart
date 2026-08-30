@@ -76,7 +76,13 @@ class _EventImageState extends State<EventImage> {
             AppText.missingEventImage,
             StackTrace.current,
           ) ??
-          const Icon(Icons.image_outlined, color: Colors.grey, size: 48);
+          Icon(
+            Icons.image_outlined,
+            color: Theme.of(context).colorScheme.onSurface.withValues(
+              alpha: 0.45,
+            ),
+            size: 48,
+          );
     }
 
     if (_isAsset) {
@@ -98,7 +104,13 @@ class _EventImageState extends State<EventImage> {
                 snapshot.error!,
                 snapshot.stackTrace,
               ) ??
-              const Icon(Icons.image_outlined, color: Colors.grey, size: 48);
+              Icon(
+                Icons.image_outlined,
+                color: Theme.of(context).colorScheme.onSurface.withValues(
+                  alpha: 0.45,
+                ),
+                size: 48,
+              );
         }
         if (!snapshot.hasData) {
           return const _ImageLoadingPlaceholder();
@@ -155,19 +167,25 @@ class _ImageLoadingPlaceholderState extends State<_ImageLoadingPlaceholder>
         gradient: LinearGradient(
           begin: Alignment(-1.5 + (_controller.value * 3), -1),
           end: Alignment(-0.5 + (_controller.value * 3), 1),
-          colors: const [
-            Color(0xFFFFF1E6),
-            Color(0xFFFFDCC8),
-            Color(0xFFFFF1E6),
-          ],
+          colors: Theme.of(context).brightness == Brightness.dark
+              ? [
+                  Theme.of(context).colorScheme.surface,
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+                  Theme.of(context).colorScheme.surface,
+                ]
+              : const [
+                  Color(0xFFFFF1E6),
+                  Color(0xFFFFDCC8),
+                  Color(0xFFFFF1E6),
+                ],
         ),
       ),
       child: child,
     ),
-    child: const Center(
+    child: Center(
       child: Icon(
         Icons.image_outlined,
-        color: Color(0xFFB14F36),
+        color: Theme.of(context).colorScheme.primary,
         size: 34,
       ),
     ),

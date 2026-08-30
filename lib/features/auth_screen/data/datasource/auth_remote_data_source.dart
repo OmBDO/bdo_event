@@ -48,6 +48,19 @@ class AuthRemoteDataSource {
   Future<void> signOut() =>
       _logger.track('auth.signOut', () => _client.auth.signOut());
 
+  Future<void> signOutEverywhere() => _logger.track(
+    'auth.signOutEverywhere',
+    () => _client.auth.signOut(scope: supabase.SignOutScope.global),
+  );
+
+  Future<supabase.UserResponse> updatePassword(String password) =>
+      _logger.track(
+        'auth.updatePassword',
+        () => _client.auth.updateUser(
+          supabase.UserAttributes(password: password),
+        ),
+      );
+
   Future<supabase.UserResponse> updateUserData(Map<String, dynamic> data) =>
       _logger.track(
         'auth.updateUser',

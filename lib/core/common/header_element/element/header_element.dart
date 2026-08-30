@@ -65,6 +65,10 @@ class _HeaderElementState extends State<HeaderElement> {
     return ValueListenableBuilder<double>(
       valueListenable: AppScrollTracker.scrollOffsetNotifier,
       builder: (context, currentPixels, child) {
+        final theme = Theme.of(context);
+        final colorScheme = theme.colorScheme;
+        final controlBackground = colorScheme.surface.withValues(alpha: 0.9);
+        final controlIconColor = colorScheme.onSurface;
         // 1. Establish the scrolling condition parameter flag
         bool isVisible =
             widget.currentScreenIndex != 0 || currentPixels <= 50.0;
@@ -105,12 +109,12 @@ class _HeaderElementState extends State<HeaderElement> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: controlBackground,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.language_outlined,
-                            color: Colors.black87,
+                            color: controlIconColor,
                             size: 20,
                           ),
                         ),
@@ -141,7 +145,7 @@ class _HeaderElementState extends State<HeaderElement> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: controlBackground,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: Colors.grey.withValues(alpha: 0.15),
@@ -153,10 +157,10 @@ class _HeaderElementState extends State<HeaderElement> {
                   children: [
                     IconButton(
                       onPressed: onNotificationClick,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.notifications_none_outlined,
                         size: 20,
-                        color: Colors.black87,
+                        color: controlIconColor,
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -178,18 +182,18 @@ class _HeaderElementState extends State<HeaderElement> {
                             height: 18,
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: colorScheme.error,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.white,
+                                color: colorScheme.surface,
                                 width: 1.5,
                               ),
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               badgeText,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: colorScheme.onError,
                                 fontSize: 9,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -213,8 +217,8 @@ class _HeaderElementState extends State<HeaderElement> {
                 menuPadding: const EdgeInsets.symmetric(vertical: 8),
                 constraints: const BoxConstraints(minWidth: 190),
                 elevation: 10,
-                shadowColor: Colors.black26,
-                color: Colors.white,
+                shadowColor: colorScheme.shadow,
+                color: colorScheme.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
@@ -260,18 +264,21 @@ class _HeaderElementState extends State<HeaderElement> {
                   height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
+                    border: Border.all(
+                      color: colorScheme.onSurface.withValues(alpha: 0.18),
+                      width: 1.5,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: colorScheme.shadow.withValues(alpha: 0.08),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     radius: 22,
-                    backgroundColor: Colors.grey,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
                     backgroundImage: NetworkImage(
                       AppAssets.defaultAvatarUrl,
                     ),
