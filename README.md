@@ -27,8 +27,9 @@ administrator or trusted backend must review that request and assign the
 effective role in Supabase `app_metadata`; approving a request must never be
 implemented by the client.
 
-The database schema is tracked as the versioned migration
-[20260829000000_initial_schema.sql](supabase/migrations/20260829000000_initial_schema.sql).
+The database schema is tracked as versioned migrations, including the
+[initial schema](supabase/migrations/20260829000000_initial_schema.sql), seat
+limit enforcement, and [registration deadline enforcement](supabase/migrations/20260830005000_enforce_registration_deadline.sql).
 For a project with the Supabase CLI installed, initialize and link the local
 project once, then apply migrations with:
 
@@ -56,6 +57,42 @@ event. The configured `capacity` is stored in the event payload and enforced
 by the server-side registration RPC using the count of active registrations.
 The setting is disabled by default, and registrations are rejected once the
 active count reaches the configured capacity.
+
+Event creators can also optionally set a registration deadline with a date and
+time. The deadline is stored as `registrationDeadline` in the event payload,
+shown in the event editor when updating an event, and can be cleared by
+disabling the setting. The client disables registration after the deadline,
+while the server-side registration RPC enforces it atomically. The setting is
+disabled by default.
+
+Events can include a start time and end time in `HH:mm` format. These values
+are stored in the event payload and are displayed on the event-detail screen
+and the My Ticket card only. Existing events without timing continue to load
+without a time display.
+
+## Event sharing and deep links
+
+The event detail menu shares links in the form
+`https://bdo-event.app/events/<event-id>`. When the app is installed, a matching
+link opens the exact event detail page after the user is authenticated. The
+`app_links` integration also supports the `bdoevent://events/<event-id>` scheme
+for local device testing.
+
+The default domain is a placeholder until a public web host is configured. To
+use another domain, build with `EVENT_LINK_BASE_URL`, for example:
+
+```text
+flutter run --dart-define=EVENT_LINK_BASE_URL=https://events.example.com
+```
+
+That domain must host an event page with `og:title`, `og:description`, and
+`og:image` metadata for WhatsApp previews. It must also serve
+`/.well-known/assetlinks.json` for Android and
+`/.well-known/apple-app-site-association` for iOS. Update the Android manifest,
+`Runner.entitlements`, and the association files with the real domain and
+release signing identifiers before production distribution. Without a hosted
+domain, shared HTTPS links can still be copied, but rich previews and automatic
+app opening cannot work reliably.
 
 A new Flutter project.
 

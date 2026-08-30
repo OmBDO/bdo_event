@@ -5,6 +5,8 @@ class EventScreenState {
   final List<String> tabs;
   final List<Event> events;
   final Set<String> registeredEventIds;
+  final Set<String> savedEventIds;
+  final List<String> recentEventIds;
   final bool isLoading;
   final bool isSaving;
   final Set<String> deletingEventIds;
@@ -16,6 +18,8 @@ class EventScreenState {
     this.tabs = const ['Upcoming', 'My Events', 'Past'],
     this.events = const [],
     this.registeredEventIds = const {},
+    this.savedEventIds = const {},
+    this.recentEventIds = const [],
     this.isLoading = false,
     this.isSaving = false,
     this.deletingEventIds = const {},
@@ -67,6 +71,8 @@ class EventScreenState {
     int? selectedTab,
     List<Event>? events,
     Set<String>? registeredEventIds,
+    Set<String>? savedEventIds,
+    List<String>? recentEventIds,
     bool? isLoading,
     bool? isSaving,
     Set<String>? deletingEventIds,
@@ -78,6 +84,8 @@ class EventScreenState {
     tabs: tabs,
     events: events ?? this.events,
     registeredEventIds: registeredEventIds ?? this.registeredEventIds,
+    savedEventIds: savedEventIds ?? this.savedEventIds,
+    recentEventIds: recentEventIds ?? this.recentEventIds,
     isLoading: isLoading ?? this.isLoading,
     isSaving: isSaving ?? this.isSaving,
     deletingEventIds: deletingEventIds ?? this.deletingEventIds,

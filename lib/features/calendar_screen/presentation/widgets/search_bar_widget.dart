@@ -33,11 +33,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFFFF6584);
-    const darkText = Color(0xFF2D0C57);
-
     return BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
       builder: (context, profileState) {
+        final theme = Theme.of(context);
+        final isDarkMode = theme.brightness == Brightness.dark;
+        final primaryColor = isDarkMode
+            ? theme.colorScheme.primary
+            : const Color(0xFFFF6584);
+        final textColor = theme.colorScheme.onSurface;
         final user = profileState.user;
         final canScan =
             user?.hasPermission(UserPermission.scanRegistrations) ?? false;
@@ -52,13 +55,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   right: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(
                     16,
                   ), // Balanced smooth rounded corners
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(
+                      color: theme.colorScheme.shadow.withValues(
                         alpha: 0.04,
                       ), // Soft elegant non-muddy shadow projection
                       blurRadius: 16,
@@ -69,19 +72,19 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 child: TextField(
                   controller: _controller,
                   onChanged: widget.onChanged,
-                  style: const TextStyle(
-                    color: darkText,
+                  style: TextStyle(
+                    color: textColor,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     hintText: widget.hintText,
                     hintStyle: TextStyle(
-                      color: darkText.withValues(alpha: 0.4),
+                      color: textColor.withValues(alpha: 0.4),
                       fontSize: 15,
                       fontWeight: FontWeight.w400,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search_rounded,
                       color: primaryColor,
                       size: 22,
@@ -89,9 +92,9 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     // Clear button shows up automatically only if text is input inside tracking loop
                     suffixIcon: _controller.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.clear_rounded,
-                              color: Colors.black38,
+                              color: textColor.withValues(alpha: 0.38),
                               size: 20,
                             ),
                             onPressed: () {
@@ -106,7 +109,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           )
                         : widget.onFilterTap != null
                         ? IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.tune_rounded,
                               color: primaryColor,
                               size: 20,
@@ -129,13 +132,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             if (canScan)
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.colorScheme.surface,
                   borderRadius: BorderRadius.circular(
                     14,
                   ), // Balanced smooth rounded corners
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(
+                      color: theme.colorScheme.shadow.withValues(
                         alpha: 0.04,
                       ), // Soft elegant non-muddy shadow projection
                       blurRadius: 16,

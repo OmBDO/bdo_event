@@ -2,6 +2,7 @@ import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
 import 'package:bdo_event/core/common/footer_element/element/footer_element.dart';
 import 'package:bdo_event/core/common/header_element/element/header_element.dart';
+import 'package:bdo_event/core/theme/app_colors.dart';
 import 'package:bdo_event/features/main_screen/domain/entities/main_tab.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_destination.dart';
@@ -30,11 +31,21 @@ class MainScreenShell extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFB1D4FA), Color(0xFFFFF1E6), Color(0xFFF9CBB0)],
+            colors: Theme.of(context).brightness == Brightness.dark
+                ? const [
+                    AppColors.shellStartDark,
+                    AppColors.backgroundDark,
+                    AppColors.shellEndDark,
+                  ]
+                : const [
+                    AppColors.shellStartLight,
+                    AppColors.backgroundLight,
+                    AppColors.shellEndLight,
+                  ],
             stops: [0.0, 0.4, 1.0],
           ),
         ),

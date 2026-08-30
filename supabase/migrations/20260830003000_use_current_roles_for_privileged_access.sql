@@ -16,7 +16,9 @@ $$;
 revoke all on function public.has_current_role(text) from public;
 grant execute on function public.has_current_role(text) to authenticated;
 
-create or replace function public.validate_event_registration(
+drop function if exists public.validate_event_registration(uuid, text);
+
+create function public.validate_event_registration(
   requested_token uuid,
   requested_event_id text
 )
@@ -43,7 +45,7 @@ begin
   end if;
 
   return query
-        select registration.event_id,
+    select registration.event_id,
            registration.user_id,
            registration.status,
            registration.created_at

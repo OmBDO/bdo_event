@@ -50,6 +50,31 @@ abstract interface class EventStore {
     required String eventId,
     required ArrivalStatus status,
   });
+
+  Future<void> recordLoginActivity({
+    String? deviceLabel,
+    String? platform,
+  });
+
+  Future<Map<String, String>> loadProfileVisibility(String userId);
+
+  Future<void> saveProfileVisibility({
+    required String userId,
+    required String profileVisibility,
+    required String registrationVisibility,
+  });
+
+  Future<List<Map<String, String>>> loadInvitationRecipients();
+
+  Future<int> sendEventInvitations({
+    required String eventId,
+    required List<String> userIds,
+  });
+
+  Future<void> respondToEventInvitation({
+    required String eventId,
+    required bool accepted,
+  });
 }
 
 class SupabaseStore implements EventStore {
@@ -60,6 +85,118 @@ class SupabaseStore implements EventStore {
 
   final supabase.SupabaseClient _client;
   final SupabaseRequestLogger _logger;
+
+  @override
+  Future<void> recordLoginActivity({
+    String? deviceLabel,
+    String? platform,
+  }) async {
+    try {
+      await _logger.track(
+        'rpc.recordLoginActivity',
+        () => _client.rpc(
+          'record_login_activity',
+          params: {
+            'requested_device_label': deviceLabel,
+            'requested_platform': platform,
+          },
+        ),
+        parameters: {'platform': platform},
+      );
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<Map<String, String>> loadProfileVisibility(String userId) async {
+    try {
+      final row = await _client
+          .from('profile_visibility_settings')
+          .select('profile_visibility, registration_visibility')
+          .eq('user_id', userId)
+          .maybeSingle();
+      return {
+        'profile_visibility': row?['profile_visibility'] as String? ?? 'private',
+        'registration_visibility':
+            row?['registration_visibility'] as String? ?? 'private',
+      };
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<void> saveProfileVisibility({
+    required String userId,
+    required String profileVisibility,
+    required String registrationVisibility,
+  }) async {
+    try {
+      await _client.from('profile_visibility_settings').upsert({
+        'user_id': userId,
+        'profile_visibility': profileVisibility,
+        'registration_visibility': registrationVisibility,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      });
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<List<Map<String, String>>> loadInvitationRecipients() async {
+    try {
+      final rows = await _client.rpc('list_invitation_recipients');
+      return (rows as List<dynamic>).map((row) {
+        final value = row as Map<String, dynamic>;
+        return {
+          'id': value['user_id'].toString(),
+          'name': value['display_name'] as String? ?? '',
+          'email': value['email'] as String? ?? '',
+        };
+      }).toList();
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<int> sendEventInvitations({
+    required String eventId,
+    required List<String> userIds,
+  }) async {
+    try {
+      final result = await _client.rpc(
+        'send_event_invitations',
+        params: {
+          'requested_event_id': eventId,
+          'requested_user_ids': userIds,
+        },
+      );
+      return (result as num?)?.toInt() ?? 0;
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
+
+  @override
+  Future<void> respondToEventInvitation({
+    required String eventId,
+    required bool accepted,
+  }) async {
+    try {
+      await _client.rpc(
+        'respond_to_event_invitation',
+        params: {
+          'requested_event_id': eventId,
+          'requested_status': accepted ? 'accepted' : 'declined',
+        },
+      );
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
 
   Future<bool> readNotificationPreference(String userId) async {
     final value = _client

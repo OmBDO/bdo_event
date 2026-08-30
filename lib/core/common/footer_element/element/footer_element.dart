@@ -33,6 +33,8 @@ class _FooterElementState extends State<FooterElement> {
   @override
   Widget build(BuildContext context) {
     final items = widget.items;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Container(
       key: _footerController.footerKey,
@@ -75,9 +77,17 @@ class _FooterElementState extends State<FooterElement> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       // The selected item gets a highlighted solid gradient background
-                      gradient: isSelected
-                          ? const LinearGradient(
-                              colors: [Color(0xFFE96B47), Color(0xFFF18A6B)],
+                        gradient: isSelected
+                          ? LinearGradient(
+                            colors: isDarkMode
+                              ? [
+                                theme.colorScheme.primary,
+                                theme.colorScheme.tertiary,
+                              ]
+                              : const [
+                                Color(0xFFE96B47),
+                                Color(0xFFF18A6B),
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             )
@@ -96,7 +106,9 @@ class _FooterElementState extends State<FooterElement> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: const Color(0xFFE96B47)
+                                color: (isDarkMode
+                                  ? theme.colorScheme.primary
+                                  : const Color(0xFFE96B47))
                                     .withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),

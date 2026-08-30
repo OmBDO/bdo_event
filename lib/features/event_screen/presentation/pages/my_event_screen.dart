@@ -1,8 +1,16 @@
+import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/category_event_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
+import 'package:bdo_event/features/event_screen/presentation/pages/event_analytics_page.dart';
+import 'package:bdo_event/features/event_screen/presentation/pages/event_invitation_page.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
@@ -49,7 +57,10 @@ class _MyEventScreenState extends State<MyEventScreen> {
       builder: (context) => AlertDialog(
         title: const Text(AppText.deleteEventQuestion),
         content: Text(
-          AppText.deleteEventDescription.replaceFirst('{eventTitle}', event.title),
+          AppText.deleteEventDescription.replaceFirst(
+            '{eventTitle}',
+            event.title,
+          ),
         ),
         actions: [
           TextButton(
@@ -78,7 +89,10 @@ class _MyEventScreenState extends State<MyEventScreen> {
         children: [
           Container(
             padding: EdgeInsets.only(top: 90),
-            decoration: BoxDecoration(color: Colors.white60),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface
+                  .withValues(alpha: 0.6),
+            ),
             child: Builder(
               builder: (context) {
                 if (state.isLoading) {
@@ -92,7 +106,9 @@ class _MyEventScreenState extends State<MyEventScreen> {
                       child: Text(
                         state.error!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                       ),
                     ),
                   );
@@ -108,21 +124,26 @@ class _MyEventScreenState extends State<MyEventScreen> {
                         Icon(
                           Icons.event_busy_outlined,
                           size: 64,
-                          color: Colors.grey.shade400,
+                          color: Theme.of(context).colorScheme.onSurface
+                              .withValues(alpha: 0.4),
                         ),
                         const SizedBox(height: 16),
-                        const Text(
+                        Text(
                           AppText.noEventsCreated,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.65),
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           AppText.tapToCreateFirstEvent,
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.65),
+                          ),
                         ),
                       ],
                     ),
@@ -168,99 +189,45 @@ class _MyEventScreenState extends State<MyEventScreen> {
                           ),
                         ),
                       ),
-                      child: Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () => _navigateToCreateOrEdit(event),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: SizedBox(
-                                  width: 80,
-                                  height: 80,
-                                  child: EventImage(
-                                    path: event.imageUrl,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
+                      childWhenDragging: Opacity(
+                        opacity: 0.35,
+                        child: Card(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 2,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () => _navigateToCreateOrEdit(event),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
                                       event.title,
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.calendar_today_outlined,
-                                          size: 14,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          event.date,
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.location_on_outlined,
-                                          size: 14,
-                                          color: Colors.grey,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            event.location,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.grey,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.65),
+                                  ),
+                                ],
                               ),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: Colors.grey,
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
-                      ),
-                      childWhenDragging: Opacity(
-                        opacity: 0.35,
-                        child: Card(
+
+                      child: Card(
                         margin: const EdgeInsets.only(bottom: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -273,21 +240,139 @@ class _MyEventScreenState extends State<MyEventScreen> {
                             padding: const EdgeInsets.all(12),
                             child: Row(
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    event.title,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: SizedBox(
+                                    width: 80,
+                                    height: 80,
+                                    child: EventImage(
+                                      path: event.imageUrl,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
-                                const Icon(Icons.chevron_right, color: Colors.grey),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        event.title,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today_outlined,
+                                            size: 14,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.65),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            formatEventDate(
+                                              formatEventDate(
+                                                event.date,
+                                                context
+                                                    .watch<ProfileScreenCubit>()
+                                                    .state
+                                                    .dateFormat,
+                                              ),
+                                              context
+                                                  .watch<ProfileScreenCubit>()
+                                                  .state
+                                                  .dateFormat,
+                                            ),
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withValues(alpha: 0.65),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.location_on_outlined,
+                                            size: 14,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.65),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              event.location,
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.65),
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'View attendees',
+                                  icon: const Icon(Icons.groups_outlined),
+                                  onPressed: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          EventAttendeesPage(event: event),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'View event analytics',
+                                  icon: const Icon(Icons.analytics_outlined),
+                                  onPressed: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          EventAnalyticsPage(event: event),
+                                    ),
+                                  ),
+                                ),
+                                if (getIt<AuthRepositoryContract>()
+                                        .currentUser
+                                        ?.isAdministrator ??
+                                    false)
+                                  IconButton(
+                                    tooltip: 'Invite users',
+                                    icon: const Icon(
+                                      Icons.person_add_alt_1_outlined,
+                                    ),
+                                    onPressed: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            EventInvitationPage(event: event),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
                         ),
-                      ),
                       ),
                     );
                   },
@@ -331,12 +416,14 @@ class _MyEventScreenState extends State<MyEventScreen> {
                       : () => _navigateToCreateOrEdit(),
                   backgroundColor: isDeleteMode
                       ? (_isDeleteTargetHovered
-                            ? Colors.red.shade800
-                            : Colors.red)
-                      : Colors.black87,
+                            ? Theme.of(context).colorScheme.errorContainer
+                            : Theme.of(context).colorScheme.error)
+                      : Theme.of(context).colorScheme.primary,
                   child: Icon(
                     isDeleteMode ? Icons.delete_outline : Icons.add,
-                    color: Colors.white,
+                    color: isDeleteMode
+                        ? Theme.of(context).colorScheme.onError
+                        : Theme.of(context).colorScheme.onPrimary,
                   ),
                 );
               },

@@ -15,6 +15,7 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return SizedBox(
       width: double.infinity,
@@ -22,8 +23,12 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black87,
-          foregroundColor: Colors.white,
+            backgroundColor: isDarkMode
+              ? theme.colorScheme.primary
+              : Colors.black87,
+            foregroundColor: isDarkMode
+              ? theme.colorScheme.onPrimary
+              : Colors.white,
           elevation: 2,
           shadowColor: theme.colorScheme.primary.withValues(alpha: 0.4),
           shape: RoundedRectangleBorder(

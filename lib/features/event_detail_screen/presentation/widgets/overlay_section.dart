@@ -7,6 +7,7 @@ import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
@@ -83,8 +84,8 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(36),
           topRight: Radius.circular(36),
@@ -105,13 +106,14 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(
+                Padding(
+                  padding: const EdgeInsets.only(
                     top: 2.0,
                   ), // Aligns icon with first line of text
                   child: Icon(
                     Icons.location_on_rounded,
-                    color: Colors.black26,
+                    color: Theme.of(context).colorScheme.onSurface
+                        .withValues(alpha: 0.26),
                     size: 16,
                   ),
                 ),
@@ -172,10 +174,10 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             ),
             const Gap(12),
 
-            const Text(
+            Text(
               AppText.upcomingEvent,
               style: TextStyle(
-                color: Colors.deepOrange,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
@@ -200,10 +202,14 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                 widget.widget.event.endTime != null)
               Row(
                 children: [
-                  Icon(Icons.schedule_outlined, color: widget.textGrey, size: 18),
+                  Icon(
+                    Icons.schedule_outlined,
+                    color: widget.textGrey,
+                    size: 18,
+                  ),
                   const Gap(8),
                   Text(
-                    '${widget.widget.event.startTime ?? '--:--'} - ${widget.widget.event.endTime ?? '--:--'}',
+                    '${formatEventTime(widget.widget.event.startTime)} - ${formatEventTime(widget.widget.event.endTime)}',
                     style: TextStyle(
                       color: widget.primaryDark,
                       fontSize: 15,
@@ -230,7 +236,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F7F9),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: InkWell(
@@ -266,7 +272,9 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                         const Spacer(),
                         CircleAvatar(
                           radius: 14,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .surface,
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 10,

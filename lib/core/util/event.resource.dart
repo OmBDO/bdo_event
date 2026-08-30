@@ -31,6 +31,9 @@ abstract final class AppText {
   static const termsAgreement = 'I agree to the terms and privacy policy';
   static const newToApp = 'New to BDO Events? ';
   static const alreadyHaveAccount = 'Already have an account? ';
+    static const appVersion = 'App version';
+    static const appVersionValue = 'Version 1.0.0 (1)';
+    static const licenses = 'Licenses';
 
   static const upcoming = 'Upcoming';
   static const myEvents = 'My Events';
@@ -75,6 +78,9 @@ abstract final class AppText {
       'Role management requires a trusted server';
   static const pleaseSignInToUpdatePreferences =
       'Please sign in to update preferences';
+  static const pleaseSignInToChangePassword =
+      'Please sign in to change your password';
+  static const unableToChangePassword = 'Unable to change password';
   static const unableToSaveNotificationPreference =
       'Unable to save notification preference';
   static const music = 'Music';
@@ -116,16 +122,48 @@ abstract final class AppText {
   static const accountSettings = 'Account Settings';
   static const editProfile = 'Edit Profile';
   static const profileDetails = 'Profile details';
+    static const organizerTools = 'Organizer Tools';
+    static const manageMyEvents = 'Manage my events';
+    static const saveProfile = 'Save profile';
+    static const profileUpdated = 'Profile updated successfully';
+    static const unableToUpdateProfile = 'Unable to update profile';
+    static const changePassword = 'Change Password';
+    static const changePasswordDescription = 'Update your account password';
+    static const newPassword = 'New password';
+    static const confirmNewPassword = 'Confirm new password';
+    static const passwordChanged = 'Password changed successfully';
+    static const savePassword = 'Save password';
+    static const cancel = 'Cancel';
   static const myEventRegistrations = 'My Event Registrations';
+    static const savedEvents = 'Saved events';
   static const paymentMethods = 'Payment Methods';
   static const preferences = 'Preferences';
   static const pushNotifications = 'Push Notifications';
+  static const eventReminders = 'Event Reminders';
+  static const eventRemindersDescription =
+      'Get notified before registered events';
+  static const reminderLeadTime = 'Reminder lead time';
+  static const reminderLeadTimeDescription =
+      'Choose when event reminders arrive';
+  static const oneHourBefore = '1 hour before';
+  static const oneDayBefore = '1 day before';
+  static const oneWeekBefore = '1 week before';
   static const darkThemeMode = 'Dark Theme Mode';
+    static const largerText = 'Larger text';
+    static const largerTextDescription = 'Increase text size across the app';
+    static const highContrast = 'High contrast';
+    static const highContrastDescription = 'Increase color contrast across the app';
   static const appLanguage = 'App Language';
   static const englishIndia = 'English (IN)';
   static const supportLegal = 'Support & Legal';
   static const helpCenterFaq = 'Help Center & FAQ';
   static const privacyPolicy = 'Privacy Policy';
+  static const signOutEverywhere = 'Sign out from all devices';
+  static const signOutEverywhereDescription =
+      'End active sessions on every device';
+  static const signOutEverywhereQuestion = 'Sign out everywhere?';
+  static const signOutEverywhereWarning =
+      'You will need to sign in again on all of your devices.';
   static const logout = 'Log Out Account';
   static const close = 'Close';
   static const paymentMethodsInfo =
@@ -139,6 +177,12 @@ abstract final class AppText {
   static const darkModeInterface = 'Toggle dark mode interface canvas';
   static const troubleshootingHelp = 'Troubleshooting and event booking help';
   static const termsAndSecurity = 'Terms of service and data security rules';
+
+    static String reminderLeadTimeLabel(int minutes) => switch (minutes) {
+        60 => oneHourBefore,
+        10080 => oneWeekBefore,
+        _ => oneDayBefore,
+    };
   static const eventHelp =
       'For event help, open the event details and use the registration action. Your registered events are available under My Event Registrations.';
   static const supabaseDataPolicy =
@@ -164,6 +208,8 @@ abstract final class AppText {
   static const emailAlreadyRegistered = 'This email is already registered';
   static const unableToCreateAccount = 'Unable to create the account';
   static const unableToSignIn = 'Unable to sign in';
+    static const unableToSignOutEverywhere =
+            'Unable to sign out from all devices';
   static const pleaseSignInToManageEvents = 'Please sign in to manage events';
   static const pleaseSignInToRegister = 'Please sign in to register for events';
   static const pleaseSignInToModifyRegistrations =
@@ -187,6 +233,24 @@ abstract final class AppText {
   static const unableToCheckIn = 'Unable to record attendance';
   static const checkInUnavailable = 'This registration cannot be checked in';
   static const scanRegistration = 'Scan registration';
+    static const watcherSettings = 'Watcher settings';
+    static const muteScanningVoice = 'Mute scanning voice';
+    static const muteScanningVoiceDescription =
+            'Silence spoken scan results while keeping scanning active.';
+      static const scanVibration = 'Scan vibration';
+      static const scanVibrationDescription =
+          'Vibrate after a successful registration scan.';
+      static const scannerSoundVolume = 'Scanner sound volume';
+      static const scannerSoundVolumeDescription =
+          'Adjust the volume of spoken scan results.';
+      static const autoOpenNextAttendee =
+          'Automatically open next attendee';
+      static const autoOpenNextAttendeeDescription =
+          'Select the next pending attendee after check-in.';
+      static const keepHistoryVisibleAfterCheckIn =
+          'Keep scan history visible after check-in';
+      static const keepHistoryVisibleAfterCheckInDescription =
+          'Leave the scan history open after confirming an attendee.';
   static const scanRegistrationPrompt = 'Scan a registration QR code';
     static const enterRegistrationCode = 'Enter registration code from My Ticket';
     static const pasteRegistrationCode = 'Paste the code shown below the QR';

@@ -1,4 +1,7 @@
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/prefs/recent_event_store.dart';
+import 'package:bdo_event/core/security/biometric_lock_service.dart';
+import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
 import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_logger.dart';
 import 'package:bdo_event/features/auth_screen/data/datasource/auth_remote_data_source.dart';
 import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
@@ -24,6 +27,11 @@ import 'package:bdo_event/features/event_screen/domain/repositories/event_reposi
 import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
+import 'package:bdo_event/features/profile_screen/data/datasource/profile_preferences_local_data_source.dart';
+import 'package:bdo_event/features/profile_screen/data/repositories/profile_preferences_repository.dart';
+import 'package:bdo_event/features/profile_screen/domain/repositories/profile_preferences_repository.dart';
+import 'package:bdo_event/features/profile_screen/domain/usecases/load_profile_preferences.dart';
+import 'package:bdo_event/features/profile_screen/domain/usecases/save_profile_preferences.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/data/repositories/registered_event_repository.dart';
 import 'package:bdo_event/features/registered_screen/data/datasource/registered_event_remote_data_source.dart';
@@ -38,13 +46,25 @@ import 'package:bdo_event/features/watcher_screen/domain/usecases/check_in_regis
 import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dashboard.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
 
-void configureDependencies() {
+void configureDependencies({SharedPreferences? preferences}) {
   if (getIt.isRegistered<AuthScreenCubit>()) return;
 
+  if (preferences != null) {
+    getIt.registerSingleton<SharedPreferences>(preferences);
+  }
+  getIt.registerLazySingleton<RecentEventStore>(
+    () => RecentEventStore(preferences),
+  );
+  getIt.registerLazySingleton<BiometricLockService>(BiometricLockService.new);
+
   getIt.registerLazySingleton<SupabaseRequestLogger>(SupabaseRequestLogger.new);
+  getIt.registerLazySingleton<EventReminderNotificationService>(
+    EventReminderNotificationService.new,
+  );
   getIt.registerLazySingleton<SupabaseStore>(
     () => SupabaseStore(logger: getIt()),
   );
@@ -72,6 +92,22 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<AuthRepositoryContract>(
     () => getIt<AuthRepository>(),
+  );
+  getIt.registerLazySingleton<ProfilePreferencesLocalDataSource>(
+    () => ProfilePreferencesLocalDataSourceImpl(
+      getIt.isRegistered<SharedPreferences>()
+          ? getIt<SharedPreferences>()
+          : null,
+    ),
+  );
+  getIt.registerLazySingleton<ProfilePreferencesRepositoryContract>(
+    () => ProfilePreferencesRepository(getIt()),
+  );
+  getIt.registerLazySingleton<LoadProfilePreferences>(
+    () => LoadProfilePreferences(getIt()),
+  );
+  getIt.registerLazySingleton<SaveProfilePreferences>(
+    () => SaveProfilePreferences(getIt()),
   );
   getIt.registerLazySingleton<RegistrationDataSource>(
     () => RegistrationRemoteDataSource(getIt<EventStore>()),
@@ -130,7 +166,14 @@ void configureDependencies() {
   getIt.registerSingleton<SignInCubit>(SignInCubit(authRepository: getIt()));
   getIt.registerSingleton<SignUpCubit>(SignUpCubit(authRepository: getIt()));
   getIt.registerSingleton<CalendarScreenCubit>(
-    CalendarScreenCubit(loadRegisteredEvents: getIt(), authRepository: getIt()),
+    CalendarScreenCubit(
+      loadRegisteredEvents: getIt(),
+      authRepository: getIt(),
+      reminderNotifications: getIt(),
+      preferences: getIt.isRegistered<SharedPreferences>()
+          ? getIt<SharedPreferences>()
+          : null,
+    ),
   );
   getIt.registerFactory<EventDetailCubit>(
     () => EventDetailCubit(
@@ -148,17 +191,27 @@ void configureDependencies() {
       updateEvent: getIt(),
       deleteEvent: getIt(),
       authRepository: getIt(),
+      recentEventStore: getIt(),
+      preferences: preferences,
     ),
   );
   getIt.registerSingleton<MainScreenCubit>(MainScreenCubit());
   getIt.registerSingleton<ProfileScreenCubit>(
-    ProfileScreenCubit(authRepository: getIt()),
+    ProfileScreenCubit(
+      authRepository: getIt(),
+      loadProfilePreferences: getIt(),
+      saveProfilePreferences: getIt(),
+      reminderNotifications: getIt(),
+      biometricLockService: getIt(),
+      eventStore: getIt(),
+    ),
   );
   getIt.registerFactory<RegisteredEventCubit>(
     () => RegisteredEventCubit(
       cancelRegisteredEvent: getIt(),
       authRepository: getIt(),
       eventStore: getIt(),
+      reminderNotifications: getIt(),
     ),
   );
 

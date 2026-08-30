@@ -5,7 +5,9 @@ import 'package:bdo_event/features/calendar_screen/domain/usecases/load_register
 import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/prefs/recent_event_store.dart';
 
 class EventScreenCubit extends Cubit<EventScreenState> {
   EventScreenCubit({
@@ -15,7 +17,11 @@ class EventScreenCubit extends Cubit<EventScreenState> {
     required this._updateEvent,
     required this._deleteEvent,
     required this._authRepository,
-  }) : super(const EventScreenState());
+     RecentEventStore? recentEventStore,
+    SharedPreferences? preferences,
+  }) : _preferences = preferences,
+       _recentEventStore = recentEventStore,
+       super(const EventScreenState());
 
   final LoadEvents _loadEvents;
   final LoadRegisteredEvents? _loadRegisteredEvents;
@@ -23,6 +29,9 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   final UpdateEvent _updateEvent;
   final DeleteEvent _deleteEvent;
   final AuthRepositoryContract _authRepository;
+  final SharedPreferences? _preferences;
+  final RecentEventStore? _recentEventStore;
+  static const _savedEventIdsKey = 'saved_event_ids';
 
   Future<void> load({bool force = false}) async {
     if (isClosed) return;
@@ -41,6 +50,13 @@ class EventScreenCubit extends Cubit<EventScreenState> {
             registeredEventIds: registeredEvents
                 .map((event) => event.id)
                 .toSet(),
+            savedEventIds: _preferences?.getStringList(_savedEventIdsKey)
+                ?.toSet() ??
+              const {},
+            recentEventIds: _recentEventStore?.readIds(
+                  userId: userId,
+                ) ??
+                const [],
             isLoading: false,
             hasLoaded: true,
           ),
@@ -132,6 +148,15 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   bool canUpdate(Event event) => _authRepository.canUpdate(event);
 
   bool canDelete(Event event) => _authRepository.canDelete(event);
+
+  void toggleSavedEvent(Event event) {
+    final savedEventIds = {...state.savedEventIds};
+    if (!savedEventIds.add(event.id)) {
+      savedEventIds.remove(event.id);
+    }
+    emit(state.copyWith(savedEventIds: savedEventIds));
+    _preferences?.setStringList(_savedEventIdsKey, savedEventIds.toList());
+  }
 
   void changeTab(int index) {
     if (index == state.selectedTab) return;

@@ -14,13 +14,14 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           subtitle,
           style: const TextStyle(
-            color: Color(0xFFB14F36),
+            color: theme.colorScheme.primary,
             fontSize: 12,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.8,
@@ -30,7 +31,7 @@ class SectionHeader extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            color: Color(0xFF2D0C57),
+            color: theme.colorScheme.onSurface,
             fontSize: 30,
             fontWeight: FontWeight.w800,
           ),
@@ -38,7 +39,10 @@ class SectionHeader extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           description,
-          style: const TextStyle(color: Color(0xFF6F607A), fontSize: 15),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+            fontSize: 15,
+          ),
         ),
       ],
     );

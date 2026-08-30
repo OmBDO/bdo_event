@@ -1,9 +1,19 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
+import 'package:bdo_event/core/common/calendar_element/widgets/event_tooltip.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/theme/app_colors.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarElement extends StatefulWidget {
-  const CalendarElement({super.key});
+  const CalendarElement({
+    super.key,
+    this.events = const [],
+    this.onEventTap,
+  });
+
+  final List<Event> events;
+  final Future<void> Function(Event event)? onEventTap;
 
   @override
   State<CalendarElement> createState() => _CalendarElementState();
@@ -13,9 +23,74 @@ class _CalendarElementState extends State<CalendarElement> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  OverlayEntry? _eventTooltip;
 
-  List<String> _getFestivalsForDay(DateTime day) {
-    return const [];
+  List<Event> _getEventsForDay(DateTime day) => widget.events
+      .where((event) {
+        final eventDate = _parseEventDate(event.date);
+        return eventDate != null && isSameDay(eventDate, day);
+      })
+      .toList();
+
+  static DateTime? _parseEventDate(String value) {
+    final parts = value.split('/');
+    if (parts.length == 3) {
+      final day = int.tryParse(parts[0]);
+      final month = int.tryParse(parts[1]);
+      final year = int.tryParse(parts[2]);
+      if (day != null && month != null && year != null) {
+        return DateTime(year, month, day);
+      }
+    }
+    return DateTime.tryParse(value);
+  }
+
+  void _hideEventTooltip() {
+    _eventTooltip?.remove();
+    _eventTooltip = null;
+  }
+
+  void _showEventTooltip(BuildContext context, Event event) {
+    _hideEventTooltip();
+    final box = context.findRenderObject() as RenderBox;
+    final anchor = box.localToGlobal(Offset.zero);
+    final tooltipWidth = MediaQuery.sizeOf(context).width - 32;
+
+    _eventTooltip = OverlayEntry(
+      builder: (_) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _hideEventTooltip,
+            ),
+          ),
+          Positioned(
+            left: 16,
+            top: anchor.dy + 74,
+            width: tooltipWidth,
+            child: Column(
+              children: [
+                EventTooltip(
+                  event: event,
+                  onDismiss: _hideEventTooltip,
+                  onOpen: () async {
+                    await widget.onEventTap?.call(event);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+    Overlay.of(context).insert(_eventTooltip!);
+  }
+
+  @override
+  void dispose() {
+    _hideEventTooltip();
+    super.dispose();
   }
 
   @override
@@ -26,16 +101,23 @@ class _CalendarElementState extends State<CalendarElement> {
 
   @override
   Widget build(BuildContext context) {
-    // Shared color palette variables for swift theme modifications
-    const primaryColor = Color.fromARGB(255, 0, 0, 0); // Modern indigo
-    const accentColor = Color(0xFFFF6584); // Elegant coral for festivals
-    const textColor = Color(0xFF2D0C57); // Deep plum dark text
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final primaryColor = isDarkMode
+      ? theme.colorScheme.primary
+      : Colors.black;
+    final accentColor = isDarkMode
+      ? theme.colorScheme.tertiary
+      : const Color(0xFFFF6584);
+    final textColor = isDarkMode
+      ? theme.colorScheme.onSurface
+      : AppColors.secondaryLight;
 
     return Container(
       margin: const EdgeInsets.only(top: 10, left: 16, right: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(
           24,
         ), // Smooth premium rounded corners
@@ -61,6 +143,10 @@ class _CalendarElementState extends State<CalendarElement> {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
           });
+          final events = _getEventsForDay(selectedDay);
+          if (events.isNotEmpty) {
+            _showEventTooltip(context, events.first);
+          }
         },
         onFormatChanged: (format) {
           setState(() {
@@ -70,25 +156,25 @@ class _CalendarElementState extends State<CalendarElement> {
         onPageChanged: (focusedDay) {
           _focusedDay = focusedDay;
         },
-        eventLoader: _getFestivalsForDay,
+        eventLoader: (day) => _getEventsForDay(day),
 
         // 1. Premium Minimalism Header Styling
         headerStyle: HeaderStyle(
           titleCentered: true,
           formatButtonVisible:
               false, // Clean look by hiding the format switcher toggle
-          titleTextStyle: const TextStyle(
+          titleTextStyle: TextStyle(
             color: textColor,
             fontWeight: FontWeight.w800,
             fontSize: 18,
             letterSpacing: 0.5,
           ),
-          leftChevronIcon: const Icon(
+          leftChevronIcon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: primaryColor,
             size: 18,
           ),
-          rightChevronIcon: const Icon(
+          rightChevronIcon: Icon(
             Icons.arrow_forward_ios_rounded,
             color: primaryColor,
             size: 18,
@@ -97,9 +183,9 @@ class _CalendarElementState extends State<CalendarElement> {
         ),
 
         // 2. Clear Weekday Labels Configuration
-        daysOfWeekStyle: const DaysOfWeekStyle(
+        daysOfWeekStyle: DaysOfWeekStyle(
           weekdayStyle: TextStyle(
-            color: Colors.black38,
+            color: textColor.withValues(alpha: 0.55),
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),
@@ -114,11 +200,11 @@ class _CalendarElementState extends State<CalendarElement> {
         calendarStyle: CalendarStyle(
           outsideDaysVisible:
               false, // Strips away trailing clutter days from other months
-          defaultTextStyle: const TextStyle(
+          defaultTextStyle: TextStyle(
             color: textColor,
             fontWeight: FontWeight.w500,
           ),
-          weekendTextStyle: const TextStyle(
+          weekendTextStyle: TextStyle(
             color: accentColor,
             fontWeight: FontWeight.w500,
           ),
@@ -131,18 +217,18 @@ class _CalendarElementState extends State<CalendarElement> {
             ),
             shape: BoxShape.circle,
           ),
-          todayTextStyle: const TextStyle(
+          todayTextStyle: TextStyle(
             color: primaryColor,
             fontWeight: FontWeight.bold,
           ),
 
           // User-Selected Day UI (Solid Background Accent Color)
-          selectedDecoration: const BoxDecoration(
+          selectedDecoration: BoxDecoration(
             color: primaryColor,
             shape: BoxShape.circle,
           ),
-          selectedTextStyle: const TextStyle(
-            color: Colors.white,
+          selectedTextStyle: TextStyle(
+            color: theme.colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -157,7 +243,7 @@ class _CalendarElementState extends State<CalendarElement> {
               margin: const EdgeInsets.only(bottom: 4),
               width: 5,
               height: 5,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: accentColor,
                 shape: BoxShape.circle,
               ),

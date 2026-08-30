@@ -7,7 +7,7 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF1E6),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -19,12 +19,12 @@ class LoadingScreen extends StatelessWidget {
               fit: BoxFit.contain,
             ),
             const SizedBox(height: 28),
-            const SizedBox(
+            SizedBox(
               width: 100,
               height: 3,
               child: LinearProgressIndicator(
                 minHeight: 0.3,
-                color: Color.fromARGB(255, 233, 76, 4),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ],

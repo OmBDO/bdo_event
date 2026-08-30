@@ -10,6 +10,7 @@ import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cu
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:bdo_event/core/security/biometric_lock_gate.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -43,7 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
               onSignedUp: cubit.showSignIn,
             );
           case AuthStep.authenticated:
-            return const MainScreen();
+            return const BiometricLockGate(child: MainScreen());
         }
       },
     );
