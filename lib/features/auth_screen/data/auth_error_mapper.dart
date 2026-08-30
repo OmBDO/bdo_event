@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 String mapAuthError(Object error, {required bool signingUp}) {

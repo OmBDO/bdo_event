@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key});

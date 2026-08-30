@@ -6,7 +6,7 @@ import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/prefs/recent_event_store.dart';
 
 class EventScreenCubit extends Cubit<EventScreenState> {

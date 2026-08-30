@@ -26,7 +26,7 @@ import 'package:bdo_event/features/watcher_screen/data/repositories/watcher_repo
 import 'package:bdo_event/features/watcher_screen/domain/usecases/check_in_registration.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dashboard.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

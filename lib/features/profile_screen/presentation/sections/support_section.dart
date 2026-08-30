@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_section_header.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_settings_group.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_settings_tile.dart';

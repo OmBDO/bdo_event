@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class LocationDropdown extends StatefulWidget {
   final Location selectedValue;

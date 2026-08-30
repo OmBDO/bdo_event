@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventRegistration {
   final String id;

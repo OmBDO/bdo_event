@@ -7,7 +7,7 @@ import 'package:bdo_event/features/auth_screen/data/datasource/auth_remote_data_
 import 'package:bdo_event/features/auth_screen/data/model/auth_user_dto.dart';
 import 'package:bdo_event/features/auth_screen/data/auth_error_mapper.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthRepository implements AuthRepositoryContract {
@@ -197,6 +197,7 @@ class AuthRepository implements AuthRepositoryContract {
     return AppText.roleManagementTrustedServer;
   }
 
+  @override
   Future<String?> updateNotificationPreference(bool enabled) async {
     final current = _currentUser;
     if (current == null) return AppText.pleaseSignInToUpdatePreferences;
@@ -220,11 +221,7 @@ class AuthRepository implements AuthRepositoryContract {
     ).toEntity();
   }
 
-  void _logUserClaims(
-    String source,
-    supabase.User authUser,
-    User mappedUser,
-  ) {
+  void _logUserClaims(String source, supabase.User authUser, User mappedUser) {
     developer.log(
       'auth.userClaims $source '
       '{userId: ${authUser.id}, '

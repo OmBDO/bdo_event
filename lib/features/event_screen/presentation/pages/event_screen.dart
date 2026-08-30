@@ -13,7 +13,7 @@ import 'package:bdo_event/features/event_screen/presentation/widgets/event_tab.d
 import 'package:bdo_event/features/event_screen/presentation/widgets/recent_event_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventPage extends StatelessWidget {
   const EventPage({super.key});

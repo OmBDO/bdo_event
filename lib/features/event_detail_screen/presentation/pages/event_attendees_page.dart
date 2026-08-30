@@ -60,12 +60,15 @@ class EventAttendeesPage extends StatelessWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                   itemCount: attendees.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final attendee = attendees[index];
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      leading: EventAttendeeAvatar(attendee: attendee, radius: 24),
+                      leading: EventAttendeeAvatar(
+                        attendee: attendee,
+                        radius: 24,
+                      ),
                       title: Text(
                         attendee.displayName,
                         style: const TextStyle(fontWeight: FontWeight.w700),
@@ -95,7 +98,13 @@ class EventAttendeesPage extends StatelessWidget {
     await SharePlus.instance.share(
       ShareParams(
         text: 'Attendee list for ${event.title}',
-        files: [XFile.fromData(utf8.encode(csv), name: fileName, mimeType: 'text/csv')],
+        files: [
+          XFile.fromData(
+            utf8.encode(csv),
+            name: fileName,
+            mimeType: 'text/csv',
+          ),
+        ],
         fileNameOverrides: [fileName],
       ),
     );
@@ -112,9 +121,8 @@ class EventAttendeesPage extends StatelessWidget {
     );
     await Clipboard.setData(ClipboardData(text: csv));
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Attendee CSV copied')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Attendee CSV copied')));
     }
   }
 
@@ -125,7 +133,11 @@ class EventAttendeesPage extends StatelessWidget {
 }
 
 class EventAttendeeAvatar extends StatelessWidget {
-  const EventAttendeeAvatar({required this.attendee, this.radius = 14});
+  const EventAttendeeAvatar({
+    super.key,
+    required this.attendee,
+    this.radius = 14,
+  });
 
   final EventAttendee attendee;
   final double radius;

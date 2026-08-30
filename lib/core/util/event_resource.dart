@@ -31,9 +31,9 @@ abstract final class AppText {
   static const termsAgreement = 'I agree to the terms and privacy policy';
   static const newToApp = 'New to BDO Events? ';
   static const alreadyHaveAccount = 'Already have an account? ';
-    static const appVersion = 'App version';
-    static const appVersionValue = 'Version 1.0.0 (1)';
-    static const licenses = 'Licenses';
+  static const appVersion = 'App version';
+  static const appVersionValue = 'Version 1.0.0 (1)';
+  static const licenses = 'Licenses';
 
   static const upcoming = 'Upcoming';
   static const myEvents = 'My Events';
@@ -106,9 +106,9 @@ abstract final class AppText {
   static const whyQrCode = 'Why is there a QR code?';
   static const gotIt = 'Got it';
   static const showQrCode = 'Show this QR code at the event entrance';
-    static const registrationCode = 'Registration code for manual entry';
-    static const copyRegistrationCode = 'Copy registration code';
-    static const registrationCodeCopied = 'Registration code copied';
+  static const registrationCode = 'Registration code for manual entry';
+  static const copyRegistrationCode = 'Copy registration code';
+  static const registrationCodeCopied = 'Registration code copied';
   static const registrationConfirmed = 'Registration confirmed';
   static const cancellation = 'CANCELLATION';
   static const needToChangePlans = 'Need to change your plans?';
@@ -122,20 +122,20 @@ abstract final class AppText {
   static const accountSettings = 'Account Settings';
   static const editProfile = 'Edit Profile';
   static const profileDetails = 'Profile details';
-    static const organizerTools = 'Organizer Tools';
-    static const manageMyEvents = 'Manage my events';
-    static const saveProfile = 'Save profile';
-    static const profileUpdated = 'Profile updated successfully';
-    static const unableToUpdateProfile = 'Unable to update profile';
-    static const changePassword = 'Change Password';
-    static const changePasswordDescription = 'Update your account password';
-    static const newPassword = 'New password';
-    static const confirmNewPassword = 'Confirm new password';
-    static const passwordChanged = 'Password changed successfully';
-    static const savePassword = 'Save password';
-    static const cancel = 'Cancel';
+  static const organizerTools = 'Organizer Tools';
+  static const manageMyEvents = 'Manage my events';
+  static const saveProfile = 'Save profile';
+  static const profileUpdated = 'Profile updated successfully';
+  static const unableToUpdateProfile = 'Unable to update profile';
+  static const changePassword = 'Change Password';
+  static const changePasswordDescription = 'Update your account password';
+  static const newPassword = 'New password';
+  static const confirmNewPassword = 'Confirm new password';
+  static const passwordChanged = 'Password changed successfully';
+  static const savePassword = 'Save password';
+  static const cancel = 'Cancel';
   static const myEventRegistrations = 'My Event Registrations';
-    static const savedEvents = 'Saved events';
+  static const savedEvents = 'Saved events';
   static const paymentMethods = 'Payment Methods';
   static const preferences = 'Preferences';
   static const pushNotifications = 'Push Notifications';
@@ -149,10 +149,11 @@ abstract final class AppText {
   static const oneDayBefore = '1 day before';
   static const oneWeekBefore = '1 week before';
   static const darkThemeMode = 'Dark Theme Mode';
-    static const largerText = 'Larger text';
-    static const largerTextDescription = 'Increase text size across the app';
-    static const highContrast = 'High contrast';
-    static const highContrastDescription = 'Increase color contrast across the app';
+  static const largerText = 'Larger text';
+  static const largerTextDescription = 'Increase text size across the app';
+  static const highContrast = 'High contrast';
+  static const highContrastDescription =
+      'Increase color contrast across the app';
   static const appLanguage = 'App Language';
   static const englishIndia = 'English (IN)';
   static const supportLegal = 'Support & Legal';
@@ -178,11 +179,11 @@ abstract final class AppText {
   static const troubleshootingHelp = 'Troubleshooting and event booking help';
   static const termsAndSecurity = 'Terms of service and data security rules';
 
-    static String reminderLeadTimeLabel(int minutes) => switch (minutes) {
-        60 => oneHourBefore,
-        10080 => oneWeekBefore,
-        _ => oneDayBefore,
-    };
+  static String reminderLeadTimeLabel(int minutes) => switch (minutes) {
+    60 => oneHourBefore,
+    10080 => oneWeekBefore,
+    _ => oneDayBefore,
+  };
   static const eventHelp =
       'For event help, open the event details and use the registration action. Your registered events are available under My Event Registrations.';
   static const supabaseDataPolicy =
@@ -208,8 +209,8 @@ abstract final class AppText {
   static const emailAlreadyRegistered = 'This email is already registered';
   static const unableToCreateAccount = 'Unable to create the account';
   static const unableToSignIn = 'Unable to sign in';
-    static const unableToSignOutEverywhere =
-            'Unable to sign out from all devices';
+  static const unableToSignOutEverywhere =
+      'Unable to sign out from all devices';
   static const pleaseSignInToManageEvents = 'Please sign in to manage events';
   static const pleaseSignInToRegister = 'Please sign in to register for events';
   static const pleaseSignInToModifyRegistrations =
@@ -217,8 +218,8 @@ abstract final class AppText {
   static const eventNoLongerAvailable =
       'This event is no longer available for registration';
   static const eventAtCapacity = 'This event has reached its capacity';
-    static const registrationDeadlinePassed =
-            'Registration for this event has closed';
+  static const registrationDeadlinePassed =
+      'Registration for this event has closed';
   static const alreadyRegistered = 'You are already registered for this event';
   static const registrationRevoked =
       'This registration was cancelled and cannot be reactivated';
@@ -233,27 +234,39 @@ abstract final class AppText {
   static const unableToCheckIn = 'Unable to record attendance';
   static const checkInUnavailable = 'This registration cannot be checked in';
   static const scanRegistration = 'Scan registration';
-    static const watcherSettings = 'Watcher settings';
-    static const muteScanningVoice = 'Mute scanning voice';
-    static const muteScanningVoiceDescription =
-            'Silence spoken scan results while keeping scanning active.';
-      static const scanVibration = 'Scan vibration';
-      static const scanVibrationDescription =
-          'Vibrate after a successful registration scan.';
-      static const scannerSoundVolume = 'Scanner sound volume';
-      static const scannerSoundVolumeDescription =
-          'Adjust the volume of spoken scan results.';
-      static const autoOpenNextAttendee =
-          'Automatically open next attendee';
-      static const autoOpenNextAttendeeDescription =
-          'Select the next pending attendee after check-in.';
-      static const keepHistoryVisibleAfterCheckIn =
-          'Keep scan history visible after check-in';
-      static const keepHistoryVisibleAfterCheckInDescription =
-          'Leave the scan history open after confirming an attendee.';
+  static const watcherSettings = 'Watcher settings';
+  static const unmuteScanningVoice = 'Unmute scanning voice';
+  static const muteScanningVoice = 'Mute scanning voice';
+  static const toggleFlashLight = 'Toggle flashlight';
+  static const switchCamera = 'Switch camera';
+  static const pendingCheckIn = 'Pending check-in';
+  static const unknownAttendee = 'Unknown attendee';
+  static const validateRegistrationCode = 'Validate registration code';
+  static const checkedInitial = 'Checked in';
+  static const expected = 'Expected';
+  static const viewScanHistory = 'View scan history';
+  static const cofirmCheckedIn = 'Confirm check-in';
+  static const cancelregisterTooltip =
+      "you can register upto the date of event";
+
+  static const muteScanningVoiceDescription =
+      'Silence spoken scan results while keeping scanning active.';
+  static const scanVibration = 'Scan vibration';
+  static const scanVibrationDescription =
+      'Vibrate after a successful registration scan.';
+  static const scannerSoundVolume = 'Scanner sound volume';
+  static const scannerSoundVolumeDescription =
+      'Adjust the volume of spoken scan results.';
+  static const autoOpenNextAttendee = 'Automatically open next attendee';
+  static const autoOpenNextAttendeeDescription =
+      'Select the next pending attendee after check-in.';
+  static const keepHistoryVisibleAfterCheckIn =
+      'Keep scan history visible after check-in';
+  static const keepHistoryVisibleAfterCheckInDescription =
+      'Leave the scan history open after confirming an attendee.';
   static const scanRegistrationPrompt = 'Scan a registration QR code';
-    static const enterRegistrationCode = 'Enter registration code from My Ticket';
-    static const pasteRegistrationCode = 'Paste the code shown below the QR';
+  static const enterRegistrationCode = 'Enter registration code from My Ticket';
+  static const pasteRegistrationCode = 'Paste the code shown below the QR';
   static const scanAgain = 'Scan again';
   static const notRegistered = 'You are not registered for this event';
   static const registrationCancelled =
@@ -269,7 +282,7 @@ abstract final class AppText {
   static const unableToCancelRegistration = 'Unable to cancel the registration';
   static const updateInProgress = 'An update is already in progress';
   static const unableToSaveEvent = 'Unable to save the event';
-    static const unableToUploadEventImage = 'Unable to upload the event image';
+  static const unableToUploadEventImage = 'Unable to upload the event image';
   static const unableToLoadEvents = 'Unable to load events';
   static const unableToUpdateEvent = 'Unable to update the event';
   static const unableToDeleteEvent = 'Unable to delete the event';
@@ -285,15 +298,26 @@ abstract final class AppText {
   static const noMatchingEvents = 'No matching events found';
   static const searchFestivalsOrEvents = 'Search festivals or events...';
   static const noNewNotifications = 'No new notifications';
-    static const notifications = 'Notifications';
-    static const noNotifications = 'No notifications yet';
-    static const unableToLoadNotifications = 'Unable to load notifications';
-    static const unableToUpdateArrival = 'Unable to update arrival status';
-    static const arrivalConfirmation = 'Will you attend this event?';
-    static const attending = 'I will attend';
-    static const notAttending = 'I cannot attend';
-    static const arrivalConfirmed = 'Arrival status updated';
+  static const notifications = 'Notifications';
+  static const noNotifications = 'No notifications yet';
+  static const unableToLoadNotifications = 'Unable to load notifications';
+  static const unableToUpdateArrival = 'Unable to update arrival status';
+  static const arrivalConfirmation = 'Will you attend this event?';
+  static const attending = 'I will attend';
+  static const notAttending = 'I cannot attend';
+  static const arrivalConfirmed = 'Arrival status updated';
   static const pleaseWait = 'Please wait';
+  static const alreadyCheckedIn2 = 'Already checked in';
+  static const notScanYet = 'No scans yet';
+  static const scanHistory = 'Scan history';
+  static const confirmAll = 'Confirm all';
+  static const qrInitilDescription =
+      'Give this code to event staff if the QR code cannot be scanned.';
+
+  static const ticketDeparting = 'Ticket is departing...';
+  static const nullCount = '--';
+  static const profileUnavailable = 'Profile unavailable';
+  static const empty = '';
 }
 
 abstract final class AppAssets {
@@ -306,6 +330,14 @@ abstract final class AppAssets {
 abstract final class AppStorageKeys {
   static const displayName = 'display_name';
   static const notificationsEnabled = 'notifications_enabled';
+}
+
+abstract final class AppEssentials {
+  // ENV
+
+  static const supabaseURLKEY = 'SUPABASE_URL';
+  static const supabaseAnonKEY = 'SUPABASE_URL';
+  static const bdoinitialQr = 'bdo-event-ticket-preparing';
 }
 
 abstract final class AppDatabase {
@@ -336,6 +368,8 @@ abstract final class AppIdentifiers {
   static const logoutMenuValue = 'logout';
   static const storedEventFilePrefix = 'event_';
   static const storedEventFileExtension = '.jpg';
+
+  static const readytocheckIn = 'Ready to check in';
 }
 
 abstract final class AppLocations {
@@ -372,4 +406,22 @@ abstract final class AppLocations {
   static const north = 'North';
   static const south = 'South';
   static const ncr = 'NCR';
+}
+
+abstract final class AppModelKeys {
+  static const type = 'type';
+  static const eventId = 'eventId';
+  static const token = 'token';
+  static const userId = 'user_id';
+  static const eventUnderscoreId = 'event_id';
+  static const displayName = "display_name";
+  static const checkedIn = "checked_in";
+  static const alreadyCheckedIn = "already_checked_in";
+  static const event = 'event';
+  static const date = 'date';
+  static const location = 'location';
+}
+
+abstract final class AppUtil {
+  static const monospace = 'monospace';
 }

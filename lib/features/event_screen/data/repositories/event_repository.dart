@@ -4,7 +4,7 @@ import 'package:bdo_event/features/auth_screen/domain/repositories/auth_reposito
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
 import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
 import 'package:bdo_event/features/event_screen/domain/repositories/event_repository.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventRepository implements EventRepositoryContract {
   EventRepository({

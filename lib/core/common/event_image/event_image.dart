@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventImage extends StatefulWidget {
   final String path;

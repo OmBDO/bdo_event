@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/pages/calendar_screen.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/saved_events_page.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_section_header.dart';

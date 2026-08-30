@@ -3,7 +3,7 @@ import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/repositories/registration_repository.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class RegisteredEventRepository implements RegistrationRepositoryContract {
   RegisteredEventRepository({
