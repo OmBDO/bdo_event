@@ -7,9 +7,10 @@ import 'package:bdo_event/core/util/event_resource.dart';
 
 class RegisteredEventRepository implements RegistrationRepositoryContract {
   RegisteredEventRepository({
-    required this._dataSource,
-    required this._authRepository,
-  });
+    required RegistrationDataSource dataSource,
+    required AuthRepositoryContract authRepository,
+  }) : _dataSource = dataSource,
+       _authRepository = authRepository;
 
   final RegistrationDataSource _dataSource;
   final AuthRepositoryContract _authRepository;

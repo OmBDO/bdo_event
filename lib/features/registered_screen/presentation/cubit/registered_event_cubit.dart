@@ -9,11 +9,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisteredEventCubit extends Cubit<RegisteredEventState> {
   RegisteredEventCubit({
-    required this._cancelRegisteredEvent,
-    required this._authRepository,
-    required this._eventStore,
-    required this._reminderNotifications,
-  }) : super(const RegisteredEventState());
+    required CancelRegisteredEvent cancelRegisteredEvent,
+    required AuthRepositoryContract authRepository,
+    required EventStore eventStore,
+    required EventReminderNotificationService? reminderNotifications,
+  }) : _cancelRegisteredEvent = cancelRegisteredEvent,
+       _authRepository = authRepository,
+       _eventStore = eventStore,
+       _reminderNotifications = reminderNotifications,
+       super(const RegisteredEventState());
 
   final CancelRegisteredEvent _cancelRegisteredEvent;
   final AuthRepositoryContract _authRepository;
