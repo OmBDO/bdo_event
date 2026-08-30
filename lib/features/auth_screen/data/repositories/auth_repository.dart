@@ -96,9 +96,73 @@ class AuthRepository implements AuthRepositoryContract {
   }
 
   @override
+  Future<String?> updatePassword(String password) async {
+    if (_currentUser == null) return AppText.pleaseSignInToChangePassword;
+
+    try {
+      await _authDataSource.updatePassword(password);
+    } on supabase.AuthException catch (error) {
+      return error.message.isNotEmpty
+          ? error.message
+          : AppText.unableToChangePassword;
+    } on Object {
+      return AppText.unableToChangePassword;
+    }
+    return null;
+  }
+
+  @override
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+  }) async {
+    final current = _currentUser;
+    if (current == null) return AppText.pleaseSignInToChangePassword;
+    final trimmedName = displayName.trim();
+    final normalizedEmail = email.trim().toLowerCase();
+    if (trimmedName.isEmpty || normalizedEmail.isEmpty) {
+      return AppText.unableToUpdateProfile;
+    }
+
+    try {
+      final response = await _authDataSource.updateUserData({
+        'display_name': trimmedName,
+        'email': normalizedEmail,
+      });
+      final updatedUser = response.user;
+      if (updatedUser != null) {
+        _currentUser = await _mapUser(updatedUser);
+      } else {
+        _currentUser = current.copyWith(
+          displayName: trimmedName,
+          email: normalizedEmail,
+        );
+      }
+    } on supabase.AuthException catch (error) {
+      return error.message.isNotEmpty
+          ? error.message
+          : AppText.unableToUpdateProfile;
+    } on Object {
+      return AppText.unableToUpdateProfile;
+    }
+    return null;
+  }
+
+  @override
   Future<void> logout() async {
     _currentUser = null;
     await _authDataSource.signOut();
+  }
+
+  @override
+  Future<String?> logoutEverywhere() async {
+    try {
+      await _authDataSource.signOutEverywhere();
+      _currentUser = null;
+    } on Object {
+      return AppText.unableToSignOutEverywhere;
+    }
+    return null;
   }
 
   /// Role changes are intentionally restricted to administrators. A future

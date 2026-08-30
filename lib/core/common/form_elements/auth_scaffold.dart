@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:bdo_event/core/theme/app_colors.dart';
+
 class AuthScaffold extends StatelessWidget {
   final String eyebrow;
   final String title;
@@ -16,13 +18,25 @@ class AuthScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFB1D4FA), Color(0xFFFFF1E6), Color(0xFFF9CBB0)],
+            colors: isDarkMode
+                ? const [
+                    AppColors.shellStartDark,
+                    AppColors.backgroundDark,
+                    AppColors.shellEndDark,
+                  ]
+                : const [
+                    AppColors.shellStartLight,
+                    AppColors.backgroundLight,
+                    AppColors.shellEndLight,
+                  ],
           ),
         ),
         child: SafeArea(
@@ -37,7 +51,7 @@ class AuthScaffold extends StatelessWidget {
                     Text(
                       eyebrow,
                       style: const TextStyle(
-                        color: Color(0xFFB14F36),
+                        color: theme.colorScheme.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.8,
@@ -47,7 +61,7 @@ class AuthScaffold extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                        color: Color(0xFF2D0C57),
+                        color: theme.colorScheme.onSurface,
                         fontSize: 30,
                         fontWeight: FontWeight.w800,
                       ),
@@ -56,7 +70,7 @@ class AuthScaffold extends StatelessWidget {
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        color: Color(0xFF6F607A),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 15,
                         height: 1.4,
                       ),
@@ -65,12 +79,18 @@ class AuthScaffold extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.84),
+                        color: theme.colorScheme.surface.withValues(
+                          alpha: isDarkMode ? 0.96 : 0.84,
+                        ),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white),
-                        boxShadow: const [
+                        border: Border.all(
+                          color: theme.colorScheme.surface,
+                        ),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x1F7A4C43),
+                            color: Colors.black.withValues(
+                              alpha: isDarkMode ? 0.35 : 0.12,
+                            ),
                             blurRadius: 24,
                             offset: Offset(0, 12),
                           ),

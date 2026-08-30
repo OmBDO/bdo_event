@@ -113,8 +113,8 @@ class _SigninScreenState extends State<SigninScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     state.error!,
-                    style: const TextStyle(
-                      color: Color(0xFFB64234),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

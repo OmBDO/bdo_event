@@ -127,9 +127,22 @@ class _NotificationCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    notification.title,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        notification.title,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        _categoryLabel(notification.category),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -176,4 +189,11 @@ class _NotificationCard extends StatelessWidget {
       ),
     );
   }
+
+  String _categoryLabel(NotificationCategory category) => switch (category) {
+    NotificationCategory.registration => 'Registration',
+    NotificationCategory.reminder => 'Reminder',
+    NotificationCategory.system => 'System',
+    NotificationCategory.event => 'Event',
+  };
 }

@@ -78,7 +78,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
             ScanHistoryEntry(
               registrationToken: payload['token'] as String,
               userId: result['user_id'] as String?,
-              displayName: result['display_name'] as String?,
+              displayName: _displayName(result),
               eventId: result['event_id'] as String?,
               status: 'Ready to check in',
             ),
@@ -95,6 +95,12 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
         ),
       );
     }
+  }
+
+  String? _displayName(Map<String, dynamic> result) {
+    final value = result['display_name'];
+    if (value is! String || value.trim().isEmpty) return null;
+    return value.trim();
   }
 
   Map<String, dynamic>? _decodeRegistrationValue(String rawValue) {
@@ -124,7 +130,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     }
   }
 
-  Future<void> checkIn() async {
+  Future<void> checkIn({bool autoOpenNext = true}) async {
     final eventId = state.eventId;
     final token = state.registrationToken;
     if (eventId == null ||
@@ -150,7 +156,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
           .where((entry) => entry.status == 'Ready to check in')
           .firstOrNull;
       emit(
-        nextPending == null
+        nextPending == null || !autoOpenNext
             ? state.copyWith(
                 status: WatcherScanStatus.idle,
                 history: updatedHistory,
@@ -185,7 +191,28 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     }
   }
 
-  Future<void> checkInAll() async {
+  Future<void> checkInEntry(
+    ScanHistoryEntry entry, {
+    bool autoOpenNext = true,
+  }) async {
+    if (entry.status != 'Ready to check in' ||
+        entry.eventId == null ||
+        state.status == WatcherScanStatus.checkingIn ||
+        isClosed) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        status: WatcherScanStatus.valid,
+        eventId: entry.eventId,
+        registrationToken: entry.registrationToken,
+        userId: entry.userId,
+      ),
+    );
+    await checkIn(autoOpenNext: autoOpenNext);
+  }
+
+  Future<void> checkInAll({bool autoOpenNext = true}) async {
     final pending = state.history
         .where((entry) => entry.status == 'Ready to check in')
         .toList();
@@ -217,7 +244,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
         .firstOrNull;
     if (!isClosed) {
       emit(
-        remainingPending == null
+        remainingPending == null || !autoOpenNext
             ? state.copyWith(
                 status: WatcherScanStatus.idle,
                 clearResult: true,

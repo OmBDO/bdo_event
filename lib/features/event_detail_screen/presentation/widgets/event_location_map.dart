@@ -16,13 +16,17 @@ class EventLocationMap extends StatelessWidget {
         height: 180,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFFF1F4F3),
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(24),
         ),
-        child: const Center(
+          child: Center(
           child: Text(
             'Map location is not available for this event yet.',
-            style: TextStyle(color: Colors.black54),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withValues(
+                  alpha: 0.65,
+                ),
+              ),
           ),
         ),
       );
@@ -50,9 +54,9 @@ class EventLocationMap extends StatelessWidget {
                   point: point,
                   width: 46,
                   height: 46,
-                  child: const Icon(
+                  child: Icon(
                     Icons.location_on,
-                    color: Colors.deepOrange,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 44,
                   ),
                 ),

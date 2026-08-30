@@ -28,6 +28,14 @@ class AuthScreenCubit extends Cubit<AuthScreenState> {
     if (!isClosed) emit(state.copyWith(step: AuthStep.signIn));
   }
 
+  Future<String?> logoutEverywhere() async {
+    final error = await _authRepository.logoutEverywhere();
+    if (error == null && !isClosed) {
+      emit(state.copyWith(step: AuthStep.signIn));
+    }
+    return error;
+  }
+
   void showSignUp() => emit(state.copyWith(step: AuthStep.signUp));
 
   void showSignIn([String? email]) => emit(

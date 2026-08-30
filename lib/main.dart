@@ -1,6 +1,8 @@
 import 'package:bdo_event/dotenv.dart' show DotEnvInitialization;
+import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
 import 'package:bdo_event/features/auth_screen/presentation/pages/auth_screen.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/theme/app_theme.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';
@@ -14,6 +16,7 @@ import 'package:bdo_event/core/common/configuration_error_app/configuration_erro
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +31,9 @@ Future<void> main() async {
     url: env.supabaseUrl,
     publishableKey: env.supabaseAnonKey,
   );
-  configureDependencies();
+  final preferences = await SharedPreferences.getInstance();
+  configureDependencies(preferences: preferences);
+  await getIt<EventReminderNotificationService>().initialize();
   await getIt<AuthScreenCubit>().checkActiveSession();
   getIt<ProfileScreenCubit>().refresh();
   await getIt<CalendarScreenCubit>().loadRegistrations();
@@ -52,13 +57,29 @@ class MyApp extends StatelessWidget {
         BlocProvider.value(value: getIt<ProfileScreenCubit>()),
         BlocProvider.value(value: getIt<WatcherScanCubit>()),
       ],
-      child: MaterialApp(
+      child: Builder(
+        builder: (context) {
+          final profileState = context.watch<ProfileScreenCubit>().state;
+          final highContrast = profileState.isHighContrastEnabled;
+          return MaterialApp(
         title: AppText.appName,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        theme: AppTheme.light(highContrast: highContrast),
+        darkTheme: AppTheme.dark(highContrast: highContrast),
+        themeMode: profileState.isDarkModeEnabled
+            ? ThemeMode.dark
+            : ThemeMode.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: profileState.isLargeTextEnabled
+                ? const TextScaler.linear(1.15)
+                : const TextScaler.linear(1.0),
+          ),
+          child: child!,
         ),
         debugShowCheckedModeBanner: false,
-        home: const AuthScreen(),
+            home: const AuthScreen(),
+          );
+        },
       ),
     );
   }

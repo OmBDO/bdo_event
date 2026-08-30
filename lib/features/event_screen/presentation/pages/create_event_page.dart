@@ -371,7 +371,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               ? AppText.updateEventEyebrow
                               : AppText.createEventEyebrow,
                           style: TextStyle(
-                            color: Color(0xFFB14F36),
+                            color: Theme.of(context).colorScheme.primary,
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.5,
@@ -383,16 +383,17 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               ? AppText.updateYourEvent
                               : AppText.bringPeopleTogether,
                           style: TextStyle(
-                            color: Color(0xFF2D0C57),
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           AppText.eventDetailsPrompt,
                           style: TextStyle(
-                            color: Color(0xFF6F607A),
+                            color: Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 14,
                           ),
                         ),
@@ -403,9 +404,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             height: 170,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.72),
+                                color: Theme.of(context).colorScheme.surface
+                                  .withValues(alpha: 0.72),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.white),
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
                             ),
                             child: _selectedImagePath == null
                                 ? const Column(
@@ -798,9 +802,9 @@ class _LocationPickerSection extends StatelessWidget {
                         point: coordinates!,
                         width: 44,
                         height: 44,
-                        child: const Icon(
+                        child: Icon(
                           Icons.location_on,
-                          color: Colors.deepOrange,
+                          color: Theme.of(context).colorScheme.tertiary,
                           size: 42,
                         ),
                       ),
@@ -811,9 +815,12 @@ class _LocationPickerSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Choose an office above, search for a place, or tap the map to drop a pin.',
-          style: TextStyle(color: Colors.black54, fontSize: 12),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 12,
+          ),
         ),
       ],
     );

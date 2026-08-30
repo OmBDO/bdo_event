@@ -39,6 +39,7 @@ class BottomEventRegisterSection extends StatelessWidget {
     return BlocBuilder<EventDetailCubit, EventDetailState>(
       bloc: cubit,
       builder: (context, state) {
+        final theme = Theme.of(context);
         final bool isAlreadyRegistered = state.isRegistered;
 
         String statusText = AppText.available;
@@ -46,7 +47,7 @@ class BottomEventRegisterSection extends StatelessWidget {
 
         String buttonText = AppText.register;
         Color buttonBgColor = primaryDark;
-        Color buttonForegroundColor = Colors.white;
+        Color buttonForegroundColor = theme.colorScheme.onPrimary;
 
         VoidCallback? buttonAction;
 
@@ -54,8 +55,8 @@ class BottomEventRegisterSection extends StatelessWidget {
           statusText = AppText.registered;
           statusColor = Colors.blue.shade700;
           buttonText = AppText.myTicket;
-          buttonBgColor = Colors.blue.shade50;
-          buttonForegroundColor = Colors.blue.shade700;
+          buttonBgColor = theme.colorScheme.secondaryContainer;
+          buttonForegroundColor = theme.colorScheme.onSecondaryContainer;
 
           buttonAction = () async {
             await Navigator.of(context).push(
@@ -111,7 +112,7 @@ class BottomEventRegisterSection extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -155,8 +156,10 @@ class BottomEventRegisterSection extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonBgColor,
                       foregroundColor: buttonForegroundColor,
-                      disabledBackgroundColor: Colors.grey.shade200,
-                      disabledForegroundColor: Colors.grey.shade500,
+                        disabledBackgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                        disabledForegroundColor:
+                          Theme.of(context).colorScheme.onSurfaceVariant,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),

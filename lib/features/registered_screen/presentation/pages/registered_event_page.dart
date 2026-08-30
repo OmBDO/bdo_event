@@ -6,6 +6,8 @@ import 'package:bdo_event/features/registered_screen/presentation/cubit/register
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
+import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/services.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -143,7 +145,11 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
     );
 
     if (!mounted) return;
-    if (cancelled) navigator.pop();
+    if (cancelled) {
+      await context.read<EventScreenCubit>().load(force: true);
+      await context.read<CalendarScreenCubit>().loadRegistrations();
+      if (mounted) navigator.pop();
+    }
   }
 
   String _qrData(String token) => jsonEncode({
@@ -167,7 +173,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<RegisteredEventCubit, RegisteredEventState>(
       builder: (context, state) => Scaffold(
-        backgroundColor: const Color(0xFFFFF1E6),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           title: const Text(AppText.myTicket),
           backgroundColor: Colors.transparent,
@@ -203,7 +209,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.fromLTRB(22, 24, 22, 26),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: const [
                     BoxShadow(
@@ -225,10 +231,10 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    const Text(
+                    Text(
                       AppText.registeredEvent,
                       style: TextStyle(
-                        color: Color(0xFFB14F36),
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.5,
@@ -238,8 +244,8 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                     Text(
                       widget.event.title,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF2D0C57),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
                       ),
@@ -248,8 +254,10 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                     Text(
                       '${widget.event.date}  •  ${widget.event.location}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF6F607A),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 14,
                       ),
                     ),
@@ -259,8 +267,8 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       Text(
                         '${widget.event.startTime ?? '--:--'} - ${widget.event.endTime ?? '--:--'}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFF2D0C57),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
@@ -270,9 +278,13 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: const Color(0xFFE8E1E1)),
+                        border: Border.all(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .outlineVariant,
+                        ),
                       ),
                       child: state.registrationToken == null
                           ? SizedBox(
@@ -323,8 +335,9 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           AppText.registrationCode,
-                          style: const TextStyle(
-                            color: Color(0xFF6F607A),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                           ),
@@ -338,17 +351,19 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFF8F2),
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFF0C9C4)),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: SelectableText(
                                 _manualCode(state.registrationToken!),
-                                style: const TextStyle(
-                                  color: Color(0xFF2D0C57),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontFamily: 'monospace',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -378,29 +393,31 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Give this code to event staff if the QR code cannot be scanned.',
                           style: TextStyle(
-                            color: Color(0xFF6F607A),
+                            color: Theme.of(context).colorScheme.onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 12,
                           ),
                         ),
                       ),
                     ],
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       AppText.showQrCode,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Color(0xFF6F607A),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.7),
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
@@ -426,36 +443,39 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Theme.of(context).colorScheme.surface.withValues(
+                    alpha: 0.9,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFF0C9C4)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       AppText.cancellation,
                       style: TextStyle(
-                        color: Color(0xFFB64234),
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.4,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       AppText.needToChangePlans,
                       style: TextStyle(
-                        color: Color(0xFF2D0C57),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
+                    Text(
                       AppText.cancellationWarning,
                       style: TextStyle(
-                        color: Color(0xFF6F607A),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.7),
                         fontSize: 13,
                         height: 1.4,
                       ),
@@ -486,8 +506,10 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFFB64234),
-                          side: const BorderSide(color: Color(0xFFE5A39A)),
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                           padding: const EdgeInsets.symmetric(vertical: 13),
                         ),
                       ),
@@ -497,8 +519,8 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       Text(
                         state.error!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFFB64234),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
                           fontSize: 12,
                         ),
                       ),

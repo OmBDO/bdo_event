@@ -8,6 +8,8 @@ class EventCard extends StatelessWidget {
   final Function(BuildContext)? onTap;
   final VoidCallback? onUpdate;
   final VoidCallback? onDelete;
+  final VoidCallback? onSave;
+  final bool isSaved;
 
   const EventCard({
     super.key,
@@ -15,16 +17,20 @@ class EventCard extends StatelessWidget {
     this.onTap,
     this.onUpdate,
     this.onDelete,
+    this.onSave,
+    this.isSaved = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 9),
       width: MediaQuery.sizeOf(context).width,
       height: 310, // Increased slightly by 10px to accommodate bottom margins beautifully
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -85,6 +91,26 @@ class EventCard extends StatelessWidget {
                   ),
                 ),
               ),
+
+              if (onSave != null)
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: Material(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    shape: const CircleBorder(),
+                    child: IconButton(
+                      tooltip: isSaved ? 'Remove saved event' : 'Save event',
+                      onPressed: onSave,
+                      icon: Icon(
+                        isSaved
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_border_rounded,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ),
 
               if (event.attendeeCount > 0)
                 Positioned(
@@ -163,10 +189,10 @@ class EventCard extends StatelessWidget {
                         event.title,
                         maxLines: 1, // Restricting to 1 line limits height spillover bugs
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: Colors.black,
+                          color: theme.colorScheme.onSurface,
                           height: 1.2,
                         ),
                       ),
@@ -176,13 +202,17 @@ class EventCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.grey.withValues(alpha: 0.1),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.1,
+                              ),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.language,
                               size: 14,
-                              color: Colors.grey,
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -191,8 +221,10 @@ class EventCard extends StatelessWidget {
                               event.location,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.grey,
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.6,
+                                ),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -212,13 +244,17 @@ class EventCard extends StatelessWidget {
                   child: Container(
                     width: 44,
                     height: 44,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
+                    decoration: BoxDecoration(
+                      color: isDarkMode
+                          ? theme.colorScheme.primary
+                          : Colors.black,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.north_east,
-                      color: Colors.white,
+                      color: isDarkMode
+                          ? theme.colorScheme.onPrimary
+                          : Colors.white,
                       size: 18,
                     ),
                   ),
@@ -236,8 +272,12 @@ class EventCard extends StatelessWidget {
     return Container(
       height: 200,
       width: double.infinity,
-      color: const Color(0xFFE8E8F5),
-      child: const Icon(Icons.image, size: 50, color: Colors.grey),
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: Icon(
+        Icons.image,
+        size: 50,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     );
   }
 

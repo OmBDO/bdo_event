@@ -83,8 +83,8 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(36),
           topRight: Radius.circular(36),
@@ -111,7 +111,8 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                   ), // Aligns icon with first line of text
                   child: Icon(
                     Icons.location_on_rounded,
-                    color: Colors.black26,
+                    color: Theme.of(context).colorScheme.onSurface
+                        .withValues(alpha: 0.26),
                     size: 16,
                   ),
                 ),
@@ -172,10 +173,10 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             ),
             const Gap(12),
 
-            const Text(
+            Text(
               AppText.upcomingEvent,
               style: TextStyle(
-                color: Colors.deepOrange,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
@@ -230,7 +231,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F7F9),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: InkWell(
@@ -266,7 +267,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                         const Spacer(),
                         CircleAvatar(
                           radius: 14,
-                          backgroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.surface,
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 10,
