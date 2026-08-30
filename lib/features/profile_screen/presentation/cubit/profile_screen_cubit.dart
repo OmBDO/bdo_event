@@ -193,10 +193,18 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   Future<String?> updateProfile({
     required String displayName,
     required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
   }) async {
     final error = await _authRepository.updateProfile(
       displayName: displayName,
       email: email,
+      photoUrl: photoUrl,
+      phoneNumber: phoneNumber,
+      bio: bio,
+      locale: locale,
     );
     if (error == null && !isClosed) {
       refresh();

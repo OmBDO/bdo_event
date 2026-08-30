@@ -7,11 +7,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   CalendarScreenCubit({
-    required this._loadRegisteredEvents,
-    required this._authRepository,
-    required this._reminderNotifications,
-    this._preferences,
-  }) : super(const CalendarScreenState());
+    required LoadRegisteredEvents loadRegisteredEvents,
+    required AuthRepositoryContract authRepository,
+    required EventReminderNotificationService reminderNotifications,
+    SharedPreferences? preferences,
+  }) : _loadRegisteredEvents = loadRegisteredEvents,
+       _authRepository = authRepository,
+       _reminderNotifications = reminderNotifications,
+       _preferences = preferences,
+       super(const CalendarScreenState());
 
   final LoadRegisteredEvents _loadRegisteredEvents;
   final AuthRepositoryContract _authRepository;

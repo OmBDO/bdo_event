@@ -27,9 +27,11 @@ class ProfileHeaderSection extends StatelessWidget {
                     ? AppColors.tertiaryDark
                     : AppColors.tertiaryLight)
                   .withValues(alpha: 0.1),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(AppAssets.defaultAvatarUrl),
+                backgroundImage: user?.photoUrl?.trim().isNotEmpty == true
+                    ? NetworkImage(user!.photoUrl!)
+                    : const NetworkImage(AppAssets.defaultAvatarUrl),
               ),
             ),
             CircleAvatar(

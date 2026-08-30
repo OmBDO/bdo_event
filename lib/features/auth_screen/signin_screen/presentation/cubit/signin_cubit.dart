@@ -1,11 +1,13 @@
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignInCubit extends Cubit<SignInState> {
-  SignInCubit({required this._authRepository}) : super(const SignInState());
+  SignInCubit({required AuthRepositoryContract authRepository})
+    : _authRepository = authRepository,
+      super(const SignInState());
 
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   void showError(String message) =>
       emit(state.copyWith(isSubmitting: false, error: message));
