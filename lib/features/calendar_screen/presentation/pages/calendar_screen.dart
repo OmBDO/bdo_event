@@ -122,88 +122,91 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                       if (visibleEvents.isEmpty) {
                         final theme = Theme.of(context);
                         final hasRegistrations = state.events.isNotEmpty;
-                        return Container(
-                          margin: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-                          padding: const EdgeInsets.fromLTRB(24, 30, 24, 26),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface.withValues(
-                              alpha: 0.88,
-                            ),
-                            borderRadius: BorderRadius.circular(26),
-                            border: Border.all(
-                              color: theme.colorScheme.outlineVariant,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF52718A)
-                                    .withValues(alpha: 0.12),
-                                blurRadius: 18,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 74,
-                                height: 74,
-                                decoration: BoxDecoration(
-                                  color:
-                                      theme.colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: Icon(
-                                  hasRegistrations
-                                      ? Icons.search_off_rounded
-                                      : Icons.event_available_rounded,
-                                  size: 36,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                hasRegistrations
-                                    ? 'No events found'
-                                    : 'Your calendar is ready',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                hasRegistrations ? AppText.noMatchingEvents : 'Registered events will appear here so you can find every ticket in one place.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.7,
+                        return Center(
+                          child: Container(
+                            margin: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                            padding: const EdgeInsets.fromLTRB(24, 30, 24, 26),
+                            // decoration: BoxDecoration(
+                            //   color: theme.colorScheme.surface.withValues(
+                            //     alpha: 0.88,
+                            //   ),
+                            //   borderRadius: BorderRadius.circular(26),
+                            //   border: Border.all(
+                            //     color: theme.colorScheme.outlineVariant,
+                            //   ),
+                            //   boxShadow: [
+                            //     BoxShadow(
+                            //       color: const Color(0xFF52718A)
+                            //           .withValues(alpha: 0.12),
+                            //       blurRadius: 18,
+                            //       offset: const Offset(0, 8),
+                            //     ),
+                            //   ],
+                            // ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 74,
+                                  height: 74,
+                                  decoration: BoxDecoration(
+                                    color: theme
+                                        .colorScheme
+                                        .surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(24),
                                   ),
-                                  fontSize: 14,
-                                  height: 1.45,
+                                  child: Icon(
+                                    hasRegistrations
+                                        ? Icons.search_off_rounded
+                                        : Icons.event_available_rounded,
+                                    size: 36,
+                                    color: theme.colorScheme.primary,
+                                  ),
                                 ),
-                              ),
-                              if (!hasRegistrations) ...[
-                                const SizedBox(height: 22),
-                                FilledButton.icon(
-                                  onPressed: () => context
-                                      .read<MainScreenCubit>()
-                                      .selectTab(MainTab.events),
-                                  icon: const Icon(Icons.explore_outlined),
-                                  label: const Text('Explore events'),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: theme.colorScheme.primary,
-                                    foregroundColor:
-                                        theme.colorScheme.onPrimary,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 18,
-                                      vertical: 13,
+                                const SizedBox(height: 20),
+                                Text(
+                                  hasRegistrations
+                                      ? 'No events found'
+                                      : 'Your calendar is ready',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  hasRegistrations ? AppText.noMatchingEvents : 'Registered events will appear here so you can find every ticket in one place.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 14,
+                                    height: 1.45,
+                                  ),
+                                ),
+                                if (!hasRegistrations) ...[
+                                  const SizedBox(height: 22),
+                                  FilledButton.icon(
+                                    onPressed: () => context
+                                        .read<MainScreenCubit>()
+                                        .selectTab(MainTab.events),
+                                    icon: const Icon(Icons.explore_outlined),
+                                    label: const Text('Explore events'),
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor:
+                                          theme.colorScheme.primary,
+                                      foregroundColor:
+                                          theme.colorScheme.onPrimary,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                        vertical: 13,
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
                         );
                       }

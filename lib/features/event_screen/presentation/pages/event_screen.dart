@@ -44,7 +44,10 @@ class _EventPageViewState extends State<_EventPageView> {
       builder: (context) => AlertDialog(
         title: const Text(AppText.deleteEventQuestion),
         content: Text(
-          AppText.deleteEventDescription.replaceFirst('{eventTitle}', event.title),
+          AppText.deleteEventDescription.replaceFirst(
+            '{eventTitle}',
+            event.title,
+          ),
         ),
         actions: [
           TextButton(
@@ -73,9 +76,11 @@ class _EventPageViewState extends State<_EventPageView> {
       builder: (context, state) {
         final currentTabList = state.currentTabEvents;
         final recentEvents = state.recentEventIds
-          .map((id) => state.events.where((event) => event.id == id).firstOrNull)
-          .whereType<Event>()
-          .toList();
+            .map(
+              (id) => state.events.where((event) => event.id == id).firstOrNull,
+            )
+            .whereType<Event>()
+            .toList();
 
         return CustomScrollView(
           controller: AppScrollTracker.eventScrollController,
@@ -106,9 +111,8 @@ class _EventPageViewState extends State<_EventPageView> {
                     children: [
                       Text(
                         'Recently viewed',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 10),
                       SizedBox(
@@ -170,7 +174,10 @@ class _EventPageViewState extends State<_EventPageView> {
                           onTap: openContainer,
                           child: EventCard(
                             event: cardData,
-                            onUpdate: context.read<EventScreenCubit>().canUpdate(cardData)
+                            onUpdate:
+                                context.read<EventScreenCubit>().canUpdate(
+                                  cardData,
+                                )
                                 ? () => Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (_) =>
@@ -178,13 +185,16 @@ class _EventPageViewState extends State<_EventPageView> {
                                     ),
                                   )
                                 : null,
-                            onDelete: context.read<EventScreenCubit>().canDelete(cardData)
+                            onDelete:
+                                context.read<EventScreenCubit>().canDelete(
+                                  cardData,
+                                )
                                 ? () => _confirmDelete(cardData)
                                 : null,
                             isSaved: state.savedEventIds.contains(cardData.id),
                             onSave: () => context
-                              .read<EventScreenCubit>()
-                              .toggleSavedEvent(cardData),
+                                .read<EventScreenCubit>()
+                                .toggleSavedEvent(cardData),
                           ),
                         ),
                       );
@@ -219,13 +229,6 @@ class _EventPageViewState extends State<_EventPageView> {
         padding: const EdgeInsets.fromLTRB(24, 34, 24, 80),
         child: Container(
           padding: const EdgeInsets.fromLTRB(24, 30, 24, 28),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-          ),
           child: Column(
             children: [
               Container(
@@ -254,9 +257,8 @@ class _EventPageViewState extends State<_EventPageView> {
                 '$tabTitle will appear here when there is something to explore.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(
-                    alpha: 0.7,
-                  ),
+                  color: Theme.of(context).colorScheme.onSurface
+                      .withValues(alpha: 0.7),
                   height: 1.45,
                 ),
               ),
