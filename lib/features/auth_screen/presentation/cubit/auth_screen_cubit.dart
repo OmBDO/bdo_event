@@ -1,12 +1,13 @@
-import 'package:bdo_event/features/auth_screen/data/repositories/auth_repository.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthScreenCubit extends Cubit<AuthScreenState> {
-  AuthScreenCubit({required this._authRepository})
-    : super(const AuthScreenState());
+  AuthScreenCubit({required AuthRepositoryContract authRepository})
+    : _authRepository = authRepository,
+      super(const AuthScreenState());
 
-  final AuthRepository _authRepository;
+  final AuthRepositoryContract _authRepository;
 
   Future<void> checkActiveSession() async {
     try {
