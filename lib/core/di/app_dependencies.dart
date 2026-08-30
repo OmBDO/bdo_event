@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/prefs/recent_event_store.dart';
+import 'package:bdo_event/core/security/biometric_lock_service.dart';
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
 import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_logger.dart';
 import 'package:bdo_event/features/auth_screen/data/datasource/auth_remote_data_source.dart';
@@ -58,6 +59,7 @@ void configureDependencies({SharedPreferences? preferences}) {
   getIt.registerLazySingleton<RecentEventStore>(
     () => RecentEventStore(preferences),
   );
+  getIt.registerLazySingleton<BiometricLockService>(BiometricLockService.new);
 
   getIt.registerLazySingleton<SupabaseRequestLogger>(SupabaseRequestLogger.new);
   getIt.registerLazySingleton<EventReminderNotificationService>(
@@ -200,6 +202,7 @@ void configureDependencies({SharedPreferences? preferences}) {
       loadProfilePreferences: getIt(),
       saveProfilePreferences: getIt(),
       reminderNotifications: getIt(),
+      biometricLockService: getIt(),
     ),
   );
   getIt.registerFactory<RegisteredEventCubit>(

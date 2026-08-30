@@ -12,6 +12,8 @@ class ProfilePreferences {
     this.isWatcherKeepHistoryVisibleAfterCheckIn = false,
     this.isEventRemindersEnabled = true,
     this.eventReminderLeadTimeMinutes = 1440,
+    this.dateFormat = 'dd/MM/yyyy',
+    this.isBiometricLockEnabled = false,
   });
 
   final bool isDarkModeEnabled;
@@ -24,6 +26,8 @@ class ProfilePreferences {
   final bool isWatcherKeepHistoryVisibleAfterCheckIn;
   final bool isEventRemindersEnabled;
   final int eventReminderLeadTimeMinutes;
+  final String dateFormat;
+  final bool isBiometricLockEnabled;
 
   ProfilePreferences copyWith({
     bool? isDarkModeEnabled,
@@ -36,6 +40,8 @@ class ProfilePreferences {
     bool? isWatcherKeepHistoryVisibleAfterCheckIn,
     bool? isEventRemindersEnabled,
     int? eventReminderLeadTimeMinutes,
+    String? dateFormat,
+    bool? isBiometricLockEnabled,
   }) => ProfilePreferences(
     isDarkModeEnabled: isDarkModeEnabled ?? this.isDarkModeEnabled,
     isLargeTextEnabled: isLargeTextEnabled ?? this.isLargeTextEnabled,
@@ -53,5 +59,8 @@ class ProfilePreferences {
         isEventRemindersEnabled ?? this.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes:
         eventReminderLeadTimeMinutes ?? this.eventReminderLeadTimeMinutes,
+    dateFormat: dateFormat ?? this.dateFormat,
+    isBiometricLockEnabled:
+      isBiometricLockEnabled ?? this.isBiometricLockEnabled,
   );
 }

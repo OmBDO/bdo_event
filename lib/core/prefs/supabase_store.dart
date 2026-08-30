@@ -50,6 +50,11 @@ abstract interface class EventStore {
     required String eventId,
     required ArrivalStatus status,
   });
+
+  Future<void> recordLoginActivity({
+    String? deviceLabel,
+    String? platform,
+  });
 }
 
 class SupabaseStore implements EventStore {
@@ -60,6 +65,28 @@ class SupabaseStore implements EventStore {
 
   final supabase.SupabaseClient _client;
   final SupabaseRequestLogger _logger;
+
+  @override
+  Future<void> recordLoginActivity({
+    String? deviceLabel,
+    String? platform,
+  }) async {
+    try {
+      await _logger.track(
+        'rpc.recordLoginActivity',
+        () => _client.rpc(
+          'record_login_activity',
+          params: {
+            'requested_device_label': deviceLabel,
+            'requested_platform': platform,
+          },
+        ),
+        parameters: {'platform': platform},
+      );
+    } on Object {
+      throw const LocalStorageException();
+    }
+  }
 
   Future<bool> readNotificationPreference(String userId) async {
     final value = _client

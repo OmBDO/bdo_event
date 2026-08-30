@@ -82,7 +82,64 @@ class ProfilePreferencesSection extends StatelessWidget {
           subtitle: AppText.englishIndia,
           onTap: onShowLanguageInfo,
         ),
+        ProfileSettingsTile(
+          icon: Icons.calendar_month_outlined,
+          color: Colors.indigo,
+          title: 'Date format',
+          subtitle: state.dateFormat,
+          onTap: () => _showDateFormatDialog(context, state.dateFormat),
+        ),
+        ProfileSettingsToggle(
+          icon: Icons.fingerprint_rounded,
+          color: Colors.deepOrange,
+          title: 'Biometric lock',
+          subtitle: 'Protect the app when it is reopened',
+          value: state.isBiometricLockEnabled,
+          onChanged: (enabled) async {
+            final changed = await context
+                .read<ProfileScreenCubit>()
+                .toggleBiometricLock(enabled);
+            if (!changed && enabled && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Biometric authentication is unavailable.'),
+                ),
+              );
+            }
+          },
+        ),
       ]),
     ],
   );
+
+  Future<void> _showDateFormatDialog(
+    BuildContext context,
+    String currentFormat,
+  ) async {
+    final format = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Date format'),
+        children: [
+          for (final value in const ['dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy-MM-dd'])
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(dialogContext).pop(value),
+              child: Row(
+                children: [
+                  if (value == currentFormat)
+                    const Icon(Icons.check_rounded, size: 18)
+                  else
+                    const SizedBox(width: 18),
+                  const SizedBox(width: 8),
+                  Text(value),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+    if (format != null && context.mounted) {
+      context.read<ProfileScreenCubit>().updateDateFormat(format);
+    }
+  }
 }

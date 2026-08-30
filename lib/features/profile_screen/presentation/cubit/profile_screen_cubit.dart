@@ -7,6 +7,7 @@ import 'package:bdo_event/features/profile_screen/domain/usecases/save_profile_p
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/security/biometric_lock_service.dart';
 
 class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   ProfileScreenCubit({
@@ -14,10 +15,12 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     required LoadProfilePreferences loadProfilePreferences,
     required SaveProfilePreferences saveProfilePreferences,
     EventReminderNotificationService? reminderNotifications,
+    BiometricLockService? biometricLockService,
   })
       : _authRepository = authRepository,
         _saveProfilePreferences = saveProfilePreferences,
         _reminderNotifications = reminderNotifications,
+        _biometricLockService = biometricLockService,
       super(_initialState(authRepository, loadProfilePreferences.call()));
 
   static ProfileScreenState _initialState(
@@ -37,11 +40,14 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
       preferences.isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: preferences.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: preferences.eventReminderLeadTimeMinutes,
+    dateFormat: preferences.dateFormat,
+    isBiometricLockEnabled: preferences.isBiometricLockEnabled,
   );
 
   final AuthRepositoryContract _authRepository;
   final SaveProfilePreferences _saveProfilePreferences;
   final EventReminderNotificationService? _reminderNotifications;
+  final BiometricLockService? _biometricLockService;
 
   void refresh() {
     final user = _authRepository.currentUser;
@@ -60,6 +66,28 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     unawaited(_persistPreferences(_preferencesFromState().copyWith(
       isDarkModeEnabled: enabled,
     )));
+  }
+
+  void updateDateFormat(String format) {
+    emit(state.copyWith(dateFormat: format));
+    unawaited(_persistPreferences(_preferencesFromState().copyWith(
+      dateFormat: format,
+    )));
+  }
+
+  Future<bool> toggleBiometricLock(bool enabled) async {
+    if (enabled) {
+      final isAvailable = await _biometricLockService?.isAvailable() ?? false;
+      if (!isAvailable) return false;
+      final authenticated = await _biometricLockService!.unlock();
+      if (!authenticated) return false;
+    }
+    if (isClosed) return false;
+    emit(state.copyWith(isBiometricLockEnabled: enabled));
+    unawaited(_persistPreferences(_preferencesFromState().copyWith(
+      isBiometricLockEnabled: enabled,
+    )));
+    return true;
   }
 
   void toggleLargeText(bool enabled) {
@@ -156,6 +184,8 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
       state.isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: state.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: state.eventReminderLeadTimeMinutes,
+    dateFormat: state.dateFormat,
+    isBiometricLockEnabled: state.isBiometricLockEnabled,
   );
 
   Future<void> _persistPreferences(ProfilePreferences preferences) async {

@@ -12,6 +12,8 @@ class ProfilePreferencesModel extends ProfilePreferences {
     super.isWatcherKeepHistoryVisibleAfterCheckIn,
     super.isEventRemindersEnabled,
     super.eventReminderLeadTimeMinutes,
+    super.dateFormat,
+    super.isBiometricLockEnabled,
   });
 
   factory ProfilePreferencesModel.fromPreferences({
@@ -25,6 +27,8 @@ class ProfilePreferencesModel extends ProfilePreferences {
     required bool isWatcherKeepHistoryVisibleAfterCheckIn,
     required bool isEventRemindersEnabled,
     required int eventReminderLeadTimeMinutes,
+    String dateFormat = 'dd/MM/yyyy',
+    bool isBiometricLockEnabled = false,
   }) => ProfilePreferencesModel(
     isDarkModeEnabled: isDarkModeEnabled,
     isLargeTextEnabled: isLargeTextEnabled,
@@ -37,5 +41,7 @@ class ProfilePreferencesModel extends ProfilePreferences {
       isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: eventReminderLeadTimeMinutes,
+    dateFormat: dateFormat,
+    isBiometricLockEnabled: isBiometricLockEnabled,
   );
 }

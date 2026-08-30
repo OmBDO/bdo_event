@@ -49,6 +49,7 @@ class AuthRepository implements AuthRepositoryContract {
 
     _currentUser = await _mapUser(userForMapping);
     _logUserClaims('session restored', userForMapping, _currentUser!);
+    await _recordLoginActivity();
   }
 
   @override
@@ -87,12 +88,21 @@ class AuthRepository implements AuthRepositoryContract {
       if (user == null) return AppText.emailOrPasswordIncorrect;
       _currentUser = await _mapUser(user);
       _logUserClaims('login succeeded', user, _currentUser!);
+      await _recordLoginActivity();
     } on supabase.AuthException catch (error) {
       return mapAuthError(error, signingUp: false);
     } on Object {
       return AppText.unableToSignIn;
     }
     return null;
+  }
+
+  Future<void> _recordLoginActivity() async {
+    try {
+      await _store.recordLoginActivity();
+    } on Object {
+      return;
+    }
   }
 
   @override

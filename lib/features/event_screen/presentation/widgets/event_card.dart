@@ -2,6 +2,9 @@ import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -24,6 +27,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final dateFormat = context.watch<ProfileScreenCubit>().state.dateFormat;
     final isDarkMode = theme.brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 9),
@@ -82,7 +86,7 @@ class EventCard extends StatelessWidget {
                     ],
                   ),
                   child: Text(
-                    event.date,
+                    formatEventDate(event.date, dateFormat),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,

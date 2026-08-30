@@ -24,6 +24,8 @@ class ProfilePreferencesLocalDataSourceImpl
       'watcher_keep_history_visible_after_check_in';
   static const _eventRemindersEnabledKey = 'event_reminders_enabled';
   static const _eventReminderLeadTimeKey = 'event_reminder_lead_time';
+  static const _dateFormatKey = 'date_format';
+  static const _biometricLockKey = 'biometric_lock_enabled';
 
   @override
   ProfilePreferencesModel load() => ProfilePreferencesModel.fromPreferences(
@@ -42,6 +44,8 @@ class ProfilePreferencesLocalDataSourceImpl
         _preferences?.getBool(_eventRemindersEnabledKey) ?? true,
     eventReminderLeadTimeMinutes:
         _preferences?.getInt(_eventReminderLeadTimeKey) ?? 1440,
+    dateFormat: _preferences?.getString(_dateFormatKey) ?? 'dd/MM/yyyy',
+    isBiometricLockEnabled: _preferences?.getBool(_biometricLockKey) ?? false,
   );
 
   @override
@@ -86,6 +90,11 @@ class ProfilePreferencesLocalDataSourceImpl
     await _preferences!.setInt(
       _eventReminderLeadTimeKey,
       preferences.eventReminderLeadTimeMinutes,
+    );
+    await _preferences!.setString(_dateFormatKey, preferences.dateFormat);
+    await _preferences!.setBool(
+      _biometricLockKey,
+      preferences.isBiometricLockEnabled,
     );
   }
 }

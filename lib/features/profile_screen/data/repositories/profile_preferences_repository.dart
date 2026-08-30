@@ -26,6 +26,8 @@ class ProfilePreferencesRepository
           preferences.isWatcherKeepHistoryVisibleAfterCheckIn,
       isEventRemindersEnabled: preferences.isEventRemindersEnabled,
       eventReminderLeadTimeMinutes: preferences.eventReminderLeadTimeMinutes,
+      dateFormat: preferences.dateFormat,
+      isBiometricLockEnabled: preferences.isBiometricLockEnabled,
     ),
   );
 }

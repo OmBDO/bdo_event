@@ -16,6 +16,8 @@ class ProfileScreenState {
   final bool isWatcherKeepHistoryVisibleAfterCheckIn;
   final bool isEventRemindersEnabled;
   final int eventReminderLeadTimeMinutes;
+  final String dateFormat;
+  final bool isBiometricLockEnabled;
   final String? errorMessage;
 
   const ProfileScreenState({
@@ -31,6 +33,8 @@ class ProfileScreenState {
     this.isWatcherKeepHistoryVisibleAfterCheckIn = false,
     this.isEventRemindersEnabled = true,
     this.eventReminderLeadTimeMinutes = 1440,
+    this.dateFormat = 'dd/MM/yyyy',
+    this.isBiometricLockEnabled = false,
     this.status = ProfileScreenStatus.ready,
     this.errorMessage,
   });
@@ -49,6 +53,8 @@ class ProfileScreenState {
     bool? isWatcherKeepHistoryVisibleAfterCheckIn,
     bool? isEventRemindersEnabled,
     int? eventReminderLeadTimeMinutes,
+    String? dateFormat,
+    bool? isBiometricLockEnabled,
     String? errorMessage,
     bool clearErrorMessage = false,
   }) => ProfileScreenState(
@@ -72,6 +78,9 @@ class ProfileScreenState {
       isEventRemindersEnabled ?? this.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes:
       eventReminderLeadTimeMinutes ?? this.eventReminderLeadTimeMinutes,
+    dateFormat: dateFormat ?? this.dateFormat,
+    isBiometricLockEnabled:
+      isBiometricLockEnabled ?? this.isBiometricLockEnabled,
     errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
   );
 }

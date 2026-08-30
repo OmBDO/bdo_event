@@ -14,6 +14,9 @@ import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cu
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -240,7 +243,7 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                               ),
                             ),
                             subtitle: Text(
-                              '${event.date} • ${event.location}',
+                              '${formatEventDate(event.date, context.watch<ProfileScreenCubit>().state.dateFormat)} • ${event.location}',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
