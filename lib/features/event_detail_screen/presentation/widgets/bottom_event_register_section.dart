@@ -1,5 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
@@ -10,7 +12,6 @@ import 'package:bdo_event/features/registered_screen/presentation/cubit/register
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class BottomEventRegisterSection extends StatelessWidget {
   const BottomEventRegisterSection({
@@ -33,8 +34,8 @@ class BottomEventRegisterSection extends StatelessWidget {
     final bool isFull =
         event.capacity != null && event.attendeeCount >= event.capacity!;
     final bool isPastRegistrationDeadline =
-      event.registrationDeadline != null &&
-      !DateTime.now().isBefore(event.registrationDeadline!);
+        event.registrationDeadline != null &&
+        !DateTime.now().isBefore(event.registrationDeadline!);
 
     return BlocBuilder<EventDetailCubit, EventDetailState>(
       bloc: cubit,
@@ -156,10 +157,12 @@ class BottomEventRegisterSection extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonBgColor,
                       foregroundColor: buttonForegroundColor,
-                        disabledBackgroundColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                        disabledForegroundColor:
-                          Theme.of(context).colorScheme.onSurfaceVariant,
+                      disabledBackgroundColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      disabledForegroundColor: Theme.of(context)
+                          .colorScheme
+                          .onSurfaceVariant,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),

@@ -1,7 +1,7 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bdo_event/core/theme/app_colors.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:gap/gap.dart';
 
 class AuthScaffold extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart' hide AppUtil;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,4 +1,6 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_section_header.dart';
@@ -27,110 +29,113 @@ class ProfilePreferencesSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       ProfileSectionHeader(AppText.preferences),
-      ProfileSettingsGroup(children: [
-        ProfileSettingsToggle(
-          icon: Icons.notifications_none_rounded,
-          color: Colors.deepPurple,
-          title: AppText.pushNotifications,
-          subtitle: AppText.festivalUpdateAlerts,
-          value: state.isNotificationEnabled,
-          onChanged: context.read<ProfileScreenCubit>().updateNotificationPreference,
-        ),
-        ProfileSettingsToggle(
-          icon: Icons.event_available_outlined,
-          color: Colors.green,
-          title: AppText.eventReminders,
-          subtitle: AppText.eventRemindersDescription,
-          value: state.isEventRemindersEnabled,
-          onChanged: context.read<ProfileScreenCubit>().toggleEventReminders,
-        ),
-        ProfileSettingsTile(
-          icon: Icons.schedule_outlined,
-          color: Colors.orange,
-          title: AppText.reminderLeadTime,
-          subtitle: '${AppText.reminderLeadTimeDescription} • ${AppText.reminderLeadTimeLabel(state.eventReminderLeadTimeMinutes)}',
-          onTap: () => onReminderLeadTime(state.eventReminderLeadTimeMinutes),
-        ),
-        ProfileSettingsToggle(
-          icon: Icons.dark_mode_outlined,
-          color: Colors.blueGrey,
-          title: AppText.darkThemeMode,
-          subtitle: AppText.darkModeInterface,
-          value: state.isDarkModeEnabled,
-          onChanged: context.read<ProfileScreenCubit>().toggleDarkMode,
-        ),
-        ProfileSettingsToggle(
-          icon: Icons.format_size_outlined,
-          color: Colors.pink,
-          title: AppText.largerText,
-          subtitle: AppText.largerTextDescription,
-          value: state.isLargeTextEnabled,
-          onChanged: context.read<ProfileScreenCubit>().toggleLargeText,
-        ),
-        ProfileSettingsToggle(
-          icon: Icons.contrast_outlined,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black,
-          title: AppText.highContrast,
-          subtitle: AppText.highContrastDescription,
-          value: state.isHighContrastEnabled,
-          onChanged: context.read<ProfileScreenCubit>().toggleHighContrast,
-        ),
-        ProfileSettingsTile(
-          icon: Icons.language_rounded,
-          color: Colors.teal,
-          title: AppText.appLanguage,
-          subtitle: AppText.englishIndia,
-          onTap: onShowLanguageInfo,
-        ),
-        ProfileSettingsTile(
-          icon: Icons.calendar_month_outlined,
-          color: Colors.indigo,
-          title: 'Date format',
-          subtitle: state.dateFormat,
-          onTap: () => _showDateFormatDialog(context, state.dateFormat),
-        ),
-        ProfileSettingsToggle(
-          icon: Icons.fingerprint_rounded,
-          color: Colors.deepOrange,
-          title: 'Biometric lock',
-          subtitle: 'Protect the app when it is reopened',
-          value: state.isBiometricLockEnabled,
-          onChanged: (enabled) async {
-            final changed = await context
+      ProfileSettingsGroup(
+        children: [
+          ProfileSettingsToggle(
+            icon: Icons.notifications_none_rounded,
+            color: Colors.deepPurple,
+            title: AppText.pushNotifications,
+            subtitle: AppText.festivalUpdateAlerts,
+            value: state.isNotificationEnabled,
+            onChanged: context
                 .read<ProfileScreenCubit>()
-                .toggleBiometricLock(enabled);
-            if (!changed && enabled && context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(AppText.biometricAuthenticationUnavailable),
-                ),
-              );
-            }
-          },
-        ),
-        ProfileSettingsTile(
-          icon: Icons.visibility_outlined,
-          color: Colors.blue,
-          title: 'Profile visibility',
-          subtitle: state.profileVisibility.label,
-          onTap: () => _showProfileVisibilityDialog(
-            context,
-            state.profileVisibility,
+                .updateNotificationPreference,
           ),
-        ),
-        ProfileSettingsTile(
-          icon: Icons.assignment_ind_outlined,
-          color: Colors.cyan,
-          title: 'Registration visibility',
-          subtitle: state.registrationVisibility.label,
-          onTap: () => _showRegistrationVisibilityDialog(
-            context,
-            state.registrationVisibility,
+          ProfileSettingsToggle(
+            icon: Icons.event_available_outlined,
+            color: Colors.green,
+            title: AppText.eventReminders,
+            subtitle: AppText.eventRemindersDescription,
+            value: state.isEventRemindersEnabled,
+            onChanged: context.read<ProfileScreenCubit>().toggleEventReminders,
           ),
-        ),
-      ]),
+          ProfileSettingsTile(
+            icon: Icons.schedule_outlined,
+            color: Colors.orange,
+            title: AppText.reminderLeadTime,
+            subtitle:
+                '${AppText.reminderLeadTimeDescription} • ${AppText.reminderLeadTimeLabel(state.eventReminderLeadTimeMinutes)}',
+            onTap: () => onReminderLeadTime(state.eventReminderLeadTimeMinutes),
+          ),
+          ProfileSettingsToggle(
+            icon: Icons.dark_mode_outlined,
+            color: Colors.blueGrey,
+            title: AppText.darkThemeMode,
+            subtitle: AppText.darkModeInterface,
+            value: state.isDarkModeEnabled,
+            onChanged: context.read<ProfileScreenCubit>().toggleDarkMode,
+          ),
+          ProfileSettingsToggle(
+            icon: Icons.format_size_outlined,
+            color: Colors.pink,
+            title: AppText.largerText,
+            subtitle: AppText.largerTextDescription,
+            value: state.isLargeTextEnabled,
+            onChanged: context.read<ProfileScreenCubit>().toggleLargeText,
+          ),
+          ProfileSettingsToggle(
+            icon: Icons.contrast_outlined,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
+            title: AppText.highContrast,
+            subtitle: AppText.highContrastDescription,
+            value: state.isHighContrastEnabled,
+            onChanged: context.read<ProfileScreenCubit>().toggleHighContrast,
+          ),
+          ProfileSettingsTile(
+            icon: Icons.language_rounded,
+            color: Colors.teal,
+            title: AppText.appLanguage,
+            subtitle: AppText.englishIndia,
+            onTap: onShowLanguageInfo,
+          ),
+          ProfileSettingsTile(
+            icon: Icons.calendar_month_outlined,
+            color: Colors.indigo,
+            title: 'Date format',
+            subtitle: state.dateFormat,
+            onTap: () => _showDateFormatDialog(context, state.dateFormat),
+          ),
+          ProfileSettingsToggle(
+            icon: Icons.fingerprint_rounded,
+            color: Colors.deepOrange,
+            title: 'Biometric lock',
+            subtitle: 'Protect the app when it is reopened',
+            value: state.isBiometricLockEnabled,
+            onChanged: (enabled) async {
+              final changed = await context
+                  .read<ProfileScreenCubit>()
+                  .toggleBiometricLock(enabled);
+              if (!changed && enabled && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(AppText.biometricAuthenticationUnavailable),
+                  ),
+                );
+              }
+            },
+          ),
+          ProfileSettingsTile(
+            icon: Icons.visibility_outlined,
+            color: Colors.blue,
+            title: 'Profile visibility',
+            subtitle: state.profileVisibility.label,
+            onTap: () =>
+                _showProfileVisibilityDialog(context, state.profileVisibility),
+          ),
+          ProfileSettingsTile(
+            icon: Icons.assignment_ind_outlined,
+            color: Colors.cyan,
+            title: 'Registration visibility',
+            subtitle: state.registrationVisibility.label,
+            onTap: () => _showRegistrationVisibilityDialog(
+              context,
+              state.registrationVisibility,
+            ),
+          ),
+        ],
+      ),
     ],
   );
 

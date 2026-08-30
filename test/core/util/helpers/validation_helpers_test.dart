@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('builds the correct password visibility button state',
-      (tester) async {
+  testWidgets('builds the correct password visibility button state', (
+    tester,
+  ) async {
     var pressed = 0;
     await tester.pumpWidget(
       MaterialApp(
@@ -28,8 +29,9 @@ void main() {
     expect(pressed, 2);
   });
 
-  testWidgets('builds a validated form field with the supplied properties',
-      (tester) async {
+  testWidgets('builds a validated form field with the supplied properties', (
+    tester,
+  ) async {
     final controller = TextEditingController();
     await tester.pumpWidget(
       MaterialApp(

@@ -1,5 +1,5 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -24,10 +24,10 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-            backgroundColor: isDarkMode
+          backgroundColor: isDarkMode
               ? theme.colorScheme.primary
               : Colors.black87,
-            foregroundColor: isDarkMode
+          foregroundColor: isDarkMode
               ? theme.colorScheme.onPrimary
               : Colors.white,
           elevation: 2,

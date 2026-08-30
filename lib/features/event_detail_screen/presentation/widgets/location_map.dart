@@ -1,5 +1,5 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -64,7 +64,9 @@ class _LocationSectionState extends State<LocationSection> {
                   toggled: _isExpanded,
                   label: _isExpanded ? 'Collapse address' : 'Expand address',
                   child: IconButton(
-                    tooltip: _isExpanded ? 'Collapse address' : 'Expand address',
+                    tooltip: _isExpanded
+                        ? 'Collapse address'
+                        : 'Expand address',
                     alignment: Alignment.topCenter,
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

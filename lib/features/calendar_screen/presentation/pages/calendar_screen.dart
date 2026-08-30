@@ -2,6 +2,8 @@ import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.
 import 'package:bdo_event/core/common/calendar_element/element/calendar_element.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_state.dart';
@@ -17,7 +19,6 @@ import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:gap/gap.dart';
 
 class CalendarScreen extends StatelessWidget {
@@ -176,7 +177,7 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                                 ),
                                 const Gap(AppSpace.space8),
                                 Text(
-                                    hasRegistrations
+                                  hasRegistrations
                                       ? AppText.noMatchingEvents
                                       : AppText.registeredEventsWillAppearHere,
                                   textAlign: TextAlign.center,
@@ -273,7 +274,7 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                           );
                         },
                         separatorBuilder: (context, index) =>
-                          const Gap(AppSpace.space10),
+                            const Gap(AppSpace.space10),
                       );
                     },
                   ),

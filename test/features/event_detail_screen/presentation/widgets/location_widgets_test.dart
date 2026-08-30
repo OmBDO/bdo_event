@@ -12,8 +12,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 void main() {
-  testWidgets('location chevron expands and collapses the address',
-      (tester) async {
+  testWidgets('location chevron expands and collapses the address', (
+    tester,
+  ) async {
     final event = locationEvent(
       locationAddress:
           '49th Floor, Oberoi Commerz III, International Business Park',
@@ -43,8 +44,9 @@ void main() {
     expect(tester.widget<Text>(address).maxLines, 1);
   });
 
-  testWidgets('shows a fallback when event coordinates are unavailable',
-      (tester) async {
+  testWidgets('shows a fallback when event coordinates are unavailable', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(home: EventLocationMap(event: locationEvent())),
     );
@@ -56,8 +58,9 @@ void main() {
     expect(find.byType(FlutterMap), findsNothing);
   });
 
-  testWidgets('renders a map and marker when event coordinates exist',
-      (tester) async {
+  testWidgets('renders a map and marker when event coordinates exist', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: EventLocationMap(
@@ -73,7 +76,7 @@ void main() {
 
   testWidgets('paints map-line pixels', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp(
         home: RepaintBoundary(
           child: SizedBox(
             width: 240,

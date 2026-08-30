@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/category_event_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
@@ -14,8 +15,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:gap/gap.dart';
+
+import 'package:bdo_event/core/util/resource/app_text.dart';
 
 class MyEventScreen extends StatefulWidget {
   const MyEventScreen({super.key});
@@ -422,15 +424,15 @@ class _MyEventScreenState extends State<MyEventScreen> {
                   shape: CircleBorder(
                     side: BorderSide(
                       color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: 0.35)
-                      : Colors.transparent,
+                          ? Colors.white.withValues(alpha: 0.35)
+                          : Colors.transparent,
                     ),
                   ),
                   child: Icon(
                     isDeleteMode ? Icons.delete_outline : Icons.add,
                     color: isDeleteMode
                         ? Theme.of(context).colorScheme.onError
-                    : Colors.white,
+                        : Colors.white,
                   ),
                 );
               },

@@ -1,23 +1,19 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/registration_use_cases.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 
 class EventDetailCubit extends Cubit<EventDetailState> {
   EventDetailCubit({
-    required RegisterForEvent registerForEvent,
-    required CancelEventRegistration cancelEventRegistration,
-    required EventStore eventStore,
-    required AuthRepositoryContract authRepository,
-  }) : _registerForEvent = registerForEvent,
-       _cancelEventRegistration = cancelEventRegistration,
-       _eventStore = eventStore,
-       _authRepository = authRepository,
-       super(const EventDetailState());
+    required this._registerForEvent,
+    required this._cancelEventRegistration,
+    required this._eventStore,
+    required this._authRepository,
+  }) : super(const EventDetailState());
 
   final RegisterForEvent _registerForEvent;
   final CancelEventRegistration _cancelEventRegistration;

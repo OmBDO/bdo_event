@@ -1,4 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/attendance_profile.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_location_map.dart';
@@ -6,7 +8,6 @@ import 'package:bdo_event/features/event_detail_screen/presentation/widgets/loca
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:gap/gap.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class OverlayCurveSection extends StatefulWidget {
   const OverlayCurveSection({

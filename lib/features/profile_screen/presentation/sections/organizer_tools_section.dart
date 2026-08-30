@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/category_event_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/my_event_screen.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_section_header.dart';
@@ -18,36 +18,37 @@ class ProfileOrganizerToolsSection extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       ProfileSectionHeader(AppText.organizerTools),
-      ProfileSettingsGroup(children: [
-        ProfileSettingsTile(
-          icon: Icons.add_business_outlined,
-          color: Colors.green,
-          title: AppText.createEvent,
-          subtitle: AppText.bringPeopleTogether,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const CategoryEventPage()),
-          ),
-        ),
-        ProfileSettingsTile(
-          icon: Icons.event_note_outlined,
-          color: Colors.blue,
-          title: AppText.manageMyEvents,
-          subtitle: AppText.myEvents,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const MyEventScreen()),
-          ),
-        ),
-        if (user.hasPermission(UserPermission.scanRegistrations))
+      ProfileSettingsGroup(
+        children: [
           ProfileSettingsTile(
-            icon: Icons.qr_code_scanner_outlined,
-            color: Colors.deepPurple,
-            title: AppText.scanRegistration,
-            subtitle: AppText.scanRegistrationPrompt,
+            icon: Icons.add_business_outlined,
+            color: Colors.green,
+            title: AppText.createEvent,
+            subtitle: AppText.bringPeopleTogether,
             onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const WatcherScanScreen()),
+              MaterialPageRoute(builder: (_) => const CategoryEventPage()),
             ),
           ),
-      ]),
+          ProfileSettingsTile(
+            icon: Icons.event_note_outlined,
+            color: Colors.blue,
+            title: AppText.manageMyEvents,
+            subtitle: AppText.myEvents,
+            onTap: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const MyEventScreen())),
+          ),
+          if (user.hasPermission(UserPermission.scanRegistrations))
+            ProfileSettingsTile(
+              icon: Icons.qr_code_scanner_outlined,
+              color: Colors.deepPurple,
+              title: AppText.scanRegistration,
+              subtitle: AppText.scanRegistrationPrompt,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WatcherScanScreen()),
+              ),
+            ),
+        ],
+      ),
     ],
   );
 }

@@ -1,4 +1,9 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
+import 'package:bdo_event/core/util/resource/app_file.dart';
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_model_key.dart';
+import 'package:bdo_event/core/util/resource/app_notification.dart';
+import 'package:bdo_event/core/util/resource/app_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

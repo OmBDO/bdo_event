@@ -31,7 +31,7 @@ void main() {
   });
 
   test('writes SQL fields and encodes checked-in state as an integer', () {
-    const registration = EventRegistration(
+    final registration = EventRegistration(
       id: 'registration-1',
       eventId: 'event-1',
       userId: 'user-1',

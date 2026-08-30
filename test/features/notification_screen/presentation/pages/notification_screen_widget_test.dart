@@ -7,7 +7,6 @@ import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
-import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -37,8 +36,9 @@ void main() {
     expect(find.text('No notifications'), findsOneWidget);
   });
 
-  testWidgets('renders an arrival notification and marks it read',
-      (tester) async {
+  testWidgets('renders an arrival notification and marks it read', (
+    tester,
+  ) async {
     final notification = sampleNotification();
     final store = FakeNotificationEventStore(notifications: [notification]);
     await pumpNotifications(tester, store);
@@ -50,8 +50,9 @@ void main() {
     expect(store.markedReadId, notification.id);
   });
 
-  testWidgets('renders invitation actions and sends an accept response',
-      (tester) async {
+  testWidgets('renders invitation actions and sends an accept response', (
+    tester,
+  ) async {
     final notification = sampleNotification(
       category: NotificationCategory.invitation,
     );
@@ -65,8 +66,9 @@ void main() {
     expect(store.respondedAccepted, isTrue);
   });
 
-  testWidgets('shows an error when notifications cannot be loaded',
-      (tester) async {
+  testWidgets('shows an error when notifications cannot be loaded', (
+    tester,
+  ) async {
     await pumpNotifications(
       tester,
       FakeNotificationEventStore(notificationError: true),
@@ -89,8 +91,9 @@ void main() {
     expect(find.text(AppText.arrivalConfirmed), findsOneWidget);
   });
 
-  testWidgets('shows feedback when attendance confirmation fails',
-      (tester) async {
+  testWidgets('shows feedback when attendance confirmation fails', (
+    tester,
+  ) async {
     final store = FakeNotificationEventStore(
       notifications: [sampleNotification()],
       arrivalError: true,
@@ -152,25 +155,25 @@ class FakeNotificationEventStore implements EventStore {
     this.checkedInError,
   }) : _recipients = recipients,
        _notificationsCompleter = pendingNotifications
-         ? Completer<List<AppNotification>>()
-         : null,
+           ? Completer<List<AppNotification>>()
+           : null,
        _attendeesCompleter = pendingAttendees
-         ? Completer<List<EventAttendee>>()
-         : null;
+           ? Completer<List<EventAttendee>>()
+           : null;
 
   final List<AppNotification> notifications;
   final List<Map<String, String>> recipients;
-    final List<EventAttendee> attendees;
+  final List<EventAttendee> attendees;
   final bool pendingNotifications;
-    final bool pendingAttendees;
+  final bool pendingAttendees;
   final bool sendError;
-    final bool attendeeError;
+  final bool attendeeError;
   final bool notificationError;
   final bool arrivalError;
   final int checkedInCount;
   final Object? checkedInError;
   final Completer<List<AppNotification>>? _notificationsCompleter;
-    final Completer<List<EventAttendee>>? _attendeesCompleter;
+  final Completer<List<EventAttendee>>? _attendeesCompleter;
   String? markedReadId;
   String? respondedEventId;
   bool? respondedAccepted;
@@ -183,7 +186,7 @@ class FakeNotificationEventStore implements EventStore {
   void completeNotifications(List<AppNotification> value) =>
       _notificationsCompleter?.complete(value);
 
-    void completeAttendees(List<EventAttendee> value) =>
+  void completeAttendees(List<EventAttendee> value) =>
       _attendeesCompleter?.complete(value);
 
   @override
@@ -252,29 +255,47 @@ class FakeNotificationEventStore implements EventStore {
   @override
   Future<void> deleteEvent(String eventId) => throw UnimplementedError();
   @override
-  Future<List<Event>> loadRegistrations(String userId) => throw UnimplementedError();
+  Future<List<Event>> loadRegistrations(String userId) =>
+      throw UnimplementedError();
   @override
-  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) => throw UnimplementedError();
+  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) =>
+      throw UnimplementedError();
   @override
-  Future<void> activateRegistration(String userId, Event event) => throw UnimplementedError();
+  Future<void> activateRegistration(String userId, Event event) =>
+      throw UnimplementedError();
   @override
-  Future<void> revokeRegistration(String userId, String eventId) => throw UnimplementedError();
+  Future<void> revokeRegistration(String userId, String eventId) =>
+      throw UnimplementedError();
   @override
-  Future<String?> loadRegistrationToken(String userId, String eventId) => throw UnimplementedError();
+  Future<String?> loadRegistrationToken(String userId, String eventId) =>
+      throw UnimplementedError();
   @override
-  Future<Map<String, dynamic>?> validateRegistration({required String token, required String eventId}) => throw UnimplementedError();
+  Future<Map<String, dynamic>?> validateRegistration({
+    required String token,
+    required String eventId,
+  }) => throw UnimplementedError();
   @override
-  Future<String> checkInRegistration({required String token, required String eventId}) => throw UnimplementedError();
+  Future<String> checkInRegistration({
+    required String token,
+    required String eventId,
+  }) => throw UnimplementedError();
   @override
   Future<int> loadAttendanceCount(String eventId) => throw UnimplementedError();
   @override
-  Future<List<EventAttendee>> loadEventAttendees(String eventId) => throw UnimplementedError();
+  Future<List<EventAttendee>> loadEventAttendees(String eventId) =>
+      throw UnimplementedError();
   @override
   Future<int> loadUnreadNotificationCount() => throw UnimplementedError();
   @override
-  Future<void> recordLoginActivity({String? deviceLabel, String? platform}) => throw UnimplementedError();
+  Future<void> recordLoginActivity({String? deviceLabel, String? platform}) =>
+      throw UnimplementedError();
   @override
-  Future<Map<String, String>> loadProfileVisibility(String userId) => throw UnimplementedError();
+  Future<Map<String, String>> loadProfileVisibility(String userId) =>
+      throw UnimplementedError();
   @override
-  Future<void> saveProfileVisibility({required String userId, required String profileVisibility, required String registrationVisibility}) => throw UnimplementedError();
+  Future<void> saveProfileVisibility({
+    required String userId,
+    required String profileVisibility,
+    required String registrationVisibility,
+  }) => throw UnimplementedError();
 }

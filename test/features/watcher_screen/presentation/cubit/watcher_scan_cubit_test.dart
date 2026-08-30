@@ -10,7 +10,6 @@ import 'package:bdo_event/core/util/registration_code_codec.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/watcher_screen/data/datasource/watcher_remote_data_source.dart';
 import 'package:bdo_event/features/watcher_screen/data/repositories/watcher_repository.dart';
-import 'package:bdo_event/features/watcher_screen/domain/model/scan_dashboard.dart';
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/check_in_registration.dart';
 import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dashboard.dart';
@@ -60,7 +59,10 @@ void main() {
   });
 
   test('validates compact registration codes', () async {
-    final code = RegistrationCodeCodec.encode(eventId: 'event-1', token: 'token-1');
+    final code = RegistrationCodeCodec.encode(
+      eventId: 'event-1',
+      token: 'token-1',
+    );
     final store = FakeWatcherStore(
       validationResult: {'event_id': 'event-1', 'user_id': 'user-1'},
     );
@@ -122,17 +124,19 @@ void main() {
     );
     final cubit = createCubit(store);
     await cubit.validate(validJson);
-    cubit.emit(cubit.state.copyWith(
-      history: [
-        const ScanHistoryEntry(
-          registrationToken: 'token-2',
-          userId: 'user-2',
-          eventId: 'event-2',
-          status: 'Ready to check in',
-        ),
-        ...cubit.state.history,
-      ],
-    ));
+    cubit.emit(
+      cubit.state.copyWith(
+        history: [
+          const ScanHistoryEntry(
+            registrationToken: 'token-2',
+            userId: 'user-2',
+            eventId: 'event-2',
+            status: 'Ready to check in',
+          ),
+          ...cubit.state.history,
+        ],
+      ),
+    );
 
     await cubit.checkIn();
 
@@ -171,59 +175,68 @@ void main() {
     await cubit.close();
   });
 
-  test('checkInAll reports partial failures and updates successful entries',
-      () async {
-    final store = FakeWatcherStore(
-      checkInResults: {'token-1': 'checked_in'},
-      checkInErrors: {'token-2': StateError('failed')},
-    );
-    final cubit = createCubit(store);
-    cubit.emit(cubit.state.copyWith(
-      history: const [
-        ScanHistoryEntry(
-          registrationToken: 'token-1',
-          userId: 'user-1',
-          eventId: 'event-1',
-          status: 'Ready to check in',
+  test(
+    'checkInAll reports partial failures and updates successful entries',
+    () async {
+      final store = FakeWatcherStore(
+        checkInResults: {'token-1': 'checked_in'},
+        checkInErrors: {'token-2': StateError('failed')},
+      );
+      final cubit = createCubit(store);
+      cubit.emit(
+        cubit.state.copyWith(
+          history: const [
+            ScanHistoryEntry(
+              registrationToken: 'token-1',
+              userId: 'user-1',
+              eventId: 'event-1',
+              status: 'Ready to check in',
+            ),
+            ScanHistoryEntry(
+              registrationToken: 'token-2',
+              userId: 'user-2',
+              eventId: 'event-2',
+              status: 'Ready to check in',
+            ),
+          ],
         ),
-        ScanHistoryEntry(
-          registrationToken: 'token-2',
-          userId: 'user-2',
-          eventId: 'event-2',
-          status: 'Ready to check in',
+      );
+
+      await cubit.checkInAll(autoOpenNext: false);
+
+      expect(cubit.state.history.first.status, 'Checked in');
+      expect(cubit.state.history.last.status, 'Ready to check in');
+      expect(cubit.state.status, WatcherScanStatus.idle);
+      await cubit.close();
+    },
+  );
+
+  test(
+    'reset and clearState return the scanner to idle and empty state',
+    () async {
+      final cubit = createCubit(FakeWatcherStore());
+      cubit.emit(
+        cubit.state.copyWith(
+          status: WatcherScanStatus.failure,
+          message: 'error',
+          history: const [
+            ScanHistoryEntry(
+              registrationToken: 'token-1',
+              userId: 'user-1',
+              status: 'Checked in',
+            ),
+          ],
         ),
-      ],
-    ));
+      );
 
-    await cubit.checkInAll(autoOpenNext: false);
-
-    expect(cubit.state.history.first.status, 'Checked in');
-    expect(cubit.state.history.last.status, 'Ready to check in');
-    expect(cubit.state.status, WatcherScanStatus.idle);
-    await cubit.close();
-  });
-
-  test('reset and clearState return the scanner to idle and empty state', () async {
-    final cubit = createCubit(FakeWatcherStore());
-    cubit.emit(cubit.state.copyWith(
-      status: WatcherScanStatus.failure,
-      message: 'error',
-      history: const [
-        ScanHistoryEntry(
-          registrationToken: 'token-1',
-          userId: 'user-1',
-          status: 'Checked in',
-        ),
-      ],
-    ));
-
-    cubit.reset();
-    expect(cubit.state.status, WatcherScanStatus.idle);
-    expect(cubit.state.history, hasLength(1));
-    cubit.clearState();
-    expect(cubit.state, const WatcherScanState());
-    await cubit.close();
-  });
+      cubit.reset();
+      expect(cubit.state.status, WatcherScanStatus.idle);
+      expect(cubit.state.history, hasLength(1));
+      cubit.clearState();
+      expect(cubit.state, const WatcherScanState());
+      await cubit.close();
+    },
+  );
 
   test('closed Cubit ignores validation and check-in', () async {
     final store = FakeWatcherStore(
@@ -272,7 +285,10 @@ class FakeWatcherStore implements EventStore {
   final List<String> dashboardEventIds = [];
 
   @override
-  Future<Map<String, dynamic>?> validateRegistration({required String token, required String eventId}) async {
+  Future<Map<String, dynamic>?> validateRegistration({
+    required String token,
+    required String eventId,
+  }) async {
     validationCalls++;
     return validationResult;
   }
@@ -293,6 +309,7 @@ class FakeWatcherStore implements EventStore {
     if (dashboardError != null) throw dashboardError!;
     return 1;
   }
+
   @override
   Future<int> loadCheckedInCount(String eventId) async => 0;
 
@@ -312,7 +329,9 @@ class FakeWatcherStore implements EventStore {
   Future<List<Event>> loadRegistrations(String userId) async => [];
 
   @override
-  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async => {};
+  Future<Map<String, int>> loadRegistrationCounts(
+    List<String> eventIds,
+  ) async => {};
 
   @override
   Future<void> activateRegistration(String userId, Event event) async {}
@@ -321,7 +340,8 @@ class FakeWatcherStore implements EventStore {
   Future<void> revokeRegistration(String userId, String eventId) async {}
 
   @override
-  Future<String?> loadRegistrationToken(String userId, String eventId) async => null;
+  Future<String?> loadRegistrationToken(String userId, String eventId) async =>
+      null;
 
   @override
   Future<List<EventAttendee>> loadEventAttendees(String eventId) async => [];
@@ -394,13 +414,28 @@ class FakeAuthRepository implements AuthRepositoryContract {
   @override
   Future<void> initialize() async {}
   @override
-  Future<String?> register({required String name, required String email, required String password, required UserRole requestedRole}) async => null;
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole requestedRole,
+  }) async => null;
   @override
-  Future<String?> login({required String email, required String password}) async => null;
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async => null;
   @override
   Future<String?> updatePassword(String password) async => null;
   @override
-  Future<String?> updateProfile({required String displayName, required String email, String? photoUrl, String? phoneNumber, String? bio, String? locale}) async => null;
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
+  }) async => null;
   @override
   Future<void> logout() async {}
   @override

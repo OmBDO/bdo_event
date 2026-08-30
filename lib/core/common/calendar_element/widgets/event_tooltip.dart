@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -42,9 +42,8 @@ class EventTooltip extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.shadow.withValues(
-                        alpha: 0.2,
-                      ),
+                      color: Theme.of(context).colorScheme.shadow
+                          .withValues(alpha: 0.2),
                       blurRadius: 16,
                       offset: Offset(0, 8),
                     ),

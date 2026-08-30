@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
@@ -55,7 +55,8 @@ class EventDetailHeader extends StatelessWidget {
     if (action != 'copy') return;
     await Clipboard.setData(
       ClipboardData(
-        text: '${event.title}\n${formatEventDate(event.date, context.read<ProfileScreenCubit>().state.dateFormat)}\n${event.location}',
+        text:
+            '${event.title}\n${formatEventDate(event.date, context.read<ProfileScreenCubit>().state.dateFormat)}\n${event.location}',
       ),
     );
     if (!context.mounted) return;

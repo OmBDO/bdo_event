@@ -3,11 +3,11 @@ import 'dart:developer' as developer;
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/data/datasource/auth_remote_data_source.dart';
 import 'package:bdo_event/features/auth_screen/data/model/auth_user_dto.dart';
 import 'package:bdo_event/features/auth_screen/data/auth_error_mapper.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthRepository implements AuthRepositoryContract {

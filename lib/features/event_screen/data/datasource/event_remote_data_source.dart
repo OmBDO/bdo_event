@@ -2,8 +2,9 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+
 abstract interface class EventDataSource {
   Future<List<Event>> loadEvents();
   Future<EventOperationResult> create(Event event, User user);

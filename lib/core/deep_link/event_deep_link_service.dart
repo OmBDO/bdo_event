@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_deep_link.dart';
 
 class EventDeepLinkService {
-  EventDeepLinkService({AppLinks? appLinks}) : _appLinks = appLinks ?? AppLinks();
+  EventDeepLinkService({AppLinks? appLinks})
+    : _appLinks = appLinks ?? AppLinks();
 
   final AppLinks _appLinks;
 

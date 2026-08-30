@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +32,8 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CreateEventPage(
-          catagory: category,
-          popParentOnCreateSuccess: true,
-        ),
+        builder: (context) =>
+            CreateEventPage(catagory: category, popParentOnCreateSuccess: true),
       ),
     );
   }

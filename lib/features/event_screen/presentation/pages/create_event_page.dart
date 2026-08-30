@@ -4,6 +4,9 @@ import 'package:bdo_event/core/common/form_elements/drop_down_field.dart';
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
 import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:bdo_event/core/model/location_model/location_catalog.dart';
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +21,6 @@ import 'dart:convert';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 // ignore: must_be_immutable
 class CreateEventPage extends StatefulWidget {
@@ -267,9 +269,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     if (start == null || end == null) return AppText.chooseStartAndEndTime;
     final startMinutes = start.hour * 60 + start.minute;
     final endMinutes = end.hour * 60 + end.minute;
-    return endMinutes > startMinutes
-        ? null
-        : AppText.endTimeMustBeAfterStart;
+    return endMinutes > startMinutes ? null : AppText.endTimeMustBeAfterStart;
   }
 
   Future<void> _pickRegistrationDeadline() async {

@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_deep_link.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

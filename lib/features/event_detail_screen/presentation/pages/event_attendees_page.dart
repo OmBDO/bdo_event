@@ -5,11 +5,14 @@ import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
+import 'package:bdo_event/core/util/resource/app_file.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/build_attendee_csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:gap/gap.dart';
 
 class EventAttendeesPage extends StatelessWidget {
@@ -97,7 +100,7 @@ class EventAttendeesPage extends StatelessWidget {
       attendees: attendees,
     );
     final fileName =
-      '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
+        '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
     await SharePlus.instance.share(
       ShareParams(
         text: AppText.attendeeListFor(event.title),
@@ -124,8 +127,9 @@ class EventAttendeesPage extends StatelessWidget {
     );
     await Clipboard.setData(ClipboardData(text: csv));
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text(AppText.attendeeCsvCopied)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppText.attendeeCsvCopied)));
     }
   }
 

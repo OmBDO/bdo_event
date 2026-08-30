@@ -1,5 +1,5 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:gap/gap.dart';
 
 class EventTab extends StatelessWidget {
@@ -33,14 +33,14 @@ class EventTab extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
                 color: selectedTab == index
-                  ? theme.colorScheme.secondary
-                  : theme.colorScheme.surface,
+                    ? theme.colorScheme.secondary
+                    : theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 titles[index],
                 style: TextStyle(
-                    color: selectedTab == index
+                  color: selectedTab == index
                       ? theme.colorScheme.onSecondary
                       : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600,

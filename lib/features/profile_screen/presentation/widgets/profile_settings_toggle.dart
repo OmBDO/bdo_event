@@ -1,7 +1,7 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bdo_event/core/theme/app_colors.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class ProfileSettingsToggle extends StatelessWidget {
   const ProfileSettingsToggle({
@@ -31,7 +31,7 @@ class ProfileSettingsToggle extends StatelessWidget {
       value: value,
       onChanged: onChanged,
       // ignore: deprecated_member_use
-        activeColor: Theme.of(context).brightness == Brightness.dark
+      activeColor: Theme.of(context).brightness == Brightness.dark
           ? AppColors.primaryDark
           : AppColors.tertiaryLight,
     ),
@@ -58,7 +58,7 @@ class ProfileSettingsToggle extends StatelessWidget {
   Widget _settingsSubtitle(BuildContext context) => Text(
     subtitle,
     style: TextStyle(
-        color: Theme.of(context).brightness == Brightness.dark
+      color: Theme.of(context).brightness == Brightness.dark
           ? AppColors.mutedTextDark
           : AppColors.profileSubtitleLight,
       fontSize: AppSize.text12,

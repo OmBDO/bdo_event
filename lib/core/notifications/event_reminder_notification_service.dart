@@ -1,9 +1,10 @@
+import 'package:bdo_event/core/util/resource/app_notification.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/core/notifications/event_reminder_permission_service.dart';
 import 'package:bdo_event/core/notifications/event_reminder_policy.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/foundation.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;

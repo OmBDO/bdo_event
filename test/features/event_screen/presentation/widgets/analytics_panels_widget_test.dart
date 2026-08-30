@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_insight_panel.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_metric_tile.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_palette.dart';
@@ -19,8 +19,9 @@ void main() {
     lilac: Color(0xFF9B8AFB),
   );
 
-  testWidgets('shows the ready insight when there are no check-ins',
-      (tester) async {
+  testWidgets('shows the ready insight when there are no check-ins', (
+    tester,
+  ) async {
     await pumpPanel(
       tester,
       const AnalyticsInsightPanel(
@@ -36,8 +37,9 @@ void main() {
     expect(find.text(AppText.noCheckInsRecorded), findsOneWidget);
   });
 
-  testWidgets('shows active attendance with singular and plural messages',
-      (tester) async {
+  testWidgets('shows active attendance with singular and plural messages', (
+    tester,
+  ) async {
     await pumpPanel(
       tester,
       const AnalyticsInsightPanel(
@@ -64,8 +66,9 @@ void main() {
     expect(find.text(AppText.attendeesArrived(2)), findsOneWidget);
   });
 
-  testWidgets('prioritizes the capacity insight when the event is full',
-      (tester) async {
+  testWidgets('prioritizes the capacity insight when the event is full', (
+    tester,
+  ) async {
     await pumpPanel(
       tester,
       const AnalyticsInsightPanel(
@@ -99,52 +102,52 @@ void main() {
     expect(find.text('CLOSED'), findsOneWidget);
   });
 
-  testWidgets('uses two metric columns on narrow layouts and four on wide ones',
-      (tester) async {
-    const metrics = [
-      AnalyticsMetricData('One', '1', Icons.looks_one, Colors.red, 'note'),
-      AnalyticsMetricData('Two', '2', Icons.looks_two, Colors.green, 'note'),
-      AnalyticsMetricData('Three', '3', Icons.looks_3, Colors.blue, 'note'),
-      AnalyticsMetricData('Four', '4', Icons.looks_4, Colors.orange, 'note'),
-    ];
+  testWidgets(
+    'uses two metric columns on narrow layouts and four on wide ones',
+    (tester) async {
+      const metrics = [
+        AnalyticsMetricData('One', '1', Icons.looks_one, Colors.red, 'note'),
+        AnalyticsMetricData('Two', '2', Icons.looks_two, Colors.green, 'note'),
+        AnalyticsMetricData('Three', '3', Icons.looks_3, Colors.blue, 'note'),
+        AnalyticsMetricData('Four', '4', Icons.looks_4, Colors.orange, 'note'),
+      ];
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: SizedBox(
-            width: 400,
-            child: AnalyticsMetricGrid(metrics: metrics, isWide: false),
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              child: AnalyticsMetricGrid(metrics: metrics, isWide: false),
+            ),
           ),
         ),
-      ),
-    );
-    var grid = tester.widget<GridView>(find.byType(GridView));
-    var delegate =
-        grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
-    expect(delegate.crossAxisCount, 2);
+      );
+      var grid = tester.widget<GridView>(find.byType(GridView));
+      var delegate =
+          grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, 2);
 
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: SizedBox(
-            width: 820,
-            child: AnalyticsMetricGrid(metrics: metrics, isWide: true),
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 820,
+              child: AnalyticsMetricGrid(metrics: metrics, isWide: true),
+            ),
           ),
         ),
-      ),
-    );
-    grid = tester.widget<GridView>(find.byType(GridView));
-    delegate = grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
-    expect(delegate.crossAxisCount, 4);
-  });
+      );
+      grid = tester.widget<GridView>(find.byType(GridView));
+      delegate = grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, 4);
+    },
+  );
 }
 
 Future<void> pumpPanel(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(
     MaterialApp(
-      home: Scaffold(
-        body: SingleChildScrollView(child: child),
-      ),
+      home: Scaffold(body: SingleChildScrollView(child: child)),
     ),
   );
   await tester.pump();

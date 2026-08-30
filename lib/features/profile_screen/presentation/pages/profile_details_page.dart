@@ -1,6 +1,9 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/common/form_elements/app_text_field.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_assets.dart';
+import 'package:bdo_event/core/util/resource/app_locals.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';

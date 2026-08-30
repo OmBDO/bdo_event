@@ -2,7 +2,8 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_logger.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
+import 'package:bdo_event/core/util/resource/app_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 abstract interface class EventStore {

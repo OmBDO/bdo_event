@@ -1,4 +1,5 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_locals.dart';
+
 /// A stable application identity, independent of the authentication provider.
 ///
 /// Authentication secrets deliberately do not belong in this model. A future

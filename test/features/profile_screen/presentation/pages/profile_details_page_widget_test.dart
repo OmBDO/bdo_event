@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/pages/profile_details_page.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +9,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../cubit/profile_screen_cubit_test.dart' as fixtures;
 
 void main() {
-  testWidgets('hydrates editable profile details and locale choices',
-      (tester) async {
+  testWidgets('hydrates editable profile details and locale choices', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit(user: fixtures.testUser);
     await pumpDetails(tester, cubit, fixtures.testUser);
 
@@ -42,8 +43,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('keeps the page open and shows an error when save fails',
-      (tester) async {
+  testWidgets('keeps the page open and shows an error when save fails', (
+    tester,
+  ) async {
     final repository = fixtures.FakeAuthRepository(
       user: fixtures.testUser,
       updateProfileResult: 'profile save failed',
@@ -59,8 +61,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('removes an existing profile photo before saving',
-      (tester) async {
+  testWidgets('removes an existing profile photo before saving', (
+    tester,
+  ) async {
     final user = fixtures.testUser.copyWith(photoUrl: 'photo.png');
     final cubit = fixtures.createCubit(user: user);
     await pumpDetails(tester, cubit, user);

@@ -2,6 +2,7 @@ import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/attendance_profile.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
@@ -29,10 +30,8 @@ void main() {
   testWidgets('shows the registered attendee count', (tester) async {
     final attendees = List.generate(
       3,
-      (index) => EventAttendee(
-        userId: 'user-$index',
-        displayName: 'User $index',
-      ),
+      (index) =>
+          EventAttendee(userId: 'user-$index', displayName: 'User $index'),
     );
     await pumpAttendanceProfile(
       tester,
@@ -43,14 +42,13 @@ void main() {
     expect(find.byType(EventAttendeeAvatar), findsNWidgets(3));
   });
 
-  testWidgets('shows a rounded overflow badge for large attendee lists',
-      (tester) async {
+  testWidgets('shows a rounded overflow badge for large attendee lists', (
+    tester,
+  ) async {
     final attendees = List.generate(
       12,
-      (index) => EventAttendee(
-        userId: 'user-$index',
-        displayName: 'User $index',
-      ),
+      (index) =>
+          EventAttendee(userId: 'user-$index', displayName: 'User $index'),
     );
     await pumpAttendanceProfile(
       tester,

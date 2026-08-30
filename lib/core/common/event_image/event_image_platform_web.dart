@@ -1,6 +1,8 @@
+import 'package:bdo_event/core/util/resource/app_buckets.dart';
+import 'package:bdo_event/core/util/resource/app_file.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 Future<String> storePickedImage(XFile image) async {
   final client = Supabase.instance.client;

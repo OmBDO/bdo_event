@@ -1,7 +1,7 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bdo_event/core/theme/app_colors.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class ProfileSettingsSlider extends StatelessWidget {
   const ProfileSettingsSlider({
@@ -32,12 +32,7 @@ class ProfileSettingsSlider extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Slider(
-              value: value,
-              min: 0,
-              max: 1,
-              onChanged: onChanged,
-            ),
+            child: Slider(value: value, min: 0, max: 1, onChanged: onChanged),
           ),
           SizedBox(
             width: 34,
@@ -73,7 +68,7 @@ class ProfileSettingsSlider extends StatelessWidget {
   Widget _settingsSubtitle(BuildContext context) => Text(
     subtitle,
     style: TextStyle(
-        color: Theme.of(context).brightness == Brightness.dark
+      color: Theme.of(context).brightness == Brightness.dark
           ? AppColors.mutedTextDark
           : AppColors.profileSubtitleLight,
       fontSize: AppSize.text12,

@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_locals.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthUserDto {
@@ -24,7 +24,7 @@ class AuthUserDto {
           'User',
       email: user.email ?? '',
       roles: roles.isEmpty ? {UserRole.user} : roles,
-        photoUrl:
+      photoUrl:
           metadata['photo_url'] as String? ??
           metadata['avatar_url'] as String? ??
           metadata['picture'] as String?,

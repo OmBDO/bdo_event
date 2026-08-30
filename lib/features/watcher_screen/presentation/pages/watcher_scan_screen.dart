@@ -1,5 +1,9 @@
 import 'dart:async';
 
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_locals.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -14,7 +18,6 @@ import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_ic
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_target_overlay.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class WatcherScanScreen extends StatefulWidget {
   const WatcherScanScreen({super.key});
@@ -205,7 +208,9 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                                 currentScan.displayName ??
                                     AppText.unknownAttendee,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: AppSize.text18),
+                                style: const TextStyle(
+                                  fontSize: AppSize.text18,
+                                ),
                               ),
                             ],
                           )

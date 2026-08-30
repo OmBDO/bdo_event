@@ -3,6 +3,8 @@ import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
@@ -13,7 +15,6 @@ import 'package:bdo_event/features/event_screen/presentation/widgets/event_tab.d
 import 'package:bdo_event/features/event_screen/presentation/widgets/recent_event_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:gap/gap.dart';
 
 class EventPage extends StatelessWidget {
@@ -255,7 +256,10 @@ class _EventPageViewState extends State<_EventPageView> {
               ),
               const Gap(AppSpace.space8),
               Text(
-                AppText.eventsWillAppearHere.replaceFirst('{tabTitle}', tabTitle),
+                AppText.eventsWillAppearHere.replaceFirst(
+                  '{tabTitle}',
+                  tabTitle,
+                ),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface

@@ -1,6 +1,7 @@
+import 'package:bdo_event/core/util/resource/app_assets.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventImage extends StatefulWidget {
   final String path;
@@ -78,9 +79,8 @@ class _EventImageState extends State<EventImage> {
           ) ??
           Icon(
             Icons.image_outlined,
-            color: Theme.of(context).colorScheme.onSurface.withValues(
-              alpha: 0.45,
-            ),
+            color: Theme.of(context).colorScheme.onSurface
+                .withValues(alpha: 0.45),
             size: 48,
           );
     }
@@ -106,9 +106,8 @@ class _EventImageState extends State<EventImage> {
               ) ??
               Icon(
                 Icons.image_outlined,
-                color: Theme.of(context).colorScheme.onSurface.withValues(
-                  alpha: 0.45,
-                ),
+                color: Theme.of(context).colorScheme.onSurface
+                    .withValues(alpha: 0.45),
                 size: 48,
               );
         }
@@ -173,11 +172,7 @@ class _ImageLoadingPlaceholderState extends State<_ImageLoadingPlaceholder>
                   Theme.of(context).colorScheme.surfaceContainerHighest,
                   Theme.of(context).colorScheme.surface,
                 ]
-              : const [
-                  Color(0xFFFFF1E6),
-                  Color(0xFFFFDCC8),
-                  Color(0xFFFFF1E6),
-                ],
+              : const [Color(0xFFFFF1E6), Color(0xFFFFDCC8), Color(0xFFFFF1E6)],
         ),
       ),
       child: child,

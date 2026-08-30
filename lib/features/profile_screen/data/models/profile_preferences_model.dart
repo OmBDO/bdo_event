@@ -1,5 +1,5 @@
+import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_preferences.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class ProfilePreferencesModel extends ProfilePreferences {
   const ProfilePreferencesModel({
@@ -39,7 +39,7 @@ class ProfilePreferencesModel extends ProfilePreferences {
     watcherSoundVolume: watcherSoundVolume,
     isWatcherAutoOpenNextEnabled: isWatcherAutoOpenNextEnabled,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      isWatcherKeepHistoryVisibleAfterCheckIn,
+        isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: eventReminderLeadTimeMinutes,
     dateFormat: dateFormat,

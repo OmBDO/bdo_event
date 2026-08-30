@@ -1,8 +1,8 @@
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventInvitationPage extends StatefulWidget {
   const EventInvitationPage({required this.event, super.key});
@@ -33,9 +33,9 @@ class _EventInvitationPageState extends State<EventInvitationPage> {
         userIds: _selectedIds.toList(),
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppText.invitationsSent(count))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppText.invitationsSent(count))));
       Navigator.of(context).pop();
     } on LocalStorageException {
       if (mounted) {
@@ -75,9 +75,11 @@ class _EventInvitationPageState extends State<EventInvitationPage> {
                   : (selected) => setState(() {
                       _selectedIds
                         ..clear()
-                        ..addAll(selected == true
-                            ? recipients.map((recipient) => recipient['id']!)
-                            : const <String>[]);
+                        ..addAll(
+                          selected == true
+                              ? recipients.map((recipient) => recipient['id']!)
+                              : const <String>[],
+                        );
                     }),
             ),
             const Divider(height: 1),

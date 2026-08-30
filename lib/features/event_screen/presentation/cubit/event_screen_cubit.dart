@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/calendar_screen/domain/usecases/load_registered_events.dart';
@@ -6,28 +7,19 @@ import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/prefs/recent_event_store.dart';
 
 class EventScreenCubit extends Cubit<EventScreenState> {
   EventScreenCubit({
-    required LoadEvents loadEvents,
-    LoadRegisteredEvents? loadRegisteredEvents,
-    required CreateEvent createEvent,
-    required UpdateEvent updateEvent,
-    required DeleteEvent deleteEvent,
-    required AuthRepositoryContract authRepository,
-    RecentEventStore? recentEventStore,
-    SharedPreferences? preferences,
-  }) : _loadEvents = loadEvents,
-       _loadRegisteredEvents = loadRegisteredEvents,
-       _createEvent = createEvent,
-       _updateEvent = updateEvent,
-       _deleteEvent = deleteEvent,
-       _authRepository = authRepository,
-       _recentEventStore = recentEventStore,
-       _preferences = preferences,
-       super(const EventScreenState());
+    required this._loadEvents,
+    this._loadRegisteredEvents,
+    required this._createEvent,
+    required this._updateEvent,
+    required this._deleteEvent,
+    required this._authRepository,
+    this._recentEventStore,
+    this._preferences,
+  }) : super(const EventScreenState());
 
   final LoadEvents _loadEvents;
   final LoadRegisteredEvents? _loadRegisteredEvents;
