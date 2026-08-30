@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/common/form_elements/app_text_field.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,7 +31,9 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
   void initState() {
     super.initState();
     _photoUrl = user?.photoUrl;
-    _phoneNumberController = TextEditingController(text: user?.phoneNumber ?? '');
+    _phoneNumberController = TextEditingController(
+      text: user?.phoneNumber ?? '',
+    );
     _bioController = TextEditingController(text: user?.bio ?? '');
     _locale = user?.locale ?? 'en-IN';
   }
@@ -62,72 +64,80 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
       body: Form(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-        children: [
-          _ProfileSectionTitle(
-            title: 'Account information',
-            subtitle: 'Name and email are managed by your account.',
-          ),
-          _ReadOnlyProfileField(
-            label: AppText.fullName,
-            value: displayName,
-            icon: Icons.person_outline_rounded,
-          ),
-          const SizedBox(height: 14),
-          _ReadOnlyProfileField(
-            label: AppText.emailAddress,
-            value: email,
-            icon: Icons.email_outlined,
-          ),
-          const SizedBox(height: 28),
-          _ProfileSectionTitle(
-            title: 'Personal details',
-            subtitle: 'Update the information you want to share.',
-          ),
-          _ProfilePhotoPicker(
-            photoUrl: _removePhoto ? null : _photoUrl,
-            enabled: !_isSaving,
-            onChange: _pickPhoto,
-            onRemove: _removePhoto == false && _photoUrl != null
-                ? () => setState(() => _removePhoto = true)
-                : null,
-          ),
-          const SizedBox(height: 14),
-          AppTextField(
-            controller: _phoneNumberController,
-            label: 'Phone number',
-            icon: Icons.phone_outlined,
-            keyboardType: TextInputType.phone,
-          ),
-          const SizedBox(height: 14),
-          AppTextField(
-            controller: _bioController,
-            label: 'Bio',
-            icon: Icons.notes_rounded,
-            maxLines: 4,
-          ),
-          const SizedBox(height: 14),
-          DropdownButtonFormField<String>(
-            value: _locale,
-            decoration: const InputDecoration(
-              labelText: 'Language and region',
-              prefixIcon: Icon(Icons.language_rounded),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16)),
-              ),
+          children: [
+            _ProfileSectionTitle(
+              title: 'Account information',
+              subtitle: 'Name and email are managed by your account.',
             ),
-            items: const [
-              DropdownMenuItem(value: 'en-IN', child: Text('English (India)')),
-              DropdownMenuItem(value: 'en-US', child: Text('English (United States)')),
-            ],
-            onChanged: _isSaving ? null : (value) => setState(() => _locale = value ?? _locale),
-          ),
-          const SizedBox(height: 28),
-          FilledButton.icon(
-            onPressed: _isSaving ? null : _save,
-            icon: const Icon(Icons.save_rounded),
-            label: Text(_isSaving ? 'Saving...' : AppText.saveProfile),
-          ),
-        ],
+            _ReadOnlyProfileField(
+              label: AppText.fullName,
+              value: displayName,
+              icon: Icons.person_outline_rounded,
+            ),
+            const SizedBox(height: 14),
+            _ReadOnlyProfileField(
+              label: AppText.emailAddress,
+              value: email,
+              icon: Icons.email_outlined,
+            ),
+            const SizedBox(height: 28),
+            _ProfileSectionTitle(
+              title: 'Personal details',
+              subtitle: 'Update the information you want to share.',
+            ),
+            _ProfilePhotoPicker(
+              photoUrl: _removePhoto ? null : _photoUrl,
+              enabled: !_isSaving,
+              onChange: _pickPhoto,
+              onRemove: _removePhoto == false && _photoUrl != null
+                  ? () => setState(() => _removePhoto = true)
+                  : null,
+            ),
+            const SizedBox(height: 14),
+            AppTextField(
+              controller: _phoneNumberController,
+              label: 'Phone number',
+              icon: Icons.phone_outlined,
+              keyboardType: TextInputType.phone,
+            ),
+            const SizedBox(height: 14),
+            AppTextField(
+              controller: _bioController,
+              label: 'Bio',
+              icon: Icons.notes_rounded,
+              maxLines: 4,
+            ),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<String>(
+              initialValue: _locale,
+              decoration: const InputDecoration(
+                labelText: 'Language and region',
+                prefixIcon: Icon(Icons.language_rounded),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'en-IN',
+                  child: Text('English (India)'),
+                ),
+                DropdownMenuItem(
+                  value: 'en-US',
+                  child: Text('English (United States)'),
+                ),
+              ],
+              onChanged: _isSaving
+                  ? null
+                  : (value) => setState(() => _locale = value ?? _locale),
+            ),
+            const SizedBox(height: 28),
+            FilledButton.icon(
+              onPressed: _isSaving ? null : _save,
+              icon: const Icon(Icons.save_rounded),
+              label: Text(_isSaving ? 'Saving...' : AppText.saveProfile),
+            ),
+          ],
         ),
       ),
     );
@@ -147,12 +157,12 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     if (!mounted) return;
     if (error != null) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppText.profileUpdated)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text(AppText.profileUpdated)));
     Navigator.of(context).pop();
   }
 
@@ -210,9 +220,16 @@ class _ProfilePhotoPicker extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Profile photo', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                  Text(
+                    'Profile photo',
+                    style: Theme.of(context).textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Use a photo that represents you.', style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    'Use a photo that represents you.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -251,7 +268,11 @@ class _ProfileSectionTitle extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.w800),
+        ),
         const SizedBox(height: 4),
         Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
       ],
@@ -260,7 +281,11 @@ class _ProfileSectionTitle extends StatelessWidget {
 }
 
 class _ReadOnlyProfileField extends StatelessWidget {
-  const _ReadOnlyProfileField({required this.label, required this.value, required this.icon});
+  const _ReadOnlyProfileField({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
 
   final String label;
   final String value;

@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ class ScanHistorySheet extends StatelessWidget {
     child: SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.45,
       child: history.isEmpty
-          ? const Center(child: Text('No scans yet'))
+          ? const Center(child: Text(AppText.notScanYet))
           : Column(
               children: [
                 const Padding(
@@ -50,7 +51,7 @@ class ScanHistorySheet extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Scan history',
+                      AppText.scanHistory,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -65,7 +66,8 @@ class ScanHistorySheet extends StatelessWidget {
                     child: FilledButton(
                       onPressed:
                           history.any(
-                            (entry) => entry.status == 'Ready to check in',
+                            (entry) =>
+                                entry.status == AppIdentifiers.readytocheckIn,
                           )
                           ? () async {
                               await onConfirmAll();
@@ -85,7 +87,7 @@ class ScanHistorySheet extends StatelessWidget {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text('Confirm all'),
+                      child: const Text(AppText.confirmAll),
                     ),
                   ),
                 ),
@@ -94,20 +96,23 @@ class ScanHistorySheet extends StatelessWidget {
                     itemCount: history.length,
                     itemBuilder: (context, index) {
                       final entry = history[index];
-                      final isPending = entry.status == 'Ready to check in';
+                      final isPending =
+                          entry.status == AppIdentifiers.readytocheckIn;
                       return ListTile(
                         leading: CircleAvatar(
                           child: Icon(
-                            entry.status == 'Checked in'
+                            entry.status == AppText.checkedInitial
                                 ? Icons.check
                                 : Icons.person_outline,
                           ),
                         ),
-                        title: Text(entry.displayName ?? 'Unknown attendee'),
+                        title: Text(
+                          entry.displayName ?? AppText.unknownAttendee,
+                        ),
                         subtitle: Text(entry.status),
                         trailing: isPending
                             ? IconButton(
-                                tooltip: 'Confirm check-in',
+                                tooltip: AppText.cofirmCheckedIn,
                                 icon: const Icon(Icons.check_circle_outline),
                                 onPressed: () async {
                                   await onConfirmEntry(entry);

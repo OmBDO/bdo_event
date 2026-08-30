@@ -1,8 +1,13 @@
-import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_palette.dart';
 import 'package:flutter/material.dart';
 
 class AnalyticsMetricData {
-  const AnalyticsMetricData(this.label, this.value, this.icon, this.color, this.note);
+  const AnalyticsMetricData(
+    this.label,
+    this.value,
+    this.icon,
+    this.color,
+    this.note,
+  );
 
   final String label;
   final String value;
@@ -12,7 +17,11 @@ class AnalyticsMetricData {
 }
 
 class AnalyticsMetricGrid extends StatelessWidget {
-  const AnalyticsMetricGrid({required this.metrics, required this.isWide, super.key});
+  const AnalyticsMetricGrid({
+    required this.metrics,
+    required this.isWide,
+    super.key,
+  });
 
   final List<AnalyticsMetricData> metrics;
   final bool isWide;
@@ -50,9 +59,23 @@ class _AnalyticsMetricTile extends StatelessWidget {
       children: [
         Icon(data.icon, color: data.color, size: 21),
         const Spacer(),
-        Text(data.value, style: TextStyle(color: data.color, fontSize: 24, fontWeight: FontWeight.w900)),
+        Text(
+          data.value,
+          style: TextStyle(
+            color: data.color,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
         Text(data.label, style: const TextStyle(fontWeight: FontWeight.w700)),
-        Text(data.note, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .55), fontSize: 10)),
+        Text(
+          data.note,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface
+                .withValues(alpha: .55),
+            fontSize: 10,
+          ),
+        ),
       ],
     ),
   );

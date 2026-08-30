@@ -1,7 +1,7 @@
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
@@ -22,13 +22,15 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
+  Widget build(
+    BuildContext context,
+  ) => BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
     listenWhen: (previous, current) =>
         previous.errorMessage != current.errorMessage &&
         current.errorMessage != null,
-    listener: (context, state) => ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(state.errorMessage!)),
-    ),
+    listener: (context, state) =>
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(state.errorMessage!))),
     builder: (context, state) {
       final theme = Theme.of(context);
       final isDarkMode = theme.brightness == Brightness.dark;
@@ -60,21 +62,20 @@ class ProfileScreen extends StatelessWidget {
                   message: AppText.onlyAvailableLanguage,
                 ),
               ),
-              if (user?.hasPermission(UserPermission.scanRegistrations) ?? false) ...[
+              if (user?.hasPermission(UserPermission.scanRegistrations) ??
+                  false) ...[
                 const Gap(16),
                 ProfileWatcherSettingsSection(state: state),
               ],
-              if (user?.hasPermission(UserPermission.createEvents) ?? false) ...[
+              if (user?.hasPermission(UserPermission.createEvents) ??
+                  false) ...[
                 const Gap(16),
                 ProfileOrganizerToolsSection(user: user!),
               ],
               const Gap(16),
               ProfileSupportSection(
-                onShowInfo: ({required title, required message}) => _showInfoDialog(
-                  context,
-                  title: title,
-                  message: message,
-                ),
+                onShowInfo: ({required title, required message}) =>
+                    _showInfoDialog(context, title: title, message: message),
                 onSignOutEverywhere: () => _signOutEverywhere(context),
               ),
               const Gap(24),
@@ -84,13 +85,18 @@ class ProfileScreen extends StatelessWidget {
                   onPressed: () => _logout(context),
                   style: TextButton.styleFrom(
                     foregroundColor: isDarkMode
-                      ? theme.colorScheme.onSurface
-                      : Colors.black54,
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ? theme.colorScheme.onSurface
+                        : Colors.black54,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     backgroundColor: isDarkMode
-                      ? theme.colorScheme.surfaceContainerHighest
-                      : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
+                        ? theme.colorScheme.surfaceContainerHighest
+                        : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
                     minimumSize: const Size(double.infinity, 50),
                   ),
                   icon: const Icon(Icons.logout_rounded, size: 20),
@@ -141,7 +147,8 @@ class ProfileScreen extends StatelessWidget {
     final error = await context.read<AuthScreenCubit>().logoutEverywhere();
     if (!context.mounted) return;
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
       return;
     }
     context.read<WatcherScanCubit>().clearState();
@@ -188,7 +195,9 @@ class ProfileScreen extends StatelessWidget {
                   controller: passwordController,
                   obscureText: true,
                   enabled: !isSaving,
-                  decoration: const InputDecoration(labelText: AppText.newPassword),
+                  decoration: const InputDecoration(
+                    labelText: AppText.newPassword,
+                  ),
                   validator: (value) => (value?.length ?? 0) < 8
                       ? AppText.useAtLeastEightCharacters
                       : null,
@@ -198,7 +207,9 @@ class ProfileScreen extends StatelessWidget {
                   controller: confirmationController,
                   obscureText: true,
                   enabled: !isSaving,
-                  decoration: const InputDecoration(labelText: AppText.confirmNewPassword),
+                  decoration: const InputDecoration(
+                    labelText: AppText.confirmNewPassword,
+                  ),
                   validator: (value) => value != passwordController.text
                       ? AppText.passwordsDoNotMatch
                       : null,
@@ -208,7 +219,9 @@ class ProfileScreen extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              onPressed: isSaving ? null : () => Navigator.of(dialogContext).pop(false),
+              onPressed: isSaving
+                  ? null
+                  : () => Navigator.of(dialogContext).pop(false),
               child: const Text(AppText.cancel),
             ),
             FilledButton(
@@ -238,9 +251,8 @@ class ProfileScreen extends StatelessWidget {
     passwordController.dispose();
     confirmationController.dispose();
     if (changed == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppText.passwordChanged)),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text(AppText.passwordChanged)));
     }
   }
 
@@ -257,15 +269,19 @@ class ProfileScreen extends StatelessWidget {
               in EventReminderNotificationService.reminderLeadTimeOptions)
             RadioListTile<int>(
               value: minutes,
+              // ignore: deprecated_member_use
               groupValue: selectedMinutes,
               title: Text(AppText.reminderLeadTimeLabel(minutes)),
+              // ignore: deprecated_member_use
               onChanged: (value) => Navigator.of(dialogContext).pop(value),
             ),
         ],
       ),
     );
     if (selected != null && context.mounted) {
-      await context.read<ProfileScreenCubit>().updateEventReminderLeadTime(selected);
+      await context.read<ProfileScreenCubit>().updateEventReminderLeadTime(
+        selected,
+      );
     }
   }
 }

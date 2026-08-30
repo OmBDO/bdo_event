@@ -4,7 +4,7 @@ import 'package:bdo_event/core/notifications/event_reminder_notification_service
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_registered_event.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_state.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisteredEventCubit extends Cubit<RegisteredEventState> {

@@ -13,7 +13,7 @@ import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_ic
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_target_overlay.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class WatcherScanScreen extends StatefulWidget {
   const WatcherScanScreen({super.key});
@@ -39,6 +39,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
     await _speech.setLanguage('en-IN');
     await _speech.setSpeechRate(0.5);
     await _speech.setVolume(
+      // ignore: use_build_context_synchronously
       context.read<ProfileScreenCubit>().state.watcherSoundVolume,
     );
     await _speech.setPitch(1.0);
@@ -88,182 +89,205 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
         },
         child: BlocBuilder<WatcherScanCubit, WatcherScanState>(
           builder: (context, state) {
-          final currentScan = state.history
-              .where((entry) => entry.status == 'Ready to check in')
-              .firstOrNull;
+            final currentScan = state.history
+                .where((entry) => entry.status == AppIdentifiers.readytocheckIn)
+                .firstOrNull;
 
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text(AppText.scanRegistration),
-              actions: [
-                BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
-                  builder: (context, profileState) {
-                    final isMuted = profileState.isWatcherVoiceMuted;
-                    return IconButton(
-                      tooltip: isMuted
-                          ? 'Unmute scanning voice'
-                          : AppText.muteScanningVoice,
-                      icon: Icon(
-                        isMuted
-                            ? Icons.volume_off_outlined
-                            : Icons.volume_up_outlined,
-                      ),
-                      onPressed: () => context
-                          .read<ProfileScreenCubit>()
-                          .toggleWatcherVoiceMuted(!isMuted),
-                    );
-                  },
-                ),
-              ],
-            ),
-            body: Column(
-              children: [
-                ScannerDashboard(
-                  checkedInCount: state.checkedInCount,
-                  expectedCount: state.expectedCount,
-                  historyCount: state.history.length,
-                  onHistoryPressed: () =>
-                      ScanHistorySheet.show(
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text(AppText.scanRegistration),
+                actions: [
+                  BlocBuilder<ProfileScreenCubit, ProfileScreenState>(
+                    builder: (context, profileState) {
+                      final isMuted = profileState.isWatcherVoiceMuted;
+                      return IconButton(
+                        tooltip: isMuted
+                            ? AppText.unmuteScanningVoice
+                            : AppText.muteScanningVoice,
+                        icon: Icon(
+                          isMuted
+                              ? Icons.volume_off_outlined
+                              : Icons.volume_up_outlined,
+                        ),
+                        onPressed: () => context
+                            .read<ProfileScreenCubit>()
+                            .toggleWatcherVoiceMuted(!isMuted),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              body: Column(
+                children: [
+                  ScannerDashboard(
+                    checkedInCount: state.checkedInCount,
+                    expectedCount: state.expectedCount,
+                    historyCount: state.history.length,
+                    onHistoryPressed: () => ScanHistorySheet.show(
                       context,
                       state.history,
                       autoOpenNext: context
-                        .read<ProfileScreenCubit>()
-                        .state
-                        .isWatcherAutoOpenNextEnabled,
+                          .read<ProfileScreenCubit>()
+                          .state
+                          .isWatcherAutoOpenNextEnabled,
                       keepHistoryVisibleAfterCheckIn: context
                           .read<ProfileScreenCubit>()
                           .state
                           .isWatcherKeepHistoryVisibleAfterCheckIn,
-                      ),
-                ),
-                Expanded(
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      MobileScanner(
-                        controller: _controller,
-                        onDetect: (capture) {
-                          final value = capture.barcodes.firstOrNull?.rawValue;
-                          if (value != null &&
-                              state.status == WatcherScanStatus.idle &&
-                              _scanCooldown == null) {
-                            _scanCooldown = Timer(
-                              const Duration(milliseconds: 1500),
-                              () => _scanCooldown = null,
-                            );
-                            context.read<WatcherScanCubit>().validate(value);
-                          }
-                        },
-                      ),
-                      const ScannerTargetOverlay(),
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: Column(
-                          children: [
-                            ScannerIconButton(
-                              tooltip: 'Toggle flashlight',
-                              icon: _torchEnabled
-                                  ? Icons.flash_on
-                                  : Icons.flash_off,
-                              onPressed: () async {
-                                await _controller.toggleTorch();
-                                if (mounted) {
-                                  setState(() => _torchEnabled = !_torchEnabled);
-                                }
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            ScannerIconButton(
-                              tooltip: 'Switch camera',
-                              icon: Icons.cameraswitch_outlined,
-                              onPressed: _controller.switchCamera,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: state.status == WatcherScanStatus.valid &&
-                          currentScan != null
-                      ? Column(
-                          children: [
-                            const Text(
-                              'Pending check-in',
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              currentScan.displayName ?? 'Unknown attendee',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ],
-                        )
-                      : Text(
-                          state.message ?? AppText.scanRegistrationPrompt,
-                          textAlign: TextAlign.center,
-                        ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: TextField(
-                    controller: _manualEntryController,
-                    enabled: state.status == WatcherScanStatus.idle,
-                    textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      labelText: AppText.enterRegistrationCode,
-                      hintText: AppText.pasteRegistrationCode,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      suffixIcon: IconButton(
-                        tooltip: 'Validate registration code',
-                        icon: const Icon(Icons.arrow_forward),
-                        onPressed: state.status == WatcherScanStatus.idle
-                            ? _submitManualEntry
-                            : null,
-                      ),
                     ),
-                    onSubmitted: (_) => _submitManualEntry(),
                   ),
-                ),
-                const SizedBox(height: 12),
-                if (state.status == WatcherScanStatus.valid)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                  Expanded(
+                    child: Stack(
+                      fit: StackFit.expand,
                       children: [
-                        FilledButton(
-                          onPressed:
-                              state.status == WatcherScanStatus.checkingIn
-                                  ? null
-                                  : () => context
-                                        .read<WatcherScanCubit>()
-                                        .checkIn(
-                                          autoOpenNext: context
-                                              .read<ProfileScreenCubit>()
-                                              .state
-                                              .isWatcherAutoOpenNextEnabled,
-                                        ),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size.fromHeight(50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: const Text(AppText.checkIn),
+                        MobileScanner(
+                          controller: _controller,
+                          onDetect: (capture) {
+                            final value =
+                                capture.barcodes.firstOrNull?.rawValue;
+                            if (value != null &&
+                                state.status == WatcherScanStatus.idle &&
+                                _scanCooldown == null) {
+                              _scanCooldown = Timer(
+                                const Duration(milliseconds: 1500),
+                                () => _scanCooldown = null,
+                              );
+                              context.read<WatcherScanCubit>().validate(value);
+                            }
+                          },
                         ),
-                        const SizedBox(height: 8),
-                        FilledButton(
-                          onPressed: () =>
-                              context.read<WatcherScanCubit>().reset(),
+                        const ScannerTargetOverlay(),
+                        Positioned(
+                          top: 16,
+                          right: 16,
+                          child: Column(
+                            children: [
+                              ScannerIconButton(
+                                tooltip: AppText.toggleFlashLight,
+                                icon: _torchEnabled
+                                    ? Icons.flash_on
+                                    : Icons.flash_off,
+                                onPressed: () async {
+                                  await _controller.toggleTorch();
+                                  if (mounted) {
+                                    setState(
+                                      () => _torchEnabled = !_torchEnabled,
+                                    );
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              ScannerIconButton(
+                                tooltip: AppText.switchCamera,
+                                icon: Icons.cameraswitch_outlined,
+                                onPressed: _controller.switchCamera,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child:
+                        state.status == WatcherScanStatus.valid &&
+                            currentScan != null
+                        ? Column(
+                            children: [
+                              const Text(
+                                AppText.pendingCheckIn,
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                currentScan.displayName ??
+                                    AppText.unknownAttendee,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            state.message ?? AppText.scanRegistrationPrompt,
+                            textAlign: TextAlign.center,
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: _manualEntryController,
+                      enabled: state.status == WatcherScanStatus.idle,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        labelText: AppText.enterRegistrationCode,
+                        hintText: AppText.pasteRegistrationCode,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        suffixIcon: IconButton(
+                          tooltip: AppText.validateRegistrationCode,
+                          icon: const Icon(Icons.arrow_forward),
+                          onPressed: state.status == WatcherScanStatus.idle
+                              ? _submitManualEntry
+                              : null,
+                        ),
+                      ),
+                      onSubmitted: (_) => _submitManualEntry(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (state.status == WatcherScanStatus.valid)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          FilledButton(
+                            onPressed:
+                                state.status == WatcherScanStatus.checkingIn
+                                ? null
+                                : () =>
+                                      context.read<WatcherScanCubit>().checkIn(
+                                        autoOpenNext: context
+                                            .read<ProfileScreenCubit>()
+                                            .state
+                                            .isWatcherAutoOpenNextEnabled,
+                                      ),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size.fromHeight(50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(AppText.checkIn),
+                          ),
+                          const SizedBox(height: 8),
+                          FilledButton(
+                            onPressed: () =>
+                                context.read<WatcherScanCubit>().reset(),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size.fromHeight(50),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text(AppText.scanAgain),
+                          ),
+                        ],
+                      ),
+                    )
+                  else if (state.status != WatcherScanStatus.idle)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: context.read<WatcherScanCubit>().reset,
                           style: FilledButton.styleFrom(
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
@@ -274,32 +298,12 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                           ),
                           child: const Text(AppText.scanAgain),
                         ),
-                      ],
-                    ),
-                  )
-                else if (state.status != WatcherScanStatus.idle)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: context.read<WatcherScanCubit>().reset,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size.fromHeight(50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: const Text(AppText.scanAgain),
                       ),
                     ),
-                  ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
           },
         ),
       ),

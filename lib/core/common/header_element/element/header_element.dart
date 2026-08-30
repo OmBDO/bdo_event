@@ -5,7 +5,7 @@ import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:bdo_event/core/model/location_model/location_catalog.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/notification_count_formatter.dart';
 import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';

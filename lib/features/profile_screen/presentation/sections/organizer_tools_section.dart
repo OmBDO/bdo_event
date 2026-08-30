@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/category_event_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/my_event_screen.dart';
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_section_header.dart';

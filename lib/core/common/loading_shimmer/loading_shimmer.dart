@@ -37,11 +37,7 @@ class _AppShimmerState extends State<AppShimmer>
                 Theme.of(context).colorScheme.surface,
                 Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
               ]
-            : const [
-                Color(0xFFFFDCC8),
-                Color(0xFFFFF8F2),
-                Color(0xFFFFCDB5),
-              ],
+            : const [Color(0xFFFFDCC8), Color(0xFFFFF8F2), Color(0xFFFFCDB5)],
       ).createShader(bounds),
       child: child,
     ),
@@ -102,7 +98,7 @@ class NotificationListShimmer extends StatelessWidget {
   Widget build(BuildContext context) => ListView.separated(
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
     itemCount: 4,
-    separatorBuilder: (_, __) => const SizedBox(height: 12),
+    separatorBuilder: (_, _) => const SizedBox(height: 12),
     itemBuilder: (context, index) => AppShimmer(
       child: Container(
         height: 142,
@@ -118,7 +114,9 @@ class NotificationListShimmer extends StatelessWidget {
               children: [
                 const _ShimmerCircle(size: 24),
                 const SizedBox(width: 10),
-                Expanded(child: _ShimmerLine(width: double.infinity, height: 16)),
+                Expanded(
+                  child: _ShimmerLine(width: double.infinity, height: 16),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -141,7 +139,7 @@ class AttendeeListShimmer extends StatelessWidget {
   Widget build(BuildContext context) => ListView.separated(
     padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
     itemCount: 6,
-    separatorBuilder: (_, __) => const SizedBox(height: 10),
+    separatorBuilder: (_, _) => const SizedBox(height: 10),
     itemBuilder: (context, index) => AppShimmer(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),

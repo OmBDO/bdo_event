@@ -3,7 +3,7 @@ import 'package:bdo_event/core/common/form_elements/auth_button.dart';
 import 'package:bdo_event/core/common/form_elements/auth_scaffold.dart';
 import 'package:bdo_event/core/common/form_elements/auth_switch.dart';
 import 'package:bdo_event/core/util/helpers/validation_email.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';

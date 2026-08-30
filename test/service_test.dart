@@ -195,17 +195,21 @@ class FakeAuthRepository implements AuthRepositoryContract {
   }
 
   @override
-  Future<String?> updateProfile({
-    required String displayName,
-    required String email,
-  }) {
-    // TODO: implement updateProfile
+  Future<String?> updateNotificationPreference(bool enable) {
+    // TODO: implement updateNotificationPreference
     throw UnimplementedError();
   }
 
   @override
-  Future<String?> updateNotificationPreference(bool enable) {
-    // TODO: implement updateNotificationPreference
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
+  }) {
+    // TODO: implement updateProfile
     throw UnimplementedError();
   }
 }

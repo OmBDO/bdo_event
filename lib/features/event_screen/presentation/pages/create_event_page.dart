@@ -17,7 +17,7 @@ import 'dart:convert';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 // ignore: must_be_immutable
 class CreateEventPage extends StatefulWidget {
@@ -178,6 +178,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     setState(() => _isSaving = false);
     if (error != null) {
       await _deletePendingImages();
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error)));
       return;
@@ -188,13 +189,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
         _originalImagePath != _selectedImagePath) {
       await _tryDeleteImage(_originalImagePath!);
     }
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(_isEditing ? AppText.eventUpdated : AppText.eventCreated),
       ),
     );
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
     if (!_isEditing && widget.popParentOnCreateSuccess) {
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pop();
     }
   }
@@ -318,8 +322,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
       );
       if (response.statusCode != 200) return;
       final results = jsonDecode(response.body) as List<dynamic>;
-      if (results.isEmpty || !mounted || requestId != _locationSearchRequest)
+      if (results.isEmpty || !mounted || requestId != _locationSearchRequest) {
         return;
+      }
       final result = results.first as Map<String, dynamic>;
       final coordinates = LatLng(
         double.parse(result['lat'] as String),
@@ -404,7 +409,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             height: 170,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface
+                              color: Theme.of(context).colorScheme.surface
                                   .withValues(alpha: 0.72),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(

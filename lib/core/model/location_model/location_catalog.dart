@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/location_model/location_model.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 abstract final class LocationCatalog {
   static const offices = [

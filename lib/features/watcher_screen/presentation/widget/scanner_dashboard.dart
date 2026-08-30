@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
 
 class ScannerDashboard extends StatelessWidget {
@@ -21,21 +22,21 @@ class ScannerDashboard extends StatelessWidget {
       children: [
         Expanded(
           child: _CounterTile(
-            label: 'Checked in',
-            value: checkedInCount?.toString() ?? '--',
+            label: AppText.checkedInitial,
+            value: checkedInCount?.toString() ?? AppText.nullCount,
             icon: Icons.how_to_reg,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _CounterTile(
-            label: 'Expected',
-            value: expectedCount?.toString() ?? '--',
+            label: AppText.expected,
+            value: expectedCount?.toString() ?? AppText.nullCount,
             icon: Icons.groups_outlined,
           ),
         ),
         IconButton(
-          tooltip: 'View scan history',
+          tooltip: AppText.viewScanHistory,
           onPressed: onHistoryPressed,
           icon: Badge(
             isLabelVisible: historyCount > 0,

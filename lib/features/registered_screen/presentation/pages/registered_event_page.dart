@@ -14,7 +14,7 @@ import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class RegisteredEventPage extends StatefulWidget {
   final Event event;
@@ -66,7 +66,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
             ),
             // Material 3 Tooltip with a clean tail layout configuration
             Tooltip(
-              message: "you can register upto the date of event",
+              message: AppText.cancelregisterTooltip,
               triggerMode: TooltipTriggerMode.tap,
               preferBelow: false,
               verticalOffset: 16,
@@ -157,12 +157,12 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
   }
 
   String _qrData(String token) => jsonEncode({
-    'type': AppIdentifiers.qrRegistrationType,
-    'eventId': widget.event.id,
-    'token': token,
-    'event': widget.event.title,
-    'date': widget.event.date,
-    'location': widget.event.location,
+    AppModelKeys.type: AppIdentifiers.qrRegistrationType,
+    AppModelKeys.eventId: widget.event.id,
+    AppModelKeys.token: token,
+    AppModelKeys.event: widget.event.title,
+    AppModelKeys.date: widget.event.date,
+    AppModelKeys.location: widget.event.location,
   });
 
   String _manualCode(String token) {
@@ -295,7 +295,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                                 child: Opacity(
                                   opacity: 0.55,
                                   child: QrImageView(
-                                    data: 'bdo-event-ticket-preparing',
+                                    data: AppEssentials.bdoinitialQr,
                                     version: QrVersions.auto,
                                     size: 220,
                                     eyeStyle: const QrEyeStyle(
@@ -365,7 +365,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurface,
-                                  fontFamily: 'monospace',
+                                  fontFamily: AppUtil.monospace,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   height: 1.35,
@@ -400,7 +400,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Give this code to event staff if the QR code cannot be scanned.',
+                          AppText.qrInitilDescription,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.7),
@@ -503,7 +503,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           duration: const Duration(milliseconds: 250),
                           child: Text(
                             state.isCancelling
-                                ? 'Ticket is departing...'
+                                ? AppText.ticketDeparting
                                 : AppText.cancelRegistrationButton,
                             key: ValueKey(state.isCancelling),
                           ),

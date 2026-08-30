@@ -15,24 +15,20 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   ProfileScreenCubit({
     required AuthRepositoryContract authRepository,
     required LoadProfilePreferences loadProfilePreferences,
-    required SaveProfilePreferences saveProfilePreferences,
-    EventReminderNotificationService? reminderNotifications,
-    BiometricLockService? biometricLockService,
-    EventStore? eventStore,
-  })
-      : _authRepository = authRepository,
-        _saveProfilePreferences = saveProfilePreferences,
-        _reminderNotifications = reminderNotifications,
-        _biometricLockService = biometricLockService,
-        _eventStore = eventStore,
-      super(_initialState(authRepository, loadProfilePreferences.call()));
+    required this._saveProfilePreferences,
+    this._reminderNotifications,
+    this._biometricLockService,
+    this._eventStore,
+  }) : _authRepository = authRepository,
+       super(_initialState(authRepository, loadProfilePreferences.call()));
 
   static ProfileScreenState _initialState(
     AuthRepositoryContract authRepository,
     ProfilePreferences preferences,
   ) => ProfileScreenState(
     user: authRepository.currentUser,
-    isNotificationEnabled: authRepository.currentUser?.notificationsEnabled ?? true,
+    isNotificationEnabled:
+        authRepository.currentUser?.notificationsEnabled ?? true,
     isDarkModeEnabled: preferences.isDarkModeEnabled,
     isLargeTextEnabled: preferences.isLargeTextEnabled,
     isHighContrastEnabled: preferences.isHighContrastEnabled,
@@ -41,7 +37,7 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     watcherSoundVolume: preferences.watcherSoundVolume,
     isWatcherAutoOpenNextEnabled: preferences.isWatcherAutoOpenNextEnabled,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      preferences.isWatcherKeepHistoryVisibleAfterCheckIn,
+        preferences.isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: preferences.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: preferences.eventReminderLeadTimeMinutes,
     dateFormat: preferences.dateFormat,
@@ -73,11 +69,16 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     try {
       final values = await _eventStore.loadProfileVisibility(userId);
       if (!isClosed) {
-        emit(state.copyWith(
-          profileVisibility: ProfileVisibility.fromStorage(values['profile_visibility']),
-          registrationVisibility:
-              RegistrationVisibility.fromStorage(values['registration_visibility']),
-        ));
+        emit(
+          state.copyWith(
+            profileVisibility: ProfileVisibility.fromStorage(
+              values['profile_visibility'],
+            ),
+            registrationVisibility: RegistrationVisibility.fromStorage(
+              values['registration_visibility'],
+            ),
+          ),
+        );
       }
     } on Object {
       return;
@@ -91,10 +92,12 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     final nextProfile = profileVisibility ?? state.profileVisibility;
     final nextRegistration =
         registrationVisibility ?? state.registrationVisibility;
-    emit(state.copyWith(
-      profileVisibility: nextProfile,
-      registrationVisibility: nextRegistration,
-    ));
+    emit(
+      state.copyWith(
+        profileVisibility: nextProfile,
+        registrationVisibility: nextRegistration,
+      ),
+    );
     final userId = state.user?.id ?? _authRepository.currentUser?.id;
     if (userId == null || _eventStore == null) return;
     try {
@@ -110,16 +113,18 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
 
   void toggleDarkMode(bool enabled) {
     emit(state.copyWith(isDarkModeEnabled: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isDarkModeEnabled: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isDarkModeEnabled: enabled),
+      ),
+    );
   }
 
   void updateDateFormat(String format) {
     emit(state.copyWith(dateFormat: format));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      dateFormat: format,
-    )));
+    unawaited(
+      _persistPreferences(_preferencesFromState().copyWith(dateFormat: format)),
+    );
   }
 
   Future<bool> toggleBiometricLock(bool enabled) async {
@@ -131,60 +136,78 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     }
     if (isClosed) return false;
     emit(state.copyWith(isBiometricLockEnabled: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isBiometricLockEnabled: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isBiometricLockEnabled: enabled),
+      ),
+    );
     return true;
   }
 
   void toggleLargeText(bool enabled) {
     emit(state.copyWith(isLargeTextEnabled: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isLargeTextEnabled: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isLargeTextEnabled: enabled),
+      ),
+    );
   }
 
   void toggleHighContrast(bool enabled) {
     emit(state.copyWith(isHighContrastEnabled: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isHighContrastEnabled: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isHighContrastEnabled: enabled),
+      ),
+    );
   }
 
   void toggleWatcherVoiceMuted(bool enabled) {
     emit(state.copyWith(isWatcherVoiceMuted: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isWatcherVoiceMuted: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isWatcherVoiceMuted: enabled),
+      ),
+    );
   }
 
   void toggleWatcherVibration(bool enabled) {
     emit(state.copyWith(isWatcherVibrationEnabled: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isWatcherVibrationEnabled: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isWatcherVibrationEnabled: enabled),
+      ),
+    );
   }
 
   void updateWatcherSoundVolume(double value) {
     final volume = value.clamp(0.0, 1.0).toDouble();
     emit(state.copyWith(watcherSoundVolume: volume));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      watcherSoundVolume: volume,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(watcherSoundVolume: volume),
+      ),
+    );
   }
 
   void toggleWatcherAutoOpenNext(bool enabled) {
     emit(state.copyWith(isWatcherAutoOpenNextEnabled: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isWatcherAutoOpenNextEnabled: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(isWatcherAutoOpenNextEnabled: enabled),
+      ),
+    );
   }
 
   void toggleWatcherKeepHistoryVisibleAfterCheckIn(bool enabled) {
     emit(state.copyWith(isWatcherKeepHistoryVisibleAfterCheckIn: enabled));
-    unawaited(_persistPreferences(_preferencesFromState().copyWith(
-      isWatcherKeepHistoryVisibleAfterCheckIn: enabled,
-    )));
+    unawaited(
+      _persistPreferences(
+        _preferencesFromState().copyWith(
+          isWatcherKeepHistoryVisibleAfterCheckIn: enabled,
+        ),
+      ),
+    );
   }
 
   Future<String?> changePassword(String password) =>
@@ -236,7 +259,7 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     watcherSoundVolume: state.watcherSoundVolume,
     isWatcherAutoOpenNextEnabled: state.isWatcherAutoOpenNextEnabled,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      state.isWatcherKeepHistoryVisibleAfterCheckIn,
+        state.isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: state.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: state.eventReminderLeadTimeMinutes,
     dateFormat: state.dateFormat,

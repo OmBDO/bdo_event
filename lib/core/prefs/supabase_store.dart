@@ -2,7 +2,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/common/supabase_request_logger/supabase_request_logger.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 abstract interface class EventStore {
@@ -51,10 +51,7 @@ abstract interface class EventStore {
     required ArrivalStatus status,
   });
 
-  Future<void> recordLoginActivity({
-    String? deviceLabel,
-    String? platform,
-  });
+  Future<void> recordLoginActivity({String? deviceLabel, String? platform});
 
   Future<Map<String, String>> loadProfileVisibility(String userId);
 
@@ -117,7 +114,8 @@ class SupabaseStore implements EventStore {
           .eq('user_id', userId)
           .maybeSingle();
       return {
-        'profile_visibility': row?['profile_visibility'] as String? ?? 'private',
+        'profile_visibility':
+            row?['profile_visibility'] as String? ?? 'private',
         'registration_visibility':
             row?['registration_visibility'] as String? ?? 'private',
       };
@@ -169,10 +167,7 @@ class SupabaseStore implements EventStore {
     try {
       final result = await _client.rpc(
         'send_event_invitations',
-        params: {
-          'requested_event_id': eventId,
-          'requested_user_ids': userIds,
-        },
+        params: {'requested_event_id': eventId, 'requested_user_ids': userIds},
       );
       return (result as num?)?.toInt() ?? 0;
     } on Object {
@@ -515,9 +510,7 @@ class SupabaseStore implements EventStore {
         'rpc.markNotificationRead',
         () => _client.rpc(
           'mark_notification_read',
-          params: {
-            'requested_notification_id': int.parse(notificationId),
-          },
+          params: {'requested_notification_id': int.parse(notificationId)},
         ),
         parameters: {'notificationId': notificationId},
       );

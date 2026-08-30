@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
@@ -13,14 +13,11 @@ import 'package:bdo_event/core/util/registration_code_codec.dart';
 
 class WatcherScanCubit extends Cubit<WatcherScanState> {
   WatcherScanCubit({
-    required ValidateRegistration validateRegistration,
-    required CheckInRegistration checkInRegistration,
-    required LoadScanDashboard loadScanDashboard,
+    required this._validateRegistration,
+    required this._checkInRegistration,
+    required this._loadScanDashboard,
     required this._authRepository,
-  }) : _validateRegistration = validateRegistration,
-       _checkInRegistration = checkInRegistration,
-       _loadScanDashboard = loadScanDashboard,
-       super(const WatcherScanState());
+  }) : super(const WatcherScanState());
 
   final ValidateRegistration _validateRegistration;
   final CheckInRegistration _checkInRegistration;
@@ -42,9 +39,9 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     try {
       final payload = _decodeRegistrationValue(rawValue);
       if (payload is! Map<String, dynamic> ||
-          payload['type'] != AppIdentifiers.qrRegistrationType ||
-          payload['eventId'] is! String ||
-          payload['token'] is! String) {
+          payload[AppModelKeys.type] != AppIdentifiers.qrRegistrationType ||
+          payload[AppModelKeys.eventId] is! String ||
+          payload[AppModelKeys.token] is! String) {
         emit(
           state.copyWith(
             status: WatcherScanStatus.invalid,
@@ -56,8 +53,8 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
 
       emit(state.copyWith(status: WatcherScanStatus.scanning));
       final result = await _validateRegistration(
-        token: payload['token'] as String,
-        eventId: payload['eventId'] as String,
+        token: payload[AppModelKeys.token] as String,
+        eventId: payload[AppModelKeys.eventId] as String,
       );
       if (result == null) {
         emit(
@@ -71,23 +68,23 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       emit(
         state.copyWith(
           status: WatcherScanStatus.valid,
-          eventId: result['event_id'] as String?,
-          registrationToken: payload['token'] as String,
-          userId: result['user_id'] as String?,
+          eventId: result[AppModelKeys.eventId] as String?,
+          registrationToken: payload[AppModelKeys.token] as String,
+          userId: result[AppModelKeys.userId] as String?,
           message: AppText.registrationValid,
           history: [
             ScanHistoryEntry(
-              registrationToken: payload['token'] as String,
-              userId: result['user_id'] as String?,
+              registrationToken: payload[AppModelKeys.token] as String,
+              userId: result[AppModelKeys.userId] as String?,
               displayName: _displayName(result),
-              eventId: result['event_id'] as String?,
-              status: 'Ready to check in',
+              eventId: result[AppModelKeys.eventUnderscoreId] as String?,
+              status: AppIdentifiers.readytocheckIn,
             ),
             ...state.history,
           ],
         ),
       );
-      await _loadDashboard(result['event_id'] as String);
+      await _loadDashboard(result[AppModelKeys.eventId] as String);
     } on Object {
       emit(
         state.copyWith(
@@ -99,7 +96,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
   }
 
   String? _displayName(Map<String, dynamic> result) {
-    final value = result['display_name'];
+    final value = result[AppModelKeys.displayName];
     if (value is! String || value.trim().isEmpty) return null;
     return value.trim();
   }
@@ -111,10 +108,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     } on FormatException {
       final decoded = RegistrationCodeCodec.decode(rawValue);
       if (decoded == null) return null;
-      return {
-          'type': AppIdentifiers.qrRegistrationType,
-          ...decoded,
-        };
+      return {AppModelKeys.type: AppIdentifiers.qrRegistrationType, ...decoded};
     }
   }
 
@@ -133,15 +127,15 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       final updatedHistory = state.history.map((entry) {
         if (entry.registrationToken != token) return entry;
         return entry.copyWith(
-          status: result == 'checked_in'
-              ? 'Checked in'
-              : result == 'already_checked_in'
-              ? 'Already checked in'
-              : 'Unavailable',
+          status: result == AppModelKeys.checkedIn
+              ? AppText.checkedInitial
+              : result == AppModelKeys.alreadyCheckedIn
+              ? AppText.alreadyCheckedIn2
+              : AppText.unavailable,
         );
       }).toList();
       final nextPending = updatedHistory
-          .where((entry) => entry.status == 'Ready to check in')
+          .where((entry) => entry.status == AppIdentifiers.readytocheckIn)
           .firstOrNull;
       emit(
         nextPending == null || !autoOpenNext
@@ -162,8 +156,8 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
                 userId: nextPending.userId,
                 history: updatedHistory,
                 message: switch (result) {
-                  'checked_in' => AppText.checkedIn,
-                  'already_checked_in' => AppText.alreadyCheckedIn,
+                  AppModelKeys.checkedIn => AppText.checkedIn,
+                  AppModelKeys.alreadyCheckedIn => AppText.alreadyCheckedIn,
                   _ => AppText.checkInUnavailable,
                 },
               ),
@@ -183,7 +177,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
     ScanHistoryEntry entry, {
     bool autoOpenNext = true,
   }) async {
-    if (entry.status != 'Ready to check in' ||
+    if (entry.status != AppIdentifiers.readytocheckIn ||
         entry.eventId == null ||
         state.status == WatcherScanStatus.checkingIn ||
         isClosed) {
@@ -202,7 +196,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
 
   Future<void> checkInAll({bool autoOpenNext = true}) async {
     final pending = state.history
-        .where((entry) => entry.status == 'Ready to check in')
+        .where((entry) => entry.status == AppIdentifiers.readytocheckIn)
         .toList();
     if (pending.isEmpty || state.status == WatcherScanStatus.checkingIn) return;
 
@@ -228,7 +222,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       }
     }
     final remainingPending = state.history
-        .where((entry) => entry.status == 'Ready to check in')
+        .where((entry) => entry.status == AppIdentifiers.readytocheckIn)
         .firstOrNull;
     if (!isClosed) {
       emit(
@@ -249,15 +243,16 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
               ),
       );
     }
-    for (final eventId in pending.map((entry) => entry.eventId).nonNulls.toSet()) {
+    for (final eventId
+        in pending.map((entry) => entry.eventId).nonNulls.toSet()) {
       await _loadDashboard(eventId);
     }
   }
 
   String _checkInStatus(String result) => switch (result) {
-    'checked_in' => 'Checked in',
-    'already_checked_in' => 'Already checked in',
-    _ => 'Unavailable',
+    AppModelKeys.checkedIn => AppText.checkedInitial,
+    AppModelKeys.alreadyCheckedIn => AppText.alreadyCheckedIn2,
+    _ => AppText.unavailable,
   };
 
   void reset() => emit(

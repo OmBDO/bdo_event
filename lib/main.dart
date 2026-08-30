@@ -6,7 +6,7 @@ import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_st
 import 'package:bdo_event/features/auth_screen/presentation/pages/auth_screen.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/theme/app_theme.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/signup_cubit.dart';
@@ -129,7 +129,7 @@ class _MyAppState extends State<MyApp> {
           final profileState = context.watch<ProfileScreenCubit>().state;
           final highContrast = profileState.isHighContrastEnabled;
           return BlocListener<AuthScreenCubit, AuthScreenState>(
-            listener: (_, __) => _openPendingEvent(),
+            listener: (_, _) => _openPendingEvent(),
             child: MaterialApp(
               navigatorKey: _navigatorKey,
               title: AppText.appName,
