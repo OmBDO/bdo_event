@@ -3,6 +3,7 @@ import 'package:bdo_event/core/common/calendar_element/widgets/event_tooltip.dar
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/theme/app_colors.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarElement extends StatefulWidget {
@@ -166,7 +167,7 @@ class _CalendarElementState extends State<CalendarElement> {
           titleTextStyle: TextStyle(
             color: textColor,
             fontWeight: FontWeight.w800,
-            fontSize: 18,
+            fontSize: AppSize.text18,
             letterSpacing: 0.5,
           ),
           leftChevronIcon: Icon(
@@ -187,12 +188,12 @@ class _CalendarElementState extends State<CalendarElement> {
           weekdayStyle: TextStyle(
             color: textColor.withValues(alpha: 0.55),
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: AppSize.text13,
           ),
           weekendStyle: TextStyle(
             color: accentColor,
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: AppSize.text13,
           ),
         ),
 

@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class ScannerDashboard extends StatelessWidget {
   const ScannerDashboard({
@@ -27,7 +28,7 @@ class ScannerDashboard extends StatelessWidget {
             icon: Icons.how_to_reg,
           ),
         ),
-        const SizedBox(width: 12),
+        const Gap(AppSpace.space12),
         Expanded(
           child: _CounterTile(
             label: AppText.expected,
@@ -70,7 +71,7 @@ class _CounterTile extends StatelessWidget {
     child: Row(
       children: [
         Icon(icon, size: 20),
-        const SizedBox(width: 8),
+        const Gap(AppSpace.space8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

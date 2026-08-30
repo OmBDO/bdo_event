@@ -2,6 +2,7 @@ import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventInvitationPage extends StatefulWidget {
   const EventInvitationPage({required this.event, super.key});
@@ -33,13 +34,13 @@ class _EventInvitationPageState extends State<EventInvitationPage> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$count invitation(s) sent')),
+        SnackBar(content: Text(AppText.invitationsSent(count))),
       );
       Navigator.of(context).pop();
     } on LocalStorageException {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to send invitations')),
+          const SnackBar(content: Text(AppText.unableToSendInvitations)),
         );
       }
     } finally {
@@ -49,7 +50,7 @@ class _EventInvitationPageState extends State<EventInvitationPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Invite users')),
+    appBar: AppBar(title: const Text(AppText.inviteUsers)),
     body: FutureBuilder<List<Map<String, String>>>(
       future: _recipientsFuture,
       builder: (context, snapshot) {
@@ -57,17 +58,17 @@ class _EventInvitationPageState extends State<EventInvitationPage> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return const Center(child: Text('Unable to load users'));
+          return const Center(child: Text(AppText.unableToLoadUsers));
         }
         final recipients = snapshot.data ?? const <Map<String, String>>[];
         if (recipients.isEmpty) {
-          return const Center(child: Text('No users available to invite'));
+          return const Center(child: Text(AppText.noUsersAvailableToInvite));
         }
         final allSelected = _selectedIds.length == recipients.length;
         return Column(
           children: [
             CheckboxListTile(
-              title: const Text('Select all users'),
+              title: const Text(AppText.selectAllUsers),
               value: allSelected,
               onChanged: _isSending
                   ? null
@@ -115,7 +116,7 @@ class _EventInvitationPageState extends State<EventInvitationPage> {
                   child: FilledButton.icon(
                     onPressed: _isSending ? null : () => _send(recipients),
                     icon: const Icon(Icons.send_rounded),
-                    label: Text('Send to ${_selectedIds.length} users'),
+                    label: Text(AppText.sendToUsers(_selectedIds.length)),
                   ),
                 ),
               ),

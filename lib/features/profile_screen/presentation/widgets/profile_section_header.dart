@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
 
 class ProfileSectionHeader extends StatelessWidget {
@@ -12,7 +13,7 @@ class ProfileSectionHeader extends StatelessWidget {
       title,
       style: TextStyle(
         color: Theme.of(context).colorScheme.onSurface,
-        fontSize: 15,
+        fontSize: AppSize.text15,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.3,
       ),

@@ -4,6 +4,8 @@ import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class RecentEventTile extends StatelessWidget {
   const RecentEventTile({super.key, required this.event, required this.onTap});
@@ -62,7 +64,7 @@ class RecentEventTile extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const Gap(AppSpace.space4),
                     Text(
                       formatEventDate(event.date, dateFormat),
                       maxLines: 1,

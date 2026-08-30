@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
@@ -18,7 +19,7 @@ class LoadingScreen extends StatelessWidget {
               height: 150,
               fit: BoxFit.contain,
             ),
-            const SizedBox(height: 28),
+            const Gap(AppSpace.space28),
             SizedBox(
               width: 100,
               height: 3,

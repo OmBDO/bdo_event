@@ -1,7 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/pages/signin_screen.dart';

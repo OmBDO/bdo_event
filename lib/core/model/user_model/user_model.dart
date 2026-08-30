@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/event_resource.dart';
 /// A stable application identity, independent of the authentication provider.
 ///
 /// Authentication secrets deliberately do not belong in this model. A future
@@ -71,7 +72,7 @@ class User {
     this.photoUrl,
     this.phoneNumber,
     this.bio,
-    this.locale = 'en-IN',
+    this.locale = AppLocales.englishIndia,
     this.notificationsEnabled = true,
     required this.createdAt,
     this.updatedAt,
@@ -120,7 +121,7 @@ class User {
     photoUrl: json['photoUrl'] as String?,
     phoneNumber: json['phoneNumber'] as String?,
     bio: json['bio'] as String?,
-    locale: json['locale'] as String? ?? 'en-IN',
+    locale: json['locale'] as String? ?? AppLocales.englishIndia,
     notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
     createdAt:
         DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),

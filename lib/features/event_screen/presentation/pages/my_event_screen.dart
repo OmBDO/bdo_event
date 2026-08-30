@@ -15,6 +15,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class MyEventScreen extends StatefulWidget {
   const MyEventScreen({super.key});
@@ -126,17 +127,17 @@ class _MyEventScreenState extends State<MyEventScreen> {
                           color: Theme.of(context).colorScheme.onSurface
                               .withValues(alpha: 0.4),
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         Text(
                           AppText.noEventsCreated,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: AppSize.text18,
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.65),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const Gap(AppSpace.space8),
                         Text(
                           AppText.tapToCreateFirstEvent,
                           style: TextStyle(
@@ -207,7 +208,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                     child: Text(
                                       event.title,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: AppSize.text16,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -250,7 +251,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 16),
+                                const Gap(AppSpace.space16),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -259,13 +260,13 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                       Text(
                                         event.title,
                                         style: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: AppSize.text16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      const SizedBox(height: 4),
+                                      const Gap(AppSpace.space4),
                                       Row(
                                         children: [
                                           Icon(
@@ -276,7 +277,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                                 .onSurface
                                                 .withValues(alpha: 0.65),
                                           ),
-                                          const SizedBox(width: 4),
+                                          const Gap(AppSpace.space4),
                                           Text(
                                             formatEventDate(
                                               formatEventDate(
@@ -292,7 +293,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                                   .dateFormat,
                                             ),
                                             style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: AppSize.text13,
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .onSurface
@@ -301,7 +302,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 4),
+                                      const Gap(AppSpace.space4),
                                       Row(
                                         children: [
                                           Icon(
@@ -312,12 +313,12 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                                 .onSurface
                                                 .withValues(alpha: 0.65),
                                           ),
-                                          const SizedBox(width: 4),
+                                          const Gap(AppSpace.space4),
                                           Expanded(
                                             child: Text(
                                               event.location,
                                               style: TextStyle(
-                                                fontSize: 13,
+                                                fontSize: AppSize.text13,
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurface
@@ -333,7 +334,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  tooltip: 'View attendees',
+                                  tooltip: AppText.viewAttendees,
                                   icon: const Icon(Icons.groups_outlined),
                                   onPressed: () => Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -343,7 +344,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  tooltip: 'View event analytics',
+                                  tooltip: AppText.viewEventAnalytics,
                                   icon: const Icon(Icons.analytics_outlined),
                                   onPressed: () => Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -357,7 +358,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                         ?.isAdministrator ??
                                     false)
                                   IconButton(
-                                    tooltip: 'Invite users',
+                                    tooltip: AppText.inviteUsers,
                                     icon: const Icon(
                                       Icons.person_add_alt_1_outlined,
                                     ),

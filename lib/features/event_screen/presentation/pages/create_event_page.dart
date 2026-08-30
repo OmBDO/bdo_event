@@ -11,6 +11,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
+import 'package:gap/gap.dart';
 
 import 'dart:convert';
 
@@ -263,12 +264,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
   String? _validateTimeRange() {
     final start = _parseTime(_startTimeController.text.trim());
     final end = _parseTime(_endTimeController.text.trim());
-    if (start == null || end == null) return 'Choose a start and end time';
+    if (start == null || end == null) return AppText.chooseStartAndEndTime;
     final startMinutes = start.hour * 60 + start.minute;
     final endMinutes = end.hour * 60 + end.minute;
     return endMinutes > startMinutes
         ? null
-        : 'End time must be after start time';
+        : AppText.endTimeMustBeAfterStart;
   }
 
   Future<void> _pickRegistrationDeadline() async {
@@ -338,7 +339,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
     } on Object {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to find that location')),
+        const SnackBar(content: Text(AppText.unableToFindLocation)),
       );
     }
   }
@@ -377,32 +378,32 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               : AppText.createEventEyebrow,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
-                            fontSize: 11,
+                            fontSize: AppSize.text11,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.5,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const Gap(AppSpace.space8),
                         Text(
                           _isEditing
                               ? AppText.updateYourEvent
                               : AppText.bringPeopleTogether,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 28,
+                            fontSize: AppSize.text28,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const Gap(AppSpace.space8),
                         Text(
                           AppText.eventDetailsPrompt,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.7),
-                            fontSize: 14,
+                            fontSize: AppSize.text14,
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const Gap(AppSpace.space24),
                         GestureDetector(
                           onTap: _pickImage,
                           child: Container(
@@ -424,7 +425,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                         Icons.add_photo_alternate_outlined,
                                         size: 36,
                                       ),
-                                      SizedBox(height: 8),
+                                      Gap(AppSpace.space8),
                                       Text(AppText.addEventImage),
                                     ],
                                   )
@@ -437,7 +438,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         AppTextField(
                           controller: _titleController,
                           label: AppText.eventTitle,
@@ -447,7 +448,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               ? AppText.enterEventTitle
                               : null,
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         LayoutBuilder(
                           builder: (context, constraints) {
                             final compact = constraints.maxWidth < 520;
@@ -465,24 +466,24 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               ),
                               AppTextField(
                                 controller: _startTimeController,
-                                label: 'Start time',
+                                label: AppText.startTime,
                                 icon: Icons.schedule_outlined,
                                 readOnly: true,
                                 onTap: () => _pickTime(_startTimeController),
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                    ? 'Choose a start time'
+                                    ? AppText.chooseStartTime
                                     : null,
                               ),
                               AppTextField(
                                 controller: _endTimeController,
-                                label: 'End time',
+                                label: AppText.endTime,
                                 icon: Icons.schedule_outlined,
                                 readOnly: true,
                                 onTap: () => _pickTime(_endTimeController),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Choose an end time';
+                                    return AppText.chooseEndTime;
                                   }
                                   return _validateTimeRange();
                                 },
@@ -492,11 +493,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                 ? Column(
                                     children: [
                                       fields[0],
-                                      const SizedBox(height: 12),
+                                      const Gap(AppSpace.space12),
                                       Row(
                                         children: [
                                           Expanded(child: fields[1]),
-                                          const SizedBox(width: 12),
+                                          const Gap(AppSpace.space12),
                                           Expanded(child: fields[2]),
                                         ],
                                       ),
@@ -505,20 +506,20 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                 : Row(
                                     children: [
                                       Expanded(child: fields[0]),
-                                      const SizedBox(width: 12),
+                                      const Gap(AppSpace.space12),
                                       Expanded(child: fields[1]),
-                                      const SizedBox(width: 12),
+                                      const Gap(AppSpace.space12),
                                       Expanded(child: fields[2]),
                                     ],
                                   );
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         Row(
                           children: [
                             Expanded(
                               child: Text(
-                                'Limit seats',
+                                AppText.limitSeats,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -527,7 +528,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               onChanged: (enabled) =>
                                   setState(() => _seatLimitEnabled = enabled),
                             ),
-                            const SizedBox(width: 8),
+                            const Gap(AppSpace.space8),
                             SizedBox(
                               width: 96,
                               child: TextFormField(
@@ -541,23 +542,23 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                     value?.trim() ?? '',
                                   );
                                   return capacity == null || capacity < 1
-                                      ? 'Enter a positive number'
+                                      ? AppText.positiveNumber
                                       : null;
                                 },
                                 decoration: const InputDecoration(
-                                  labelText: 'Seats',
+                                  labelText: AppText.seats,
                                   border: OutlineInputBorder(),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         Row(
                           children: [
                             Expanded(
                               child: Text(
-                                'Registration deadline',
+                                AppText.registrationDeadline,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -574,30 +575,30 @@ class _CreateEventPageState extends State<CreateEventPage> {
                           ],
                         ),
                         if (_registrationDeadlineEnabled) ...[
-                          const SizedBox(height: 8),
+                          const Gap(AppSpace.space8),
                           TextFormField(
                             controller: _registrationDeadlineController,
                             readOnly: true,
                             onTap: _pickRegistrationDeadline,
                             validator: (_) {
                               if (_registrationDeadline == null) {
-                                return 'Choose a registration deadline';
+                                return AppText.chooseRegistrationDeadline;
                               }
                               if (!_registrationDeadline!.isAfter(
                                 DateTime.now(),
                               )) {
-                                return 'Deadline must be in the future';
+                                return AppText.deadlineMustBeInFuture;
                               }
                               return null;
                             },
                             decoration: const InputDecoration(
-                              labelText: 'Deadline date and time',
+                              labelText: AppText.deadlineDateAndTime,
                               prefixIcon: Icon(Icons.schedule_outlined),
                               border: OutlineInputBorder(),
                             ),
                           ),
                         ],
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         AppDropDownField<Location>(
                           label: AppText.location,
                           icon: Icons.location_on_outlined,
@@ -613,8 +614,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               child: Row(
                                 children: [
                                   Icon(Icons.location_searching_rounded),
-                                  SizedBox(width: 12),
-                                  Text('Select location'),
+                                  Gap(AppSpace.space12),
+                                  Text(AppText.selectLocation),
                                 ],
                               ),
                             ),
@@ -642,7 +643,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 12),
+                        const Gap(AppSpace.space12),
                         _LocationPickerSection(
                           searchController: _locationSearchController,
                           coordinates: _selectedCoordinates,
@@ -658,7 +659,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const Gap(AppSpace.space16),
                         AppTextField(
                           controller: _descriptionController,
                           label: AppText.description,
@@ -670,7 +671,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                               : null,
                         ),
 
-                        const SizedBox(height: 24),
+                        const Gap(AppSpace.space24),
 
                         AppDropDownField<EventCategory>(
                           label: AppText.selectCategory,
@@ -689,7 +690,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                                     color: category.color,
                                     size: 20,
                                   ),
-                                  const SizedBox(width: 12),
+                                  const Gap(AppSpace.space12),
                                   Text(category.name),
                                 ],
                               ),
@@ -701,7 +702,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                             });
                           },
                         ),
-                        const SizedBox(height: 24),
+                        const Gap(AppSpace.space24),
 
                         AppButton(
                           label: _isSaving
@@ -763,7 +764,7 @@ class _LocationPickerSection extends StatelessWidget {
           textInputAction: TextInputAction.search,
           onSubmitted: (_) => onSearch(),
           decoration: InputDecoration(
-            hintText: 'Search an address or place',
+            hintText: AppText.searchAddressOrPlace,
             prefixIcon: const Icon(Icons.search_rounded),
             suffixIcon: IconButton(
               onPressed: locationLocked ? null : onSearch,
@@ -773,7 +774,7 @@ class _LocationPickerSection extends StatelessWidget {
           ),
           enabled: !locationLocked,
         ),
-        const SizedBox(height: 10),
+        const Gap(AppSpace.space10),
         ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: SizedBox(
@@ -819,12 +820,12 @@ class _LocationPickerSection extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 6),
+        const Gap(AppSpace.space6),
         Text(
           'Choose an office above, search for a place, or tap the map to drop a pin.',
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontSize: 12,
+            fontSize: AppSize.text12,
           ),
         ),
       ],

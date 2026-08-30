@@ -11,6 +11,19 @@ class DotEnvInitialization {
     required this.supabaseAnonKey,
   });
 
+  static DotEnvInitialization? fromValues({
+    required String url,
+    required String anonKey,
+  }) {
+    final normalizedUrl = url.trim();
+    final normalizedKey = anonKey.trim();
+    if (normalizedUrl.isEmpty || normalizedKey.isEmpty) return null;
+    return DotEnvInitialization._(
+      supabaseUrl: normalizedUrl,
+      supabaseAnonKey: normalizedKey,
+    );
+  }
+
   /// Loads configuration safely. Returns null if parameters are invalid or missing.
   static Future<DotEnvInitialization?> initialize() async {
     const definedUrl = String.fromEnvironment(AppEssentials.supabaseURLKEY);
@@ -32,9 +45,7 @@ class DotEnvInitialization {
                   : dotenv.maybeGet(AppEssentials.supabaseAnonKEY) ?? '')
               .trim();
 
-      if (url.isEmpty || key.isEmpty) return null;
-
-      return DotEnvInitialization._(supabaseUrl: url, supabaseAnonKey: key);
+      return fromValues(url: url, anonKey: key);
     } catch (_) {
       return null;
     }

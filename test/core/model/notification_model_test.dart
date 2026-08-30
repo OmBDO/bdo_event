@@ -45,6 +45,37 @@ void main() {
       expect(missing.arrivalStatus, ArrivalStatus.pending);
       expect(unknown.arrivalStatus, ArrivalStatus.pending);
     });
+
+    test('maps notification categories from both supported key names', () {
+      final categories = <Object, NotificationCategory>{
+        'registration': NotificationCategory.registration,
+        'reminder': NotificationCategory.reminder,
+        'invitation': NotificationCategory.invitation,
+        'system': NotificationCategory.system,
+      };
+
+      for (final entry in categories.entries) {
+        final notification = AppNotification.fromJson({
+          ...baseJson,
+          'notificationType': entry.key,
+        });
+        expect(notification.category, entry.value);
+      }
+
+      expect(
+        AppNotification.fromJson({
+          ...baseJson,
+          'notification_type': 'invitation',
+          'notificationType': null,
+        }).category,
+        NotificationCategory.invitation,
+      );
+      expect(
+        AppNotification.fromJson({...baseJson, 'notificationType': 'other'})
+            .category,
+        NotificationCategory.event,
+      );
+    });
   });
 
   group('formatNotificationCount', () {

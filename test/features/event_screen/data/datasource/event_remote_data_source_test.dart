@@ -17,6 +17,7 @@ void main() {
 
   Event event({
     String id = 'event-1',
+    String imageUrl = '',
     String? creatorId,
     String? organizerName,
     DateTime? createdAt,
@@ -26,7 +27,7 @@ void main() {
     title: 'Town Hall',
     date: '01/09/2026',
     location: 'Pune',
-    imageUrl: '',
+    imageUrl: imageUrl,
     creatorId: creatorId,
     organizerName: organizerName,
     createdAt: createdAt,
@@ -43,6 +44,16 @@ void main() {
 
     expect(result.map((item) => item.attendeeCount), [3, 0]);
     expect(source.loadedCountIds, ['event-1', 'event-2']);
+  });
+
+  test('loadEvents skips registration counts when there are no events',
+      () async {
+    final source = FakeEventStore();
+
+    final result = await EventRemoteDataSource(source).loadEvents();
+
+    expect(result, isEmpty);
+    expect(source.loadedCountIds, isNull);
   });
 
   test('create adds creator metadata and reloads events', () async {
@@ -115,6 +126,49 @@ void main() {
     expect(result.events, isEmpty);
     expect(result.error, 'Unable to update the event');
   });
+
+  test('deletes the event and cleans up its stored image', () async {
+    final source = FakeEventStore(createdEvents: [event()]);
+    final deletedImages = <String>[];
+    final result = await EventRemoteDataSource(
+      source,
+      deleteImage: (path) async => deletedImages.add(path),
+    ).delete(event(imageUrl: 'user-1/event-1.jpg'));
+
+    expect(result.error, isNull);
+    expect(source.deletedEventId, 'event-1');
+    expect(deletedImages, ['user-1/event-1.jpg']);
+  });
+
+  test('maps image cleanup failures to a delete operation error', () async {
+    final source = FakeEventStore(createdEvents: [event()]);
+    final result = await EventRemoteDataSource(
+      source,
+      deleteImage: (_) async => throw const LocalStorageException(),
+    ).delete(event(imageUrl: 'user-1/event-1.jpg'));
+
+    expect(result.events, isEmpty);
+    expect(result.error, 'Unable to delete the event');
+    expect(source.deletedEventId, 'event-1');
+  });
+
+  test('maps database delete failures without attempting image cleanup',
+      () async {
+    final source = FakeEventStore(
+      createdEvents: [event()],
+      deleteError: const LocalStorageException(),
+    );
+    final deletedImages = <String>[];
+    final result = await EventRemoteDataSource(
+      source,
+      deleteImage: (path) async => deletedImages.add(path),
+    ).delete(event(imageUrl: 'user-1/event-1.jpg'));
+
+    expect(result.events, isEmpty);
+    expect(result.error, 'Unable to delete the event');
+    expect(source.deletedEventId, isNull);
+    expect(deletedImages, isEmpty);
+  });
 }
 
 class FakeEventStore implements EventStore {
@@ -123,15 +177,18 @@ class FakeEventStore implements EventStore {
     this.registrationCounts = const {},
     this.createError,
     this.updateError,
+    this.deleteError,
   }) : createdEvents = [...?createdEvents];
 
   final List<Event> createdEvents;
   final Map<String, int> registrationCounts;
   final Object? createError;
   final Object? updateError;
+  final Object? deleteError;
   List<String>? loadedCountIds;
   Event? createdEvent;
   Event? updatedEvent;
+  String? deletedEventId;
 
   @override
   Future<List<Event>> readCreatedEvents() async => [...createdEvents];
@@ -158,7 +215,11 @@ class FakeEventStore implements EventStore {
   }
 
   @override
-  Future<void> deleteEvent(String eventId) async {}
+  Future<void> deleteEvent(String eventId) async {
+    if (deleteError != null) throw deleteError!;
+    deletedEventId = eventId;
+    createdEvents.removeWhere((event) => event.id == eventId);
+  }
 
   @override
   Future<List<Event>> loadRegistrations(String userId) async => [];

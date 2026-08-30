@@ -34,7 +34,7 @@ class EventDetailHeader extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.share_rounded),
-              title: const Text('Share event'),
+              title: const Text(AppText.shareEvent),
               onTap: () => Navigator.of(context).pop('share'),
             ),
             ListTile(

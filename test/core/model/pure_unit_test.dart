@@ -86,6 +86,38 @@ void main() {
   group('User', () {
     final createdAt = DateTime.utc(2026, 8, 30);
 
+    test('applies the expected permission matrix for every role', () {
+      expect(
+        User(
+          id: 'user',
+          displayName: 'User',
+          email: 'user@example.com',
+          createdAt: createdAt,
+        ).hasPermission(UserPermission.registerForEvents),
+        isTrue,
+      );
+      expect(
+        User(
+          id: 'watcher',
+          displayName: 'Watcher',
+          email: 'watcher@example.com',
+          roles: const {UserRole.watcher},
+          createdAt: createdAt,
+        ).hasPermission(UserPermission.scanRegistrations),
+        isTrue,
+      );
+      final admin = User(
+        id: 'admin',
+        displayName: 'Admin',
+        email: 'admin@example.com',
+        roles: const {UserRole.admin},
+        createdAt: createdAt,
+      );
+      for (final permission in UserPermission.values) {
+        expect(admin.hasPermission(permission), isTrue);
+      }
+    });
+
     test('parses roles and optional profile fields', () {
       final user = User.fromJson({
         'id': 'user-1',

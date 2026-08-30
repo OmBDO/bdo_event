@@ -11,6 +11,8 @@ import 'package:bdo_event/features/event_screen/presentation/widgets/attendance_
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class AnalyticsDashboard extends StatelessWidget {
   const AnalyticsDashboard({required this.event, required this.checkedIn, required this.isLoadingCheckIns, super.key});
@@ -35,7 +37,7 @@ class AnalyticsDashboard extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(isWide ? 36 : 20, 12, isWide ? 36 : 20, 40),
           children: [
             _AnalyticsHeading(event: event, palette: palette),
-            const SizedBox(height: 24),
+            const Gap(AppSpace.space24),
             AnalyticsMetricGrid(
               isWide: isWide,
               metrics: [
@@ -45,22 +47,22 @@ class AnalyticsDashboard extends StatelessWidget {
                 AnalyticsMetricData('Remaining', remaining?.toString() ?? '--', Icons.bolt_rounded, palette.lilac, event.isAvailable ? 'registration open' : 'registration closed'),
               ],
             ),
-            const SizedBox(height: 24),
+            const Gap(AppSpace.space24),
             if (isWide)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(flex: 3, child: AnalyticsChartPanel(event: event, palette: palette)),
-                  const SizedBox(width: 16),
+                  const Gap(AppSpace.space16),
                   Expanded(flex: 2, child: AttendanceMixPanel(registered: registered, checkedIn: checkedIn, palette: palette)),
                 ],
               )
             else ...[
               AnalyticsChartPanel(event: event, palette: palette),
-              const SizedBox(height: 16),
+              const Gap(AppSpace.space16),
               AttendanceMixPanel(registered: registered, checkedIn: checkedIn, palette: palette),
             ],
-            const SizedBox(height: 16),
+            const Gap(AppSpace.space16),
             AnalyticsInsightPanel(registered: registered, checkedIn: checkedIn, capacity: capacity, palette: palette),
           ],
         );
@@ -83,15 +85,15 @@ class _AnalyticsHeading extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('OPERATIONS / EVENT ANALYSIS', style: TextStyle(color: palette.teal, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
-            const SizedBox(height: 8),
-            Text(event.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: palette.ink, fontSize: 28, fontWeight: FontWeight.w900, height: 1.05)),
-            const SizedBox(height: 8),
-            Text('${formatEventDate(event.date, context.watch<ProfileScreenCubit>().state.dateFormat)}  /  ${event.location}', style: TextStyle(color: palette.muted, fontSize: 13)),
+            Text(AppText.operationsEventAnalysis, style: TextStyle(color: palette.teal, fontSize: AppSize.text11, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
+            const Gap(AppSpace.space8),
+            Text(event.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: palette.ink, fontSize: AppSize.text28, fontWeight: FontWeight.w900, height: 1.05)),
+            const Gap(AppSpace.space8),
+            Text('${formatEventDate(event.date, context.watch<ProfileScreenCubit>().state.dateFormat)}  /  ${event.location}', style: TextStyle(color: palette.muted, fontSize: AppSize.text13)),
           ],
         ),
       ),
-      const SizedBox(width: 16),
+      const Gap(AppSpace.space16),
       AnalyticsStatusPill(isOpen: event.isAvailable, palette: palette),
     ],
   );

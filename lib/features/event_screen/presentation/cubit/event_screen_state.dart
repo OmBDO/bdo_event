@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventScreenState {
   final int selectedTab;
@@ -15,7 +16,7 @@ class EventScreenState {
 
   const EventScreenState({
     this.selectedTab = 0,
-    this.tabs = const ['Upcoming', 'My Events', 'Past'],
+    this.tabs = AppText.eventTabs,
     this.events = const [],
     this.registeredEventIds = const {},
     this.savedEventIds = const {},

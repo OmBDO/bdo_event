@@ -1,5 +1,6 @@
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 Future<String> storePickedProfileImage(XFile image) async {
   final client = Supabase.instance.client;
@@ -11,7 +12,7 @@ Future<String> storePickedProfileImage(XFile image) async {
     path,
     await image.readAsBytes(),
     fileOptions: FileOptions(
-      contentType: image.mimeType ?? 'image/jpeg',
+      contentType: image.mimeType ?? AppMimeTypes.jpeg,
       upsert: false,
     ),
   );

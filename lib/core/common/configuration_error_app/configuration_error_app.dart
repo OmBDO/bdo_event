@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class ConfigurationErrorApp extends StatelessWidget {
   const ConfigurationErrorApp({super.key});
@@ -17,13 +18,16 @@ class ConfigurationErrorApp extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(Icons.cloud_off_outlined, size: 56),
-                const SizedBox(height: 16),
+                const Gap(AppSpace.space16),
                 const Text(
                   AppText.configurationRequired,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: AppSize.text20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 8),
+                const Gap(AppSpace.space8),
                 const Text(
                   AppText.configurationInstructions,
                   textAlign: TextAlign.center,

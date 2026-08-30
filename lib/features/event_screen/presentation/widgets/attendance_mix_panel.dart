@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_palette.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class AttendanceMixPanel extends StatelessWidget {
   const AttendanceMixPanel({required this.registered, required this.checkedIn, required this.palette, super.key});
@@ -17,8 +19,8 @@ class AttendanceMixPanel extends StatelessWidget {
     final conversion = registered == 0 ? 0 : ((checkedIn / registered) * 100).round();
     return AnalyticsPanel(
       palette: palette,
-      title: 'Attendance mix',
-      subtitle: 'Registration to arrival conversion',
+      title: AppText.attendanceMix,
+      subtitle: AppText.registrationToArrivalConversion,
       child: SizedBox(
         height: 230,
         child: Row(
@@ -27,18 +29,18 @@ class AttendanceMixPanel extends StatelessWidget {
               width: 155,
               child: CustomPaint(
                 painter: _AttendanceDonutPainter(checkedIn: checkedIn, pending: pending, palette: palette),
-                child: Center(child: Text('$conversion%', style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900, color: palette.ink))),
+                child: Center(child: Text('$conversion%', style: TextStyle(fontSize: AppSize.text25, fontWeight: FontWeight.w900, color: palette.ink))),
               ),
             ),
-            const SizedBox(width: 8),
+            const Gap(AppSpace.space8),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _LegendDot(color: palette.coral, label: 'Checked in', value: '$checkedIn'),
-                  const SizedBox(height: 18),
-                  _LegendDot(color: palette.teal.withValues(alpha: .28), label: 'Awaiting arrival', value: '$pending'),
+                  _LegendDot(color: palette.coral, label: AppText.analyticsCheckedIn, value: '$checkedIn'),
+                  const Gap(AppSpace.space18),
+                  _LegendDot(color: palette.teal.withValues(alpha: .28), label: AppText.awaitingArrival, value: '$pending'),
                 ],
               ),
             ),
@@ -60,8 +62,8 @@ class _LegendDot extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: [
       Container(width: 9, height: 9, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-      const SizedBox(width: 8),
-      Expanded(child: Text(label, style: const TextStyle(fontSize: 12))),
+      const Gap(AppSpace.space8),
+      Expanded(child: Text(label, style: const TextStyle(fontSize: AppSize.text12))),
       Text(value, style: const TextStyle(fontWeight: FontWeight.w800)),
     ],
   );

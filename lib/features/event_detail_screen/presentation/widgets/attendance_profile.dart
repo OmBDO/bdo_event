@@ -47,7 +47,7 @@ class AttendanceProfileWidget extends StatelessWidget {
                 child: Text(
                   _roundedCount(attendees.length),
                   style: const TextStyle(
-                    fontSize: 9,
+                    fontSize: AppSize.text9,
                     fontWeight: FontWeight.bold,
                     color: Colors.amber,
                   ),
@@ -87,7 +87,7 @@ class AttendanceProfileWidget extends StatelessWidget {
             return Row(
               children: [
                 _buildAvatarStack(attendees),
-                const Gap(12),
+                const Gap(AppSpace.space12),
                 Text(
                   snapshot.hasData
                       ? '${attendees.length} ${AppText.attendees}'
@@ -95,7 +95,7 @@ class AttendanceProfileWidget extends StatelessWidget {
                   style: TextStyle(
                     color: widget
                         .primaryDark, // Used widget.primaryDark consistently
-                    fontSize: 14,
+                    fontSize: AppSize.text14,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

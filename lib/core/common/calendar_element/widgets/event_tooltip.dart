@@ -1,6 +1,8 @@
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class EventTooltip extends StatelessWidget {
   const EventTooltip({
@@ -62,7 +64,7 @@ class EventTooltip extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const Gap(AppSpace.space12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,10 +75,10 @@ class EventTooltip extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
-                              fontSize: 16,
+                              fontSize: AppSize.text16,
                             ),
                           ),
-                          const SizedBox(height: 5),
+                          const Gap(AppSpace.space5),
                           Text(
                             event.description.trim().isEmpty
                                 ? 'View event details'
@@ -85,7 +87,7 @@ class EventTooltip extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(height: 1.3),
                           ),
-                          const SizedBox(height: 7),
+                          const Gap(AppSpace.space7),
                           Text(
                             'Open event',
                             style: TextStyle(

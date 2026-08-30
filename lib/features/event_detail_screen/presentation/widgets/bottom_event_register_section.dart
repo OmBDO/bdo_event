@@ -132,17 +132,17 @@ class BottomEventRegisterSection extends StatelessWidget {
                     AppText.status,
                     style: TextStyle(
                       color: textGrey,
-                      fontSize: 10,
+                      fontSize: AppSize.text10,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const Gap(3),
+                  const Gap(AppSpace.space3),
                   Text(
                     statusText,
                     style: TextStyle(
                       color: statusColor,
-                      fontSize: 16,
+                      fontSize: AppSize.text16,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -169,7 +169,7 @@ class BottomEventRegisterSection extends StatelessWidget {
                     child: Text(
                       buttonText,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: AppSize.text16,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.2,
                       ),
