@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/security/biometric_lock_service.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -43,7 +44,10 @@ class _BiometricLockGateState extends State<BiometricLockGate>
 
   void _lockIfEnabled() {
     if (!mounted) return;
-    final enabled = context.read<ProfileScreenCubit>().state.isBiometricLockEnabled;
+    final enabled = context
+        .read<ProfileScreenCubit>()
+        .state
+        .isBiometricLockEnabled;
     if (enabled && !_isLocked) setState(() => _isLocked = true);
   }
 

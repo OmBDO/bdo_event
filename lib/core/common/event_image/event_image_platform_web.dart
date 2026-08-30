@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,14 +7,16 @@ Future<String> storePickedImage(XFile image) async {
   if (userId == null) throw StateError('Authentication required');
 
   final imagePath = '$userId/${DateTime.now().microsecondsSinceEpoch}.jpg';
-  await client.storage.from('event-images').uploadBinary(
-    imagePath,
-    await image.readAsBytes(),
-    fileOptions: FileOptions(
-      contentType: image.mimeType ?? 'image/jpeg',
-      upsert: false,
-    ),
-  );
+  await client.storage
+      .from('event-images')
+      .uploadBinary(
+        imagePath,
+        await image.readAsBytes(),
+        fileOptions: FileOptions(
+          contentType: image.mimeType ?? 'image/jpeg',
+          upsert: false,
+        ),
+      );
   return imagePath;
 }
 

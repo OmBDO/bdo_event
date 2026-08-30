@@ -1,6 +1,5 @@
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
-import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,11 +9,13 @@ class ScanHistorySheet extends StatelessWidget {
     required this.history,
     required this.onConfirmAll,
     required this.onConfirmEntry,
+    required this.keepHistoryVisibleAfterCheckIn,
   });
 
   final List<ScanHistoryEntry> history;
   final Future<void> Function() onConfirmAll;
   final Future<void> Function(ScanHistoryEntry entry) onConfirmEntry;
+  final bool keepHistoryVisibleAfterCheckIn;
 
   static Future<void> show(
     BuildContext context,
@@ -31,6 +32,7 @@ class ScanHistorySheet extends StatelessWidget {
         onConfirmAll: () => cubit.checkInAll(autoOpenNext: autoOpenNext),
         onConfirmEntry: (entry) =>
             cubit.checkInEntry(entry, autoOpenNext: autoOpenNext),
+        keepHistoryVisibleAfterCheckIn: keepHistoryVisibleAfterCheckIn,
       ),
     );
   }

@@ -18,7 +18,7 @@ class RecentEventStore {
       event.id,
       ...readIds(userId: userId).where((id) => id != event.id),
     ];
-    await _preferences!.setStringList(key, ids.take(_maxItems).toList());
+    await _preferences.setStringList(key, ids.take(_maxItems).toList());
   }
 
   String _keyFor(String? userId) => 'recent_event_ids_${userId ?? 'anonymous'}';

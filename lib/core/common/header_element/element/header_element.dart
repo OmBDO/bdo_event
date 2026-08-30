@@ -48,14 +48,11 @@ class _HeaderElementState extends State<HeaderElement> {
     zone: AppLocations.zoneOne,
   );
 
-  final List<Location> locations = [
-    ...LocationCatalog.offices,
-  ];
+  final List<Location> locations = [...LocationCatalog.offices];
 
   Future<void> onNotificationClick() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const NotificationScreen()),
-    );
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const NotificationScreen()));
     if (!mounted) return;
     setState(_refreshUnreadCount);
   }
@@ -79,7 +76,7 @@ class _HeaderElementState extends State<HeaderElement> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           width: double.infinity,
-          height: 150,
+          height: 130,
           decoration: BoxDecoration(
             // 3. Apply the gradient condition layer rule
             gradient: hasScrolled
@@ -279,9 +276,7 @@ class _HeaderElementState extends State<HeaderElement> {
                   child: CircleAvatar(
                     radius: 22,
                     backgroundColor: colorScheme.surfaceContainerHighest,
-                    backgroundImage: NetworkImage(
-                      AppAssets.defaultAvatarUrl,
-                    ),
+                    backgroundImage: NetworkImage(AppAssets.defaultAvatarUrl),
                   ),
                 ),
               ),

@@ -12,7 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:bdo_event/core/util/registration_code_codec.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -84,18 +83,18 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
                 ],
                 border: Border.all(
-                  color: Colors.black.withOpacity(0.06),
+                  color: Colors.black.withValues(alpha: 0.06),
                   width: 1,
                 ),
               ),
@@ -151,6 +150,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
     if (!mounted) return;
     if (cancelled) {
       await context.read<EventScreenCubit>().load(force: true);
+      // ignore: use_build_context_synchronously
       await context.read<CalendarScreenCubit>().loadRegistrations();
       if (mounted) navigator.pop();
     }
@@ -166,10 +166,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
   });
 
   String _manualCode(String token) {
-    return RegistrationCodeCodec.encode(
-      eventId: widget.event.id,
-      token: token,
-    );
+    return RegistrationCodeCodec.encode(eventId: widget.event.id, token: token);
   }
 
   @override
@@ -258,9 +255,8 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       '${formatEventDate(widget.event.date, context.watch<ProfileScreenCubit>().state.dateFormat)}  •  ${widget.event.location}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(
-                          alpha: 0.7,
-                        ),
+                        color: Theme.of(context).colorScheme.onSurface
+                            .withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -284,9 +280,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .outlineVariant,
+                          color: Theme.of(context).colorScheme.outlineVariant,
                         ),
                       ),
                       child: state.registrationToken == null
@@ -354,7 +348,9 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: Theme.of(context).colorScheme.outlineVariant,
@@ -366,7 +362,9 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                               child: SelectableText(
                                 _manualCode(state.registrationToken!),
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface,
                                   fontFamily: 'monospace',
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -385,9 +383,12 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                                   ),
                                 );
                                 if (!mounted) return;
+                                // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(AppText.registrationCodeCopied),
+                                    content: Text(
+                                      AppText.registrationCodeCopied,
+                                    ),
                                   ),
                                 );
                               },
@@ -446,9 +447,8 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withValues(
-                    alpha: 0.9,
-                  ),
+                  color: Theme.of(context).colorScheme.surface
+                      .withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: const Color(0xFFF0C9C4)),
                 ),

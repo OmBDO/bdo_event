@@ -1,5 +1,4 @@
 import 'package:bdo_event/core/common/event_image/event_image.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:flutter/material.dart';
 

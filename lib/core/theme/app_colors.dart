@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 
 abstract final class AppColors {
   static const Color primaryLight = Color(0xFFB14F36);
-  static const Color secondaryLight = Color(0xFF2D0C57);
+  static const Color secondaryLight = Color(
+    0xFF1A1A1A
+  ); // Changed from 0xFF2D0C57
   static const Color tertiaryLight = Color(0xFFE96B47);
   static const Color backgroundLight = Color(0xFFFFF1E6);
   static const Color surfaceLight = Colors.white;
-  static const Color onBackgroundLight = Color(0xFF2D0C57);
-  static const Color onSurfaceLight = Color(0xFF2D0C57);
+  static const Color onBackgroundLight = Color(
+    0xFF1A1A1A
+  ); // Changed from 0xFF2D0C57
+  static const Color onSurfaceLight = Color(
+    0xFF1A1A1A
+  ); // Changed from 0xFF2D0C57
   static const Color mutedTextLight = Color(0xFF6F607A);
   static const Color profileSubtitleLight = Color(0xFF9586A8);
   static const Color shellStartLight = Color(0xFFB1D4FA);

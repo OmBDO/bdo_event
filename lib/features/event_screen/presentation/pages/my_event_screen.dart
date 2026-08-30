@@ -15,7 +15,6 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyEventScreen extends StatefulWidget {
   const MyEventScreen({super.key});
@@ -160,7 +159,7 @@ class _MyEventScreenState extends State<MyEventScreen> {
                       delay: const Duration(milliseconds: 250),
                       onDragStarted: () =>
                           setState(() => _eventBeingDragged = event),
-                      onDraggableCanceled: (_, __) {
+                      onDraggableCanceled: (_, _) {
                         if (mounted) setState(() => _eventBeingDragged = null);
                       },
                       onDragEnd: (_) {
