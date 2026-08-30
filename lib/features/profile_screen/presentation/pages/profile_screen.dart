@@ -12,7 +12,7 @@ import 'package:bdo_event/features/profile_screen/presentation/sections/preferen
 import 'package:bdo_event/features/profile_screen/presentation/sections/profile_header_section.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/support_section.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/watcher_settings_section.dart';
-import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_edit_dialog.dart';
+import 'package:bdo_event/features/profile_screen/presentation/pages/profile_details_page.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,7 +42,11 @@ class ProfileScreen extends StatelessWidget {
               ProfileHeaderSection(user: user),
               const Gap(10),
               ProfileAccountSection(
-                onEditProfile: () => _showEditProfileDialog(context, user),
+                onEditProfile: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProfileDetailsPage(user: user),
+                  ),
+                ),
                 onChangePassword: () => _showChangePasswordDialog(context),
               ),
               const Gap(16),
@@ -163,26 +167,6 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _showEditProfileDialog(BuildContext context, User? user) async {
-    final updated = await showDialog<bool>(
-      context: context,
-      builder: (_) => ProfileEditDialog(
-        initialDisplayName: user?.displayName ?? '',
-        initialEmail: user?.email ?? '',
-        onSave: ({required displayName, required email}) =>
-            context.read<ProfileScreenCubit>().updateProfile(
-              displayName: displayName,
-              email: email,
-            ),
-      ),
-    );
-    if (updated == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppText.profileUpdated)),
-      );
-    }
   }
 
   Future<void> _showChangePasswordDialog(BuildContext context) async {

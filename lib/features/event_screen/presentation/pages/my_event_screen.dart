@@ -417,12 +417,19 @@ class _MyEventScreenState extends State<MyEventScreen> {
                       ? (_isDeleteTargetHovered
                             ? Theme.of(context).colorScheme.errorContainer
                             : Theme.of(context).colorScheme.error)
-                      : Theme.of(context).colorScheme.primary,
+                      : Colors.black,
+                  shape: CircleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white.withValues(alpha: 0.35)
+                      : Colors.transparent,
+                    ),
+                  ),
                   child: Icon(
                     isDeleteMode ? Icons.delete_outline : Icons.add,
                     color: isDeleteMode
                         ? Theme.of(context).colorScheme.onError
-                        : Theme.of(context).colorScheme.onPrimary,
+                    : Colors.white,
                   ),
                 );
               },

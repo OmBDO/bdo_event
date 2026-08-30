@@ -125,6 +125,10 @@ class AuthRepository implements AuthRepositoryContract {
   Future<String?> updateProfile({
     required String displayName,
     required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
   }) async {
     final current = _currentUser;
     if (current == null) return AppText.pleaseSignInToChangePassword;
@@ -136,16 +140,20 @@ class AuthRepository implements AuthRepositoryContract {
 
     try {
       final response = await _authDataSource.updateUserData({
-        'display_name': trimmedName,
-        'email': normalizedEmail,
+        'photo_url': photoUrl?.trim(),
+        'phone_number': phoneNumber?.trim(),
+        'bio': bio?.trim(),
+        'locale': locale?.trim(),
       });
       final updatedUser = response.user;
       if (updatedUser != null) {
         _currentUser = await _mapUser(updatedUser);
       } else {
         _currentUser = current.copyWith(
-          displayName: trimmedName,
-          email: normalizedEmail,
+          photoUrl: photoUrl?.trim(),
+          phoneNumber: phoneNumber?.trim(),
+          bio: bio?.trim(),
+          locale: locale?.trim(),
         );
       }
     } on supabase.AuthException catch (error) {

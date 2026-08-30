@@ -274,6 +274,10 @@ class FakeAuthRepository implements AuthRepositoryContract {
   Future<String?> updateProfile({
     required String displayName,
     required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
   }) {
     // TODO: implement updateProfile
     throw UnimplementedError();
