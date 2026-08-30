@@ -8,6 +8,7 @@ import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_s
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
+import 'package:gap/gap.dart';
 
 class ProfilePreferencesSection extends StatelessWidget {
   const ProfilePreferencesSection({
@@ -103,7 +104,7 @@ class ProfilePreferencesSection extends StatelessWidget {
             if (!changed && enabled && context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Biometric authentication is unavailable.'),
+                  content: Text(AppText.biometricAuthenticationUnavailable),
                 ),
               );
             }
@@ -140,9 +141,13 @@ class ProfilePreferencesSection extends StatelessWidget {
     final format = await showDialog<String>(
       context: context,
       builder: (dialogContext) => SimpleDialog(
-        title: const Text('Date format'),
+        title: const Text(AppText.dateFormat),
         children: [
-          for (final value in const ['dd/MM/yyyy', 'MM/dd/yyyy', 'yyyy-MM-dd'])
+          for (final value in const [
+            AppDateFormats.dayMonthYear,
+            AppDateFormats.monthDayYear,
+            AppDateFormats.yearMonthDay,
+          ])
             SimpleDialogOption(
               onPressed: () => Navigator.of(dialogContext).pop(value),
               child: Row(
@@ -150,8 +155,8 @@ class ProfilePreferencesSection extends StatelessWidget {
                   if (value == currentFormat)
                     const Icon(Icons.check_rounded, size: 18)
                   else
-                    const SizedBox(width: 18),
-                  const SizedBox(width: 8),
+                    const Gap(AppSpace.space18),
+                  const Gap(AppSpace.space8),
                   Text(value),
                 ],
               ),
@@ -171,7 +176,7 @@ class ProfilePreferencesSection extends StatelessWidget {
     final selected = await showDialog<ProfileVisibility>(
       context: context,
       builder: (dialogContext) => SimpleDialog(
-        title: const Text('Profile visibility'),
+        title: const Text(AppText.profileVisibility),
         children: [
           for (final value in ProfileVisibility.values)
             SimpleDialogOption(
@@ -195,7 +200,7 @@ class ProfilePreferencesSection extends StatelessWidget {
     final selected = await showDialog<RegistrationVisibility>(
       context: context,
       builder: (dialogContext) => SimpleDialog(
-        title: const Text('Registration visibility'),
+        title: const Text(AppText.registrationVisibility),
         children: [
           for (final value in RegistrationVisibility.values)
             SimpleDialogOption(
@@ -217,8 +222,8 @@ class ProfilePreferencesSection extends StatelessWidget {
       if (selected)
         const Icon(Icons.check_rounded, size: 18)
       else
-        const SizedBox(width: 18),
-      const SizedBox(width: 8),
+        const Gap(AppSpace.space18),
+      const Gap(AppSpace.space8),
       Text(label),
     ],
   );

@@ -3,6 +3,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/core/notifications/event_reminder_permission_service.dart';
 import 'package:bdo_event/core/notifications/event_reminder_policy.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/foundation.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -27,13 +28,13 @@ class EventReminderNotificationService {
   List<Event> _lastRegisteredEvents = const [];
 
   static const reminderLeadTimeOptions = EventReminderPolicy.leadTimeOptions;
-  static const _eventReminderPayload = 'bdo_event.event_reminder';
+  static const _eventReminderPayload = AppNotificationConfig.reminderPayload;
 
   Future<void> initialize() async {
     if (!_isSupportedPlatform) return;
     tz.initializeTimeZones();
     const settings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings(AppNotificationConfig.androidIcon),
       iOS: DarwinInitializationSettings(),
     );
     await _plugin.initialize(settings);
@@ -54,9 +55,9 @@ class EventReminderNotificationService {
       scheduledDate,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'event_reminders',
-          'Event reminders',
-          channelDescription: 'Reminders for registered events',
+          AppNotificationConfig.reminderChannelId,
+          AppNotificationConfig.reminderChannelName,
+          channelDescription: AppNotificationConfig.reminderChannelDescription,
           importance: Importance.high,
           priority: Priority.high,
         ),
@@ -82,13 +83,13 @@ class EventReminderNotificationService {
     await _plugin.zonedSchedule(
       EventReminderPolicy.notificationIdFor(event.id),
       event.title,
-      'Your event is scheduled for ${formatEventDate(event.date, 'dd/MM/yyyy')} at ${formatEventTime(event.startTime)}.',
+      'Your event is scheduled for ${formatEventDate(event.date, AppDateFormats.dayMonthYear)} at ${formatEventTime(event.startTime)}.',
       tz.TZDateTime.from(reminderTime, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'event_reminders',
-          'Event reminders',
-          channelDescription: 'Reminders for registered events',
+          AppNotificationConfig.reminderChannelId,
+          AppNotificationConfig.reminderChannelName,
+          channelDescription: AppNotificationConfig.reminderChannelDescription,
           importance: Importance.high,
           priority: Priority.high,
         ),

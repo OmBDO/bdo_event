@@ -1,4 +1,6 @@
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class AppShimmer extends StatefulWidget {
   const AppShimmer({super.key, required this.child});
@@ -70,16 +72,16 @@ class EventListShimmer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(width: 16),
+            const Gap(AppSpace.space16),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _ShimmerLine(width: double.infinity, height: 16),
-                  const SizedBox(height: 12),
+                  const Gap(AppSpace.space12),
                   _ShimmerLine(width: 130, height: 12),
-                  const SizedBox(height: 8),
+                  const Gap(AppSpace.space8),
                   _ShimmerLine(width: 170, height: 12),
                 ],
               ),
@@ -98,7 +100,7 @@ class NotificationListShimmer extends StatelessWidget {
   Widget build(BuildContext context) => ListView.separated(
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
     itemCount: 4,
-    separatorBuilder: (_, _) => const SizedBox(height: 12),
+    separatorBuilder: (_, _) => const Gap(AppSpace.space12),
     itemBuilder: (context, index) => AppShimmer(
       child: Container(
         height: 142,
@@ -113,15 +115,15 @@ class NotificationListShimmer extends StatelessWidget {
             Row(
               children: [
                 const _ShimmerCircle(size: 24),
-                const SizedBox(width: 10),
+                const Gap(AppSpace.space10),
                 Expanded(
                   child: _ShimmerLine(width: double.infinity, height: 16),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const Gap(AppSpace.space16),
             const _ShimmerLine(width: double.infinity, height: 12),
-            const SizedBox(height: 8),
+            const Gap(AppSpace.space8),
             const _ShimmerLine(width: 220, height: 12),
             const Spacer(),
             const _ShimmerLine(width: 100, height: 12),
@@ -139,7 +141,7 @@ class AttendeeListShimmer extends StatelessWidget {
   Widget build(BuildContext context) => ListView.separated(
     padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
     itemCount: 6,
-    separatorBuilder: (_, _) => const SizedBox(height: 10),
+    separatorBuilder: (_, _) => const Gap(AppSpace.space10),
     itemBuilder: (context, index) => AppShimmer(
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 8),
@@ -162,9 +164,9 @@ class AttendeeSummaryShimmer extends StatelessWidget {
     child: Row(
       children: [
         const _ShimmerCircle(size: 28),
-        const SizedBox(width: 4),
+        const Gap(AppSpace.space4),
         const _ShimmerCircle(size: 28),
-        const SizedBox(width: 12),
+        const Gap(AppSpace.space12),
         const _ShimmerLine(width: 112, height: 14),
         const Spacer(),
         const _ShimmerCircle(size: 28),

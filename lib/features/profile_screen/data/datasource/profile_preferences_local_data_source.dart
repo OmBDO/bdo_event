@@ -1,5 +1,6 @@
 import 'package:bdo_event/features/profile_screen/data/models/profile_preferences_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 abstract interface class ProfilePreferencesLocalDataSource {
   ProfilePreferencesModel load();
@@ -22,9 +23,9 @@ class ProfilePreferencesLocalDataSourceImpl
   static const _watcherAutoOpenNextKey = 'watcher_auto_open_next_enabled';
   static const _watcherKeepHistoryKey =
       'watcher_keep_history_visible_after_check_in';
-  static const _eventRemindersEnabledKey = 'event_reminders_enabled';
-  static const _eventReminderLeadTimeKey = 'event_reminder_lead_time';
-  static const _dateFormatKey = 'date_format';
+  static const _eventRemindersEnabledKey = AppStorageKeys.eventRemindersEnabled;
+  static const _eventReminderLeadTimeKey = AppStorageKeys.eventReminderLeadTime;
+  static const _dateFormatKey = AppStorageKeys.dateFormat;
   static const _biometricLockKey = 'biometric_lock_enabled';
 
   @override
@@ -44,7 +45,7 @@ class ProfilePreferencesLocalDataSourceImpl
         _preferences?.getBool(_eventRemindersEnabledKey) ?? true,
     eventReminderLeadTimeMinutes:
         _preferences?.getInt(_eventReminderLeadTimeKey) ?? 1440,
-    dateFormat: _preferences?.getString(_dateFormatKey) ?? 'dd/MM/yyyy',
+    dateFormat: _preferences?.getString(_dateFormatKey) ?? AppDateFormats.dayMonthYear,
     isBiometricLockEnabled: _preferences?.getBool(_biometricLockKey) ?? false,
   );
 

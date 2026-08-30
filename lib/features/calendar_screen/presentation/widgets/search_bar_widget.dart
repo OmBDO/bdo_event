@@ -74,14 +74,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   onChanged: widget.onChanged,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 15,
+                    fontSize: AppSize.text15,
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     hintText: widget.hintText,
                     hintStyle: TextStyle(
                       color: textColor.withValues(alpha: 0.4),
-                      fontSize: 15,
+                      fontSize: AppSize.text15,
                       fontWeight: FontWeight.w400,
                     ),
                     prefixIcon: Icon(

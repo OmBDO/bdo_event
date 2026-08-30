@@ -105,7 +105,7 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                     },
                   ),
 
-                  const Gap(16),
+                  const Gap(AppSpace.space16),
 
                   Builder(
                     builder: (context) {
@@ -162,37 +162,39 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                                     color: theme.colorScheme.primary,
                                   ),
                                 ),
-                                const SizedBox(height: 20),
+                                const Gap(AppSpace.space20),
                                 Text(
                                   hasRegistrations
-                                      ? 'No events found'
-                                      : 'Your calendar is ready',
+                                      ? AppText.noEventsFound
+                                      : AppText.calendarReady,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: theme.colorScheme.onSurface,
-                                    fontSize: 20,
+                                    fontSize: AppSize.text20,
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const Gap(AppSpace.space8),
                                 Text(
-                                  hasRegistrations ? AppText.noMatchingEvents : 'Registered events will appear here so you can find every ticket in one place.',
+                                    hasRegistrations
+                                      ? AppText.noMatchingEvents
+                                      : AppText.registeredEventsWillAppearHere,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: theme.colorScheme.onSurface
                                         .withValues(alpha: 0.7),
-                                    fontSize: 14,
+                                    fontSize: AppSize.text14,
                                     height: 1.45,
                                   ),
                                 ),
                                 if (!hasRegistrations) ...[
-                                  const SizedBox(height: 22),
+                                  const Gap(AppSpace.space22),
                                   FilledButton.icon(
                                     onPressed: () => context
                                         .read<MainScreenCubit>()
                                         .selectTab(MainTab.events),
                                     icon: const Icon(Icons.explore_outlined),
-                                    label: const Text('Explore events'),
+                                    label: const Text(AppText.exploreEvents),
                                     style: FilledButton.styleFrom(
                                       backgroundColor:
                                           theme.colorScheme.primary,
@@ -270,7 +272,8 @@ class _CalendarScreenViewState extends State<_CalendarScreenView> {
                             ),
                           );
                         },
-                        separatorBuilder: (context, index) => const Gap(10),
+                        separatorBuilder: (context, index) =>
+                          const Gap(AppSpace.space10),
                       );
                     },
                   ),

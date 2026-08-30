@@ -1,3 +1,5 @@
+import 'package:bdo_event/core/util/event_resource.dart';
+
 class ProfilePreferences {
   static const reminderLeadTimeOptions = <int>[60, 1440, 10080];
 
@@ -12,7 +14,7 @@ class ProfilePreferences {
     this.isWatcherKeepHistoryVisibleAfterCheckIn = false,
     this.isEventRemindersEnabled = true,
     this.eventReminderLeadTimeMinutes = 1440,
-    this.dateFormat = 'dd/MM/yyyy',
+    this.dateFormat = AppDateFormats.dayMonthYear,
     this.isBiometricLockEnabled = false,
   });
 

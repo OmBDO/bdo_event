@@ -40,9 +40,9 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Gap(30),
+              const Gap(AppSpace.space30),
               ProfileHeaderSection(user: user),
-              const Gap(10),
+              const Gap(AppSpace.space10),
               ProfileAccountSection(
                 onEditProfile: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -51,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 onChangePassword: () => _showChangePasswordDialog(context),
               ),
-              const Gap(16),
+              const Gap(AppSpace.space16),
               ProfilePreferencesSection(
                 state: state,
                 onReminderLeadTime: (minutes) =>
@@ -64,21 +64,21 @@ class ProfileScreen extends StatelessWidget {
               ),
               if (user?.hasPermission(UserPermission.scanRegistrations) ??
                   false) ...[
-                const Gap(16),
+                const Gap(AppSpace.space16),
                 ProfileWatcherSettingsSection(state: state),
               ],
               if (user?.hasPermission(UserPermission.createEvents) ??
                   false) ...[
-                const Gap(16),
+                const Gap(AppSpace.space16),
                 ProfileOrganizerToolsSection(user: user!),
               ],
-              const Gap(16),
+              const Gap(AppSpace.space16),
               ProfileSupportSection(
                 onShowInfo: ({required title, required message}) =>
                     _showInfoDialog(context, title: title, message: message),
                 onSignOutEverywhere: () => _signOutEverywhere(context),
               ),
-              const Gap(24),
+              const Gap(AppSpace.space24),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextButton.icon(
@@ -102,14 +102,17 @@ class ProfileScreen extends StatelessWidget {
                   icon: const Icon(Icons.logout_rounded, size: 20),
                   label: const Text(
                     AppText.logout,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSize.text15,
+                    ),
                   ),
                 ),
               ),
               ValueListenableBuilder<double>(
                 valueListenable: FooterHeightTracker.heightNotifier,
                 builder: (context, dynamicHeight, child) =>
-                    SizedBox(height: dynamicHeight + 24),
+                    SizedBox(height: dynamicHeight + AppSpace.space24),
               ),
             ],
           ),
@@ -202,7 +205,7 @@ class ProfileScreen extends StatelessWidget {
                       ? AppText.useAtLeastEightCharacters
                       : null,
                 ),
-                const SizedBox(height: 12),
+                const Gap(AppSpace.space12),
                 TextFormField(
                   controller: confirmationController,
                   obscureText: true,

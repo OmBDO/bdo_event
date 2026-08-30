@@ -68,7 +68,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       emit(
         state.copyWith(
           status: WatcherScanStatus.valid,
-          eventId: result[AppModelKeys.eventId] as String?,
+          eventId: result[AppModelKeys.eventUnderscoreId] as String?,
           registrationToken: payload[AppModelKeys.token] as String,
           userId: result[AppModelKeys.userId] as String?,
           message: AppText.registrationValid,
@@ -84,7 +84,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
           ],
         ),
       );
-      await _loadDashboard(result[AppModelKeys.eventId] as String);
+      await _loadDashboard(result[AppModelKeys.eventUnderscoreId] as String);
     } on Object {
       emit(
         state.copyWith(

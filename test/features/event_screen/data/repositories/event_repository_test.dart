@@ -81,6 +81,27 @@ void main() {
     expect((await repository.deleteEvent(event)).error, isNull);
   });
 
+  test('forwards ownership and scheduling metadata during updates', () async {
+    final source = FakeEventDataSource();
+    final repository = EventRepository(
+      dataSource: source,
+      authRepository: FakeAuthRepository(owner, canManageOwnEvent: true),
+    );
+    final updated = event.copyWith(
+      registrationDeadline: DateTime.utc(2026, 8, 31, 12),
+      organizerName: 'Owner',
+      locationId: 'pune-office',
+      createdAt: DateTime.utc(2026, 8, 1),
+    );
+
+    expect((await repository.updateEvent(updated)).error, isNull);
+    expect(source.updatedEvent?.creatorId, owner.id);
+    expect(source.updatedEvent?.registrationDeadline, updated.registrationDeadline);
+    expect(source.updatedEvent?.organizerName, 'Owner');
+    expect(source.updatedEvent?.locationId, 'pune-office');
+    expect(source.updatedEvent?.createdAt, updated.createdAt);
+  });
+
   test('denies an unrelated user from updating or deleting an event', () async {
     final unrelated = owner.copyWith(
       displayName: 'Other user',

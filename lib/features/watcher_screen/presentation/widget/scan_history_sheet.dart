@@ -53,7 +53,7 @@ class ScanHistorySheet extends StatelessWidget {
                     child: Text(
                       AppText.scanHistory,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: AppSize.text18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

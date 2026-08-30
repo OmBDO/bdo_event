@@ -1,7 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
 import 'package:bdo_event/features/event_detail_screen/data/repositories/registered_event_repository.dart';
@@ -19,6 +19,7 @@ void main() {
     bool isAvailable = true,
     int attendeeCount = 0,
     int? capacity,
+    DateTime? registrationDeadline,
   }) => Event(
     id: 'event-1',
     title: 'Town Hall',
@@ -28,6 +29,7 @@ void main() {
     isAvailable: isAvailable,
     attendeeCount: attendeeCount,
     capacity: capacity,
+    registrationDeadline: registrationDeadline,
   );
 
   group('registerEvent', () {
@@ -96,6 +98,73 @@ void main() {
       expect(dataSource.activateCalls, 1);
       expect(dataSource.lastUserId, user.id);
       expect(dataSource.lastEvent?.id, event().id);
+    });
+
+    test('rejects a second registration after the first succeeds', () async {
+      final dataSource = FakeRegistrationDataSource();
+      final repository = RegisteredEventRepository(
+        dataSource: dataSource,
+        authRepository: FakeAuthRepository(user),
+      );
+
+      expect(await repository.registerEvent(event()), isNull);
+      expect(
+        await repository.registerEvent(event()),
+        AppText.alreadyRegistered,
+      );
+      expect(dataSource.activateCalls, 1);
+    });
+
+    test('accepts registration immediately before the deadline', () async {
+      final now = DateTime(2026, 8, 30, 12);
+      final dataSource = FakeRegistrationDataSource();
+      final repository = RegisteredEventRepository(
+        dataSource: dataSource,
+        authRepository: FakeAuthRepository(user),
+        now: () => now,
+      );
+
+      expect(
+        await repository.registerEvent(
+          event(registrationDeadline: now.add(const Duration(minutes: 1))),
+        ),
+        isNull,
+      );
+      expect(dataSource.activateCalls, 1);
+    });
+
+    test('rejects registration at the exact deadline', () async {
+      final now = DateTime(2026, 8, 30, 12);
+      final dataSource = FakeRegistrationDataSource();
+      final repository = RegisteredEventRepository(
+        dataSource: dataSource,
+        authRepository: FakeAuthRepository(user),
+        now: () => now,
+      );
+
+      expect(
+        await repository.registerEvent(event(registrationDeadline: now)),
+        AppText.registrationDeadlinePassed,
+      );
+      expect(dataSource.activateCalls, 0);
+    });
+
+    test('rejects registration after the deadline', () async {
+      final now = DateTime(2026, 8, 30, 12);
+      final dataSource = FakeRegistrationDataSource();
+      final repository = RegisteredEventRepository(
+        dataSource: dataSource,
+        authRepository: FakeAuthRepository(user),
+        now: () => now,
+      );
+
+      expect(
+        await repository.registerEvent(
+          event(registrationDeadline: now.subtract(const Duration(minutes: 1))),
+        ),
+        AppText.registrationDeadlinePassed,
+      );
+      expect(dataSource.activateCalls, 0);
     });
 
     test('maps server capacity and deadline errors', () async {

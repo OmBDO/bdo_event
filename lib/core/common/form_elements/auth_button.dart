@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -35,7 +36,7 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
-            fontSize: 16,
+            fontSize: AppSize.text16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
           ),

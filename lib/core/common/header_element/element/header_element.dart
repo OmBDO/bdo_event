@@ -123,7 +123,7 @@ class _HeaderElementState extends State<HeaderElement> {
                             size: 20,
                           ),
                         ),
-                        const Gap(10),
+                        const Gap(AppSpace.space10),
                         Expanded(
                           child: LocationDropdown(
                             selectedValue: selectedLocation,
@@ -143,7 +143,7 @@ class _HeaderElementState extends State<HeaderElement> {
                 ),
               ),
 
-              const Gap(16),
+              const Gap(AppSpace.space16),
 
               // 2. Notification Squircle Button Block
               Container(
@@ -199,7 +199,7 @@ class _HeaderElementState extends State<HeaderElement> {
                               badgeText,
                               style: TextStyle(
                                 color: colorScheme.onError,
-                                fontSize: 9,
+                                fontSize: AppSize.text9,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -211,7 +211,7 @@ class _HeaderElementState extends State<HeaderElement> {
                 ),
               ),
 
-              const Gap(12),
+              const Gap(AppSpace.space12),
 
               // 3. User Avatar Block (Right Side)
               PopupMenuButton<String>(
@@ -241,7 +241,7 @@ class _HeaderElementState extends State<HeaderElement> {
                     child: Row(
                       children: [
                         Icon(Icons.person_outline_rounded, size: 21),
-                        SizedBox(width: 12),
+                        Gap(AppSpace.space12),
                         Text(
                           AppText.profile,
                           style: TextStyle(fontWeight: FontWeight.w600),
@@ -255,7 +255,7 @@ class _HeaderElementState extends State<HeaderElement> {
                     child: Row(
                       children: [
                         Icon(Icons.logout_rounded, size: 21),
-                        SizedBox(width: 12),
+                        Gap(AppSpace.space12),
                         Text(
                           AppText.logOut,
                           style: TextStyle(fontWeight: FontWeight.w600),

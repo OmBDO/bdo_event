@@ -50,22 +50,22 @@ class ProfileHeaderSection extends StatelessWidget {
               ),
             ],
           ),
-          const Gap(16),
+          const Gap(AppSpace.space16),
           Text(
             user?.displayName ?? AppText.profileUnavailable,
             style: TextStyle(
               color: theme.colorScheme.onSurface,
-              fontSize: 22,
+              fontSize: AppSize.text22,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.5,
             ),
           ),
-          const Gap(4),
+          const Gap(AppSpace.space4),
           Text(
             user?.email ?? AppText.empty,
             style: TextStyle(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 14,
+              fontSize: AppSize.text14,
               fontWeight: FontWeight.w500,
             ),
           ),

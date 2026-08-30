@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:gap/gap.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:flutter/services.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
@@ -36,7 +37,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
   }
 
   Future<void> _configureSpeech() async {
-    await _speech.setLanguage('en-IN');
+    await _speech.setLanguage(AppLocales.englishIndia);
     await _speech.setSpeechRate(0.5);
     await _speech.setVolume(
       // ignore: use_build_context_synchronously
@@ -176,7 +177,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                                   }
                                 },
                               ),
-                              const SizedBox(height: 12),
+                              const Gap(AppSpace.space12),
                               ScannerIconButton(
                                 tooltip: AppText.switchCamera,
                                 icon: Icons.cameraswitch_outlined,
@@ -199,12 +200,12 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                                 AppText.pendingCheckIn,
                                 style: TextStyle(fontWeight: FontWeight.w700),
                               ),
-                              const SizedBox(height: 4),
+                              const Gap(AppSpace.space4),
                               Text(
                                 currentScan.displayName ??
                                     AppText.unknownAttendee,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 18),
+                                style: const TextStyle(fontSize: AppSize.text18),
                               ),
                             ],
                           )
@@ -236,7 +237,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                       onSubmitted: (_) => _submitManualEntry(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const Gap(AppSpace.space12),
                   if (state.status == WatcherScanStatus.valid)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
@@ -264,7 +265,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                             ),
                             child: const Text(AppText.checkIn),
                           ),
-                          const SizedBox(height: 8),
+                          const Gap(AppSpace.space8),
                           FilledButton(
                             onPressed: () =>
                                 context.read<WatcherScanCubit>().reset(),
@@ -300,7 +301,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                         ),
                       ),
                     ),
-                  const SizedBox(height: 20),
+                  const Gap(AppSpace.space20),
                 ],
               ),
             );

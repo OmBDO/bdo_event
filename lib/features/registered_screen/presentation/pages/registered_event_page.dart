@@ -15,6 +15,7 @@ import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_scr
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class RegisteredEventPage extends StatefulWidget {
   final Event event;
@@ -74,7 +75,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
               margin: const EdgeInsets.symmetric(horizontal: 24),
               textStyle: const TextStyle(
                 color: Colors.black87,
-                fontSize: 13,
+                fontSize: AppSize.text13,
                 fontWeight: FontWeight.w500,
                 height: 1.3,
               ),
@@ -198,7 +199,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                 );
               },
             ),
-            const SizedBox(width: 8),
+            const Gap(AppSpace.space8),
           ],
         ),
         body: SingleChildScrollView(
@@ -230,50 +231,50 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(height: 22),
+                    const Gap(AppSpace.space22),
                     Text(
                       AppText.registeredEvent,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
-                        fontSize: 11,
+                        fontSize: AppSize.text11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(AppSpace.space8),
                     Text(
                       widget.event.title,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 24,
+                        fontSize: AppSize.text24,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(AppSpace.space8),
                     Text(
                       '${formatEventDate(widget.event.date, context.watch<ProfileScreenCubit>().state.dateFormat)}  •  ${widget.event.location}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface
                             .withValues(alpha: 0.7),
-                        fontSize: 14,
+                        fontSize: AppSize.text14,
                       ),
                     ),
                     if (widget.event.startTime != null ||
                         widget.event.endTime != null) ...[
-                      const SizedBox(height: 6),
+                      const Gap(AppSpace.space6),
                       Text(
                         '${formatEventTime(widget.event.startTime)} - ${formatEventTime(widget.event.endTime)}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 15,
+                          fontSize: AppSize.text15,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
-                    const SizedBox(height: 26),
+                    const Gap(AppSpace.space26),
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
@@ -326,7 +327,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                               backgroundColor: Colors.white,
                             ),
                     ),
-                    const SizedBox(height: 18),
+                    const Gap(AppSpace.space18),
                     if (state.registrationToken != null) ...[
                       Align(
                         alignment: Alignment.centerLeft,
@@ -335,12 +336,12 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.7),
-                            fontSize: 12,
+                            fontSize: AppSize.text12,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const Gap(AppSpace.space6),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
@@ -366,7 +367,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                                       .colorScheme
                                       .onSurface,
                                   fontFamily: AppUtil.monospace,
-                                  fontSize: 14,
+                                  fontSize: AppSize.text14,
                                   fontWeight: FontWeight.w700,
                                   height: 1.35,
                                   letterSpacing: 0,
@@ -396,7 +397,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const Gap(AppSpace.space8),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -404,23 +405,23 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface
                                 .withValues(alpha: 0.7),
-                            fontSize: 12,
+                            fontSize: AppSize.text12,
                           ),
                         ),
                       ),
                     ],
-                    const SizedBox(height: 10),
+                    const Gap(AppSpace.space10),
                     Text(
                       AppText.showQrCode,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface
                             .withValues(alpha: 0.7),
-                        fontSize: 13,
+                        fontSize: AppSize.text13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(AppSpace.space8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -429,7 +430,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                           color: Colors.green,
                           size: 17,
                         ),
-                        SizedBox(width: 6),
+                        Gap(AppSpace.space6),
                         Text(
                           AppText.registrationConfirmed,
                           style: TextStyle(
@@ -442,7 +443,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 18),
+              const Gap(AppSpace.space18),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
@@ -459,31 +460,31 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       AppText.cancellation,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
-                        fontSize: 11,
+                        fontSize: AppSize.text11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.4,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(AppSpace.space8),
                     Text(
                       AppText.needToChangePlans,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16,
+                        fontSize: AppSize.text16,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const Gap(AppSpace.space6),
                     Text(
                       AppText.cancellationWarning,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface
                             .withValues(alpha: 0.7),
-                        fontSize: 13,
+                        fontSize: AppSize.text13,
                         height: 1.4,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const Gap(AppSpace.space14),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
@@ -518,13 +519,13 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                       ),
                     ),
                     if (state.error != null) ...[
-                      const SizedBox(height: 10),
+                      const Gap(AppSpace.space10),
                       Text(
                         state.error!,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.error,
-                          fontSize: 12,
+                          fontSize: AppSize.text12,
                         ),
                       ),
                     ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class EventTab extends StatelessWidget {
   final List<String> titles;
@@ -20,7 +22,7 @@ class EventTab extends StatelessWidget {
       height: 40,
       child: ListView.separated(
         separatorBuilder: (BuildContext context, int index) {
-          return const SizedBox(width: 12);
+          return const Gap(AppSpace.space12);
         },
         scrollDirection: Axis.horizontal,
         itemCount: titles.length,
@@ -42,7 +44,7 @@ class EventTab extends StatelessWidget {
                       ? theme.colorScheme.onSecondary
                       : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: AppSize.text14,
                 ),
               ),
             ),

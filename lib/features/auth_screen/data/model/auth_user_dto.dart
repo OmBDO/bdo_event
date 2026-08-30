@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 class AuthUserDto {
@@ -29,7 +30,7 @@ class AuthUserDto {
           metadata['picture'] as String?,
       phoneNumber: metadata['phone_number'] as String?,
       bio: metadata['bio'] as String?,
-      locale: metadata['locale'] as String? ?? 'en-IN',
+      locale: metadata['locale'] as String? ?? AppLocales.englishIndia,
       createdAt: DateTime.tryParse(user.createdAt) ?? DateTime.now(),
       lastSignedInAt: user.lastSignInAt == null
           ? null

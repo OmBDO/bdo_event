@@ -9,11 +9,14 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
   RegisteredEventRepository({
     required RegistrationDataSource dataSource,
     required AuthRepositoryContract authRepository,
+      DateTime Function()? now,
   }) : _dataSource = dataSource,
-       _authRepository = authRepository;
+      _authRepository = authRepository,
+      _now = now ?? DateTime.now;
 
   final RegistrationDataSource _dataSource;
   final AuthRepositoryContract _authRepository;
+    final DateTime Function() _now;
 
   /// 1. Verifies if the logged-in user is registered for a specific event
   @override
@@ -36,7 +39,7 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
     }
 
     if (event.registrationDeadline != null &&
-        !DateTime.now().isBefore(event.registrationDeadline!)) {
+      !_now().isBefore(event.registrationDeadline!)) {
       return AppText.registrationDeadlinePassed;
     }
 

@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
 
 enum ProfileScreenStatus { ready, savingNotificationPreference, notificationPreferenceError }
@@ -36,7 +37,7 @@ class ProfileScreenState {
     this.isWatcherKeepHistoryVisibleAfterCheckIn = false,
     this.isEventRemindersEnabled = true,
     this.eventReminderLeadTimeMinutes = 1440,
-    this.dateFormat = 'dd/MM/yyyy',
+    this.dateFormat = AppDateFormats.dayMonthYear,
     this.isBiometricLockEnabled = false,
     this.profileVisibility = ProfileVisibility.private,
     this.registrationVisibility = RegistrationVisibility.private,

@@ -4,6 +4,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_palette.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 
 class AnalyticsChartPanel extends StatelessWidget {
   const AnalyticsChartPanel({required this.event, required this.palette, super.key});
@@ -14,8 +15,8 @@ class AnalyticsChartPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnalyticsPanel(
     palette: palette,
-    title: 'Capacity trajectory',
-    subtitle: 'Current registrations mapped against event capacity',
+    title: AppText.capacityTrajectory,
+    subtitle: AppText.registrationsMappedAgainstCapacity,
     child: SizedBox(
       height: 230,
       child: CustomPaint(
