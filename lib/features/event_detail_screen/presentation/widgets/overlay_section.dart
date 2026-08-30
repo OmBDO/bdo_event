@@ -7,6 +7,7 @@ import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:gap/gap.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 
@@ -204,7 +205,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                   Icon(Icons.schedule_outlined, color: widget.textGrey, size: 18),
                   const Gap(8),
                   Text(
-                    '${widget.widget.event.startTime ?? '--:--'} - ${widget.widget.event.endTime ?? '--:--'}',
+                    '${formatEventTime(widget.widget.event.startTime)} - ${formatEventTime(widget.widget.event.endTime)}',
                     style: TextStyle(
                       color: widget.primaryDark,
                       fontSize: 15,

@@ -203,6 +203,7 @@ void configureDependencies({SharedPreferences? preferences}) {
       saveProfilePreferences: getIt(),
       reminderNotifications: getIt(),
       biometricLockService: getIt(),
+      eventStore: getIt(),
     ),
   );
   getIt.registerFactory<RegisteredEventCubit>(

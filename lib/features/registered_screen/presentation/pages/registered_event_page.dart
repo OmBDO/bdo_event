@@ -9,6 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/services.dart';
+import 'package:bdo_event/core/util/registration_code_codec.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
@@ -162,11 +166,10 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
   });
 
   String _manualCode(String token) {
-    final value = utf8
-        .encode('${widget.event.id}|$token')
-        .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
-        .join();
-    return 'BDO1$value';
+    return RegistrationCodeCodec.encode(
+      eventId: widget.event.id,
+      token: token,
+    );
   }
 
   @override
@@ -252,7 +255,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '${widget.event.date}  •  ${widget.event.location}',
+                      '${formatEventDate(widget.event.date, context.watch<ProfileScreenCubit>().state.dateFormat)}  •  ${widget.event.location}',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withValues(
@@ -265,7 +268,7 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                         widget.event.endTime != null) ...[
                       const SizedBox(height: 6),
                       Text(
-                        '${widget.event.startTime ?? '--:--'} - ${widget.event.endTime ?? '--:--'}',
+                        '${formatEventTime(widget.event.startTime)} - ${formatEventTime(widget.event.endTime)}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,

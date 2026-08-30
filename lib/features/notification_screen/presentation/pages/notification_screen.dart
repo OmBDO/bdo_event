@@ -4,6 +4,9 @@ import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -53,6 +56,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
     await getIt<EventStore>().markNotificationRead(notification.id);
   }
 
+  Future<void> _respondToInvitation(
+    AppNotification notification,
+    bool accepted,
+  ) async {
+    try {
+      await getIt<EventStore>().respondToEventInvitation(
+        eventId: notification.eventId,
+        accepted: accepted,
+      );
+      if (mounted) setState(_reload);
+    } on LocalStorageException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to update invitation')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +106,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   notification: notification,
                   onShown: () => _markRead(notification),
                   onConfirm: (status) => _confirmArrival(notification, status),
+                    onInvitationResponse: (accepted) =>
+                      _respondToInvitation(notification, accepted),
                 );
               },
             ),
@@ -99,16 +123,19 @@ class _NotificationCard extends StatelessWidget {
     required this.notification,
     required this.onShown,
     required this.onConfirm,
+    required this.onInvitationResponse,
   });
 
   final AppNotification notification;
   final VoidCallback onShown;
   final ValueChanged<ArrivalStatus> onConfirm;
+  final ValueChanged<bool> onInvitationResponse;
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => onShown());
     final hasResponse = notification.arrivalStatus != ArrivalStatus.pending;
+    final isInvitation = notification.category == NotificationCategory.invitation;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -151,10 +178,30 @@ class _NotificationCard extends StatelessWidget {
             Text(notification.message),
             const SizedBox(height: 6),
             Text(
-              'Event date: ${notification.eventDate.toLocal().toString().split(' ').first}',
+              'Event date: ${formatEventDate(notification.eventDate.toLocal().toIso8601String(), context.watch<ProfileScreenCubit>().state.dateFormat)}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            if (!hasResponse) ...[
+            if (isInvitation) ...[
+              const SizedBox(height: 14),
+              Text(
+                'Would you like to attend?',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  FilledButton(
+                    onPressed: () => onInvitationResponse(true),
+                    child: const Text('Accept'),
+                  ),
+                  TextButton(
+                    onPressed: () => onInvitationResponse(false),
+                    child: const Text('Decline'),
+                  ),
+                ],
+              ),
+            ] else if (!hasResponse) ...[
               const SizedBox(height: 14),
               Text(
                 AppText.arrivalConfirmation,

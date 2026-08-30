@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
 
 enum ProfileScreenStatus { ready, savingNotificationPreference, notificationPreferenceError }
 
@@ -18,6 +19,8 @@ class ProfileScreenState {
   final int eventReminderLeadTimeMinutes;
   final String dateFormat;
   final bool isBiometricLockEnabled;
+  final ProfileVisibility profileVisibility;
+  final RegistrationVisibility registrationVisibility;
   final String? errorMessage;
 
   const ProfileScreenState({
@@ -35,6 +38,8 @@ class ProfileScreenState {
     this.eventReminderLeadTimeMinutes = 1440,
     this.dateFormat = 'dd/MM/yyyy',
     this.isBiometricLockEnabled = false,
+    this.profileVisibility = ProfileVisibility.private,
+    this.registrationVisibility = RegistrationVisibility.private,
     this.status = ProfileScreenStatus.ready,
     this.errorMessage,
   });
@@ -55,6 +60,8 @@ class ProfileScreenState {
     int? eventReminderLeadTimeMinutes,
     String? dateFormat,
     bool? isBiometricLockEnabled,
+    ProfileVisibility? profileVisibility,
+    RegistrationVisibility? registrationVisibility,
     String? errorMessage,
     bool clearErrorMessage = false,
   }) => ProfileScreenState(
@@ -81,6 +88,9 @@ class ProfileScreenState {
     dateFormat: dateFormat ?? this.dateFormat,
     isBiometricLockEnabled:
       isBiometricLockEnabled ?? this.isBiometricLockEnabled,
+    profileVisibility: profileVisibility ?? this.profileVisibility,
+    registrationVisibility:
+      registrationVisibility ?? this.registrationVisibility,
     errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
   );
 }

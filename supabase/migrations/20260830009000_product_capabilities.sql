@@ -80,3 +80,159 @@ $$;
 
 revoke all on function public.record_login_activity(text, text) from public;
 grant execute on function public.record_login_activity(text, text) to authenticated;
+
+create or replace function public.list_invitation_recipients()
+returns table (user_id uuid, display_name text, email text)
+language sql
+security definer
+set search_path = public
+as $$
+  select users.id,
+         coalesce(users.raw_user_meta_data ->> 'display_name', '') as display_name,
+         users.email
+  from auth.users as users
+  where (auth.jwt() -> 'app_metadata' -> 'roles') ? 'admin'
+    and users.id <> auth.uid()
+  order by display_name, email;
+$$;
+
+create or replace function public.send_event_invitations(
+  requested_event_id text,
+  requested_user_ids uuid[]
+)
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  inserted_count integer;
+begin
+  if not ((auth.jwt() -> 'app_metadata' -> 'roles') ? 'admin') then
+    raise exception 'Admin access required';
+  end if;
+  if not exists (select 1 from public.events where id = requested_event_id) then
+    raise exception 'Event not found';
+  end if;
+
+  insert into public.event_invitations (event_id, inviter_id, invitee_id)
+  select requested_event_id, auth.uid(), recipient
+  from unnest(requested_user_ids) as recipient
+  where recipient <> auth.uid()
+  on conflict (event_id, invitee_id) do nothing;
+  get diagnostics inserted_count = row_count;
+
+  insert into public.notifications (
+    user_id, event_id, notification_type, title, message, event_date
+  )
+  select invitation.invitee_id,
+         event.id,
+         'invitation',
+         'You are invited to an event',
+         'You have been invited to ' || coalesce(event.payload ->> 'title', 'an event') || '.',
+         case
+           when event.payload ->> 'date' ~ '^\d{4}-\d{2}-\d{2}'
+             then (event.payload ->> 'date')::date
+           else to_date(event.payload ->> 'date', 'DD/MM/YYYY')
+         end
+  from public.event_invitations as invitation
+  join public.events as event on event.id = invitation.event_id
+  where invitation.event_id = requested_event_id
+    and invitation.inviter_id = auth.uid()
+    and invitation.invitee_id = any(requested_user_ids)
+    and invitation.status = 'pending'
+  on conflict (user_id, event_id, notification_type) do nothing;
+  return inserted_count;
+end;
+$$;
+
+create or replace function public.respond_to_event_invitation(
+  requested_event_id text,
+  requested_status text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  invitation public.event_invitations%rowtype;
+  event_payload jsonb;
+begin
+  if requested_status not in ('accepted', 'declined') then
+    raise exception 'Invalid invitation response';
+  end if;
+  select * into invitation
+  from public.event_invitations
+  where event_id = requested_event_id
+    and invitee_id = auth.uid()
+    and status = 'pending'
+  order by created_at desc
+  limit 1;
+  if not found then raise exception 'Invitation not found'; end if;
+
+  update public.event_invitations
+  set status = requested_status, responded_at = now()
+  where id = invitation.id;
+
+  if requested_status = 'accepted' then
+    select payload into event_payload from public.events where id = requested_event_id;
+    insert into public.event_registrations (user_id, event_id, payload, status)
+    values (auth.uid(), requested_event_id, event_payload, 'active')
+    on conflict do nothing;
+  end if;
+end;
+$$;
+
+revoke all on function public.list_invitation_recipients() from public;
+revoke all on function public.send_event_invitations(text, uuid[]) from public;
+revoke all on function public.respond_to_event_invitation(text, text) from public;
+grant execute on function public.list_invitation_recipients() to authenticated;
+grant execute on function public.send_event_invitations(text, uuid[]) to authenticated;
+grant execute on function public.respond_to_event_invitation(text, text) to authenticated;
+
+drop function if exists public.load_user_notifications();
+create or replace function public.load_user_notifications()
+returns table (
+  id bigint,
+  "eventId" text,
+  "notificationType" text,
+  title text,
+  message text,
+  "eventDate" date,
+  "createdAt" timestamptz,
+  "isRead" boolean,
+  "arrivalStatus" text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select notification.id,
+         notification.event_id,
+         notification.notification_type,
+         notification.title,
+         notification.message,
+         notification.event_date,
+         notification.created_at,
+         notification.is_read,
+         coalesce(arrival.status, 'pending')
+  from public.notifications as notification
+  left join public.event_arrivals as arrival
+    on arrival.event_id = notification.event_id
+   and arrival.user_id = notification.user_id
+  where notification.user_id = auth.uid()
+    and not exists (
+      select 1
+      from public.event_invitations as invitation
+      where invitation.event_id = notification.event_id
+        and invitation.invitee_id = auth.uid()
+        and invitation.status in ('accepted', 'declined')
+        and notification.notification_type = 'invitation'
+    )
+  order by notification.created_at desc
+  limit 50;
+$$;
+
+revoke all on function public.load_user_notifications() from public;
+grant execute on function public.load_user_notifications() to authenticated;

@@ -1,6 +1,6 @@
 enum ArrivalStatus { pending, attending, notAttending }
 
-enum NotificationCategory { event, registration, reminder, system }
+enum NotificationCategory { event, registration, reminder, invitation, system }
 
 class AppNotification {
   const AppNotification({
@@ -42,6 +42,7 @@ class AppNotification {
       category: switch (json['notificationType'] ?? json['notification_type']) {
         'registration' => NotificationCategory.registration,
         'reminder' => NotificationCategory.reminder,
+        'invitation' => NotificationCategory.invitation,
         'system' => NotificationCategory.system,
         _ => NotificationCategory.event,
       },

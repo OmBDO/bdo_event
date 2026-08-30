@@ -7,6 +7,7 @@ import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_s
 import 'package:bdo_event/features/profile_screen/presentation/widgets/profile_settings_toggle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
 
 class ProfilePreferencesSection extends StatelessWidget {
   const ProfilePreferencesSection({
@@ -108,6 +109,26 @@ class ProfilePreferencesSection extends StatelessWidget {
             }
           },
         ),
+        ProfileSettingsTile(
+          icon: Icons.visibility_outlined,
+          color: Colors.blue,
+          title: 'Profile visibility',
+          subtitle: state.profileVisibility.label,
+          onTap: () => _showProfileVisibilityDialog(
+            context,
+            state.profileVisibility,
+          ),
+        ),
+        ProfileSettingsTile(
+          icon: Icons.assignment_ind_outlined,
+          color: Colors.cyan,
+          title: 'Registration visibility',
+          subtitle: state.registrationVisibility.label,
+          onTap: () => _showRegistrationVisibilityDialog(
+            context,
+            state.registrationVisibility,
+          ),
+        ),
       ]),
     ],
   );
@@ -142,4 +163,63 @@ class ProfilePreferencesSection extends StatelessWidget {
       context.read<ProfileScreenCubit>().updateDateFormat(format);
     }
   }
+
+  Future<void> _showProfileVisibilityDialog(
+    BuildContext context,
+    ProfileVisibility current,
+  ) async {
+    final selected = await showDialog<ProfileVisibility>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Profile visibility'),
+        children: [
+          for (final value in ProfileVisibility.values)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(dialogContext).pop(value),
+              child: _visibilityOption(value.label, value == current),
+            ),
+        ],
+      ),
+    );
+    if (selected != null && context.mounted) {
+      context.read<ProfileScreenCubit>().updateVisibility(
+        profileVisibility: selected,
+      );
+    }
+  }
+
+  Future<void> _showRegistrationVisibilityDialog(
+    BuildContext context,
+    RegistrationVisibility current,
+  ) async {
+    final selected = await showDialog<RegistrationVisibility>(
+      context: context,
+      builder: (dialogContext) => SimpleDialog(
+        title: const Text('Registration visibility'),
+        children: [
+          for (final value in RegistrationVisibility.values)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(dialogContext).pop(value),
+              child: _visibilityOption(value.label, value == current),
+            ),
+        ],
+      ),
+    );
+    if (selected != null && context.mounted) {
+      context.read<ProfileScreenCubit>().updateVisibility(
+        registrationVisibility: selected,
+      );
+    }
+  }
+
+  Widget _visibilityOption(String label, bool selected) => Row(
+    children: [
+      if (selected)
+        const Icon(Icons.check_rounded, size: 18)
+      else
+        const SizedBox(width: 18),
+      const SizedBox(width: 8),
+      Text(label),
+    ],
+  );
 }

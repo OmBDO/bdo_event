@@ -8,6 +8,8 @@ import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_scr
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/security/biometric_lock_service.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
 
 class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   ProfileScreenCubit({
@@ -16,11 +18,13 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     required SaveProfilePreferences saveProfilePreferences,
     EventReminderNotificationService? reminderNotifications,
     BiometricLockService? biometricLockService,
+    EventStore? eventStore,
   })
       : _authRepository = authRepository,
         _saveProfilePreferences = saveProfilePreferences,
         _reminderNotifications = reminderNotifications,
         _biometricLockService = biometricLockService,
+        _eventStore = eventStore,
       super(_initialState(authRepository, loadProfilePreferences.call()));
 
   static ProfileScreenState _initialState(
@@ -48,6 +52,7 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   final SaveProfilePreferences _saveProfilePreferences;
   final EventReminderNotificationService? _reminderNotifications;
   final BiometricLockService? _biometricLockService;
+  final EventStore? _eventStore;
 
   void refresh() {
     final user = _authRepository.currentUser;
@@ -59,6 +64,48 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
         clearErrorMessage: true,
       ),
     );
+    unawaited(loadVisibility());
+  }
+
+  Future<void> loadVisibility() async {
+    final userId = state.user?.id ?? _authRepository.currentUser?.id;
+    if (userId == null || _eventStore == null) return;
+    try {
+      final values = await _eventStore.loadProfileVisibility(userId);
+      if (!isClosed) {
+        emit(state.copyWith(
+          profileVisibility: ProfileVisibility.fromStorage(values['profile_visibility']),
+          registrationVisibility:
+              RegistrationVisibility.fromStorage(values['registration_visibility']),
+        ));
+      }
+    } on Object {
+      return;
+    }
+  }
+
+  Future<void> updateVisibility({
+    ProfileVisibility? profileVisibility,
+    RegistrationVisibility? registrationVisibility,
+  }) async {
+    final nextProfile = profileVisibility ?? state.profileVisibility;
+    final nextRegistration =
+        registrationVisibility ?? state.registrationVisibility;
+    emit(state.copyWith(
+      profileVisibility: nextProfile,
+      registrationVisibility: nextRegistration,
+    ));
+    final userId = state.user?.id ?? _authRepository.currentUser?.id;
+    if (userId == null || _eventStore == null) return;
+    try {
+      await _eventStore.saveProfileVisibility(
+        userId: userId,
+        profileVisibility: nextProfile.storageValue,
+        registrationVisibility: nextRegistration.storageValue,
+      );
+    } on Object {
+      return;
+    }
   }
 
   void toggleDarkMode(bool enabled) {

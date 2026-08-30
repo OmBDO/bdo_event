@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/core/notifications/event_reminder_permission_service.dart';
 import 'package:bdo_event/core/notifications/event_reminder_policy.dart';
 import 'package:flutter/foundation.dart';
@@ -81,7 +82,7 @@ class EventReminderNotificationService {
     await _plugin.zonedSchedule(
       EventReminderPolicy.notificationIdFor(event.id),
       event.title,
-      'Your event is scheduled for ${event.date}.',
+      'Your event is scheduled for ${formatEventDate(event.date, 'dd/MM/yyyy')} at ${formatEventTime(event.startTime)}.',
       tz.TZDateTime.from(reminderTime, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(

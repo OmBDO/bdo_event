@@ -9,6 +9,7 @@ import 'package:bdo_event/features/watcher_screen/domain/usecases/load_scan_dash
 import 'package:bdo_event/features/watcher_screen/domain/usecases/validate_registration.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/registration_code_codec.dart';
 
 class WatcherScanCubit extends Cubit<WatcherScanState> {
   WatcherScanCubit({
@@ -108,25 +109,12 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       final payload = jsonDecode(rawValue);
       return payload is Map<String, dynamic> ? payload : null;
     } on FormatException {
-      if (!rawValue.startsWith('BDO1')) return null;
-      try {
-        final encoded = rawValue.substring(4);
-        if (encoded.isEmpty || encoded.length.isOdd) return null;
-        final bytes = <int>[];
-        for (var index = 0; index < encoded.length; index += 2) {
-          bytes.add(int.parse(encoded.substring(index, index + 2), radix: 16));
-        }
-        final decoded = utf8.decode(bytes);
-        final separator = decoded.lastIndexOf('|');
-        if (separator <= 0 || separator == decoded.length - 1) return null;
-        return {
+      final decoded = RegistrationCodeCodec.decode(rawValue);
+      if (decoded == null) return null;
+      return {
           'type': AppIdentifiers.qrRegistrationType,
-          'eventId': decoded.substring(0, separator),
-          'token': decoded.substring(separator + 1),
+          ...decoded,
         };
-      } on FormatException {
-        return null;
-      }
     }
   }
 

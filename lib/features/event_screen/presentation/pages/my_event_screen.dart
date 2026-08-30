@@ -3,8 +3,13 @@ import 'package:bdo_event/features/event_screen/presentation/pages/category_even
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/event_analytics_page.dart';
+import 'package:bdo_event/features/event_screen/presentation/pages/event_invitation_page.dart';
+import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
@@ -232,7 +237,13 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          event.date,
+                                          formatEventDate(
+                                            formatEventDate(
+                                              event.date,
+                                              context.watch<ProfileScreenCubit>().state.dateFormat,
+                                            ),
+                                            context.watch<ProfileScreenCubit>().state.dateFormat,
+                                          ),
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Theme.of(context)
@@ -294,6 +305,19 @@ class _MyEventScreenState extends State<MyEventScreen> {
                                   ),
                                 ),
                               ),
+                              if (getIt<AuthRepositoryContract>()
+                                  .currentUser
+                                  ?.isAdministrator ??
+                                  false)
+                                IconButton(
+                                  tooltip: 'Invite users',
+                                  icon: const Icon(Icons.person_add_alt_1_outlined),
+                                  onPressed: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => EventInvitationPage(event: event),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),

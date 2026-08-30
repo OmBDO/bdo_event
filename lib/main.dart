@@ -17,6 +17,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
+import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +44,65 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  final _deepLinkService = EventDeepLinkService();
+  StreamSubscription<Uri>? _deepLinkSubscription;
+  String? _pendingEventId;
+
+  @override
+  void initState() {
+    super.initState();
+    _deepLinkSubscription = _deepLinkService.uriStream.listen(_handleUri);
+    _deepLinkService.initialUri.then((uri) {
+      if (uri != null) _handleUri(uri);
+    });
+  }
+
+  @override
+  void dispose() {
+    _deepLinkSubscription?.cancel();
+    super.dispose();
+  }
+
+  void _handleUri(Uri uri) {
+    final eventId = EventDeepLinkService.eventIdFromUri(uri);
+    if (eventId == null) return;
+    _pendingEventId = eventId;
+    _openPendingEvent();
+  }
+
+  Future<void> _openPendingEvent() async {
+    final eventId = _pendingEventId;
+    if (eventId == null || getIt<AuthScreenCubit>().state.step != AuthStep.authenticated) {
+      return;
+    }
+    _pendingEventId = null;
+
+    Event? event;
+    try {
+      final events = await getIt<EventStore>().readCreatedEvents();
+      event = events.where((candidate) => candidate.id == eventId).firstOrNull;
+    } on Object {
+      return;
+    }
+    if (!mounted || event == null) return;
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<EventDetailCubit>(),
+          child: EventDetailPage(event: event),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +121,10 @@ class MyApp extends StatelessWidget {
         builder: (context) {
           final profileState = context.watch<ProfileScreenCubit>().state;
           final highContrast = profileState.isHighContrastEnabled;
-          return MaterialApp(
+          return BlocListener<AuthScreenCubit, AuthScreenState>(
+            listener: (_, __) => _openPendingEvent(),
+            child: MaterialApp(
+        navigatorKey: _navigatorKey,
         title: AppText.appName,
         theme: AppTheme.light(highContrast: highContrast),
         darkTheme: AppTheme.dark(highContrast: highContrast),
@@ -78,6 +141,7 @@ class MyApp extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
             home: const AuthScreen(),
+            ),
           );
         },
       ),
