@@ -106,8 +106,8 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(
+                Padding(
+                  padding: const EdgeInsets.only(
                     top: 2.0,
                   ), // Aligns icon with first line of text
                   child: Icon(
@@ -202,7 +202,11 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                 widget.widget.event.endTime != null)
               Row(
                 children: [
-                  Icon(Icons.schedule_outlined, color: widget.textGrey, size: 18),
+                  Icon(
+                    Icons.schedule_outlined,
+                    color: widget.textGrey,
+                    size: 18,
+                  ),
                   const Gap(8),
                   Text(
                     '${formatEventTime(widget.widget.event.startTime)} - ${formatEventTime(widget.widget.event.endTime)}',
@@ -268,7 +272,9 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                         const Spacer(),
                         CircleAvatar(
                           radius: 14,
-                          backgroundColor: Theme.of(context).colorScheme.surface,
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .surface,
                           child: Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: 10,

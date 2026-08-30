@@ -1,6 +1,8 @@
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
+import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ScanHistorySheet extends StatelessWidget {
   const ScanHistorySheet({
@@ -16,23 +18,21 @@ class ScanHistorySheet extends StatelessWidget {
 
   static Future<void> show(
     BuildContext context,
-    List<ScanHistoryEntry> history,
-    {
+    List<ScanHistoryEntry> history, {
     bool autoOpenNext = true,
     bool keepHistoryVisibleAfterCheckIn = false,
-    }
-  {
+  }) {
     final cubit = context.read<WatcherScanCubit>();
     return showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (context) => ScanHistorySheet(
-      history: history,
+      context: context,
+      showDragHandle: true,
+      builder: (context) => ScanHistorySheet(
+        history: history,
         onConfirmAll: () => cubit.checkInAll(autoOpenNext: autoOpenNext),
         onConfirmEntry: (entry) =>
-          cubit.checkInEntry(entry, autoOpenNext: autoOpenNext),
-    ),
-  );
+            cubit.checkInEntry(entry, autoOpenNext: autoOpenNext),
+      ),
+    );
   }
 
   @override
@@ -61,9 +61,10 @@ class ScanHistorySheet extends StatelessWidget {
                   child: SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: history.any(
-                        (entry) => entry.status == 'Ready to check in',
-                      )
+                      onPressed:
+                          history.any(
+                            (entry) => entry.status == 'Ready to check in',
+                          )
                           ? () async {
                               await onConfirmAll();
                               if (context.mounted &&
@@ -73,10 +74,10 @@ class ScanHistorySheet extends StatelessWidget {
                             }
                           : null,
                       style: FilledButton.styleFrom(
-                        backgroundColor:
-                          Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                          Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context)
+                            .colorScheme
+                            .onPrimary,
                         minimumSize: const Size.fromHeight(50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),

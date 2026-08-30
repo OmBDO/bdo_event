@@ -170,7 +170,7 @@ void configureDependencies({SharedPreferences? preferences}) {
       loadRegisteredEvents: getIt(),
       authRepository: getIt(),
       reminderNotifications: getIt(),
-      _preferences: getIt.isRegistered<SharedPreferences>()
+      preferences: getIt.isRegistered<SharedPreferences>()
           ? getIt<SharedPreferences>()
           : null,
     ),

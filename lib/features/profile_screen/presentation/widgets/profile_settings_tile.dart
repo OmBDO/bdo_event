@@ -22,16 +22,16 @@ class ProfileSettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return ListTile(
-    onTap: onTap,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-    leading: _settingsIcon(),
-    title: _settingsTitle(context),
-    subtitle: _settingsSubtitle(context),
-    trailing: const Icon(
-      Icons.arrow_forward_ios_rounded,
-      color: theme.colorScheme.onSurface.withValues(alpha: 0.26),
-      size: 14,
-    ),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: _settingsIcon(),
+      title: _settingsTitle(context),
+      subtitle: _settingsSubtitle(context),
+      trailing: Icon(
+        Icons.arrow_forward_ios_rounded,
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.26),
+        size: 14,
+      ),
     );
   }
 
@@ -56,7 +56,7 @@ class ProfileSettingsTile extends StatelessWidget {
   Widget _settingsSubtitle(BuildContext context) => Text(
     subtitle,
     style: TextStyle(
-        color: Theme.of(context).brightness == Brightness.dark
+      color: Theme.of(context).brightness == Brightness.dark
           ? AppColors.mutedTextDark
           : AppColors.profileSubtitleLight,
       fontSize: 12,

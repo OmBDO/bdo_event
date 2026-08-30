@@ -1,5 +1,8 @@
+import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/dotenv.dart' show DotEnvInitialization;
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
+import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_state.dart';
 import 'package:bdo_event/features/auth_screen/presentation/pages/auth_screen.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/theme/app_theme.dart';
@@ -8,6 +11,7 @@ import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cu
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/signup_cubit.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
+import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
@@ -17,7 +21,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'dart:async';
+
 import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 
@@ -81,7 +87,8 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _openPendingEvent() async {
     final eventId = _pendingEventId;
-    if (eventId == null || getIt<AuthScreenCubit>().state.step != AuthStep.authenticated) {
+    if (eventId == null ||
+        getIt<AuthScreenCubit>().state.step != AuthStep.authenticated) {
       return;
     }
     _pendingEventId = null;
@@ -98,7 +105,7 @@ class _MyAppState extends State<MyApp> {
       MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (_) => getIt<EventDetailCubit>(),
-          child: EventDetailPage(event: event),
+          child: EventDetailPage(event: event!),
         ),
       ),
     );
@@ -124,23 +131,23 @@ class _MyAppState extends State<MyApp> {
           return BlocListener<AuthScreenCubit, AuthScreenState>(
             listener: (_, __) => _openPendingEvent(),
             child: MaterialApp(
-        navigatorKey: _navigatorKey,
-        title: AppText.appName,
-        theme: AppTheme.light(highContrast: highContrast),
-        darkTheme: AppTheme.dark(highContrast: highContrast),
-        themeMode: profileState.isDarkModeEnabled
-            ? ThemeMode.dark
-            : ThemeMode.light,
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: profileState.isLargeTextEnabled
-                ? const TextScaler.linear(1.15)
-                : const TextScaler.linear(1.0),
-          ),
-          child: child!,
-        ),
-        debugShowCheckedModeBanner: false,
-            home: const AuthScreen(),
+              navigatorKey: _navigatorKey,
+              title: AppText.appName,
+              theme: AppTheme.light(highContrast: highContrast),
+              darkTheme: AppTheme.dark(highContrast: highContrast),
+              themeMode: profileState.isDarkModeEnabled
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
+              builder: (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: profileState.isLargeTextEnabled
+                      ? const TextScaler.linear(1.15)
+                      : const TextScaler.linear(1.0),
+                ),
+                child: child!,
+              ),
+              debugShowCheckedModeBanner: false,
+              home: const AuthScreen(),
             ),
           );
         },

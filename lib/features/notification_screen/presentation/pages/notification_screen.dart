@@ -106,7 +106,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   notification: notification,
                   onShown: () => _markRead(notification),
                   onConfirm: (status) => _confirmArrival(notification, status),
-                    onInvitationResponse: (accepted) =>
+                  onInvitationResponse: (accepted) =>
                       _respondToInvitation(notification, accepted),
                 );
               },
@@ -135,7 +135,8 @@ class _NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => onShown());
     final hasResponse = notification.arrivalStatus != ArrivalStatus.pending;
-    final isInvitation = notification.category == NotificationCategory.invitation;
+    final isInvitation =
+        notification.category == NotificationCategory.invitation;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -242,5 +243,6 @@ class _NotificationCard extends StatelessWidget {
     NotificationCategory.reminder => 'Reminder',
     NotificationCategory.system => 'System',
     NotificationCategory.event => 'Event',
+    NotificationCategory.invitation => throw UnimplementedError(),
   };
 }

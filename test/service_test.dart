@@ -42,7 +42,10 @@ void main() {
     expect(full, 'This event has reached its capacity');
 
     expect(await repository.registerEvent(event), isNull);
-    expect(await repository.registerEvent(event), 'You are already registered for this event');
+    expect(
+      await repository.registerEvent(event),
+      'You are already registered for this event',
+    );
   });
 
   test('event JSON preserves an optional deadline as an instant', () {
@@ -70,7 +73,11 @@ void main() {
     );
 
     final error = await repository.registerEvent(
-      event.copyWith(registrationDeadline: DateTime.now().subtract(const Duration(minutes: 1))),
+      event.copyWith(
+        registrationDeadline: DateTime.now().subtract(
+          const Duration(minutes: 1),
+        ),
+      ),
     );
 
     expect(error, 'Registration for this event has closed');
@@ -167,10 +174,34 @@ class FakeAuthRepository implements AuthRepositoryContract {
   }) async => null;
 
   @override
-  Future<String?> login({required String email, required String password}) async => null;
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async => null;
 
   @override
   Future<void> logout() async {}
+
+  @override
+  Future<String?> logoutEverywhere() {
+    // TODO: implement logoutEverywhere
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> updatePassword(String password) {
+    // TODO: implement updatePassword
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+  }) {
+    // TODO: implement updateProfile
+    throw UnimplementedError();
+  }
 }
 
 class InMemoryEventStore implements EventStore {
@@ -264,4 +295,50 @@ class InMemoryEventStore implements EventStore {
     required String eventId,
     required ArrivalStatus status,
   }) async {}
+
+  @override
+  Future<List<Map<String, String>>> loadInvitationRecipients() {
+    // TODO: implement loadInvitationRecipients
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, String>> loadProfileVisibility(String userId) {
+    // TODO: implement loadProfileVisibility
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> recordLoginActivity({String? deviceLabel, String? platform}) {
+    // TODO: implement recordLoginActivity
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> respondToEventInvitation({
+    required String eventId,
+    required bool accepted,
+  }) {
+    // TODO: implement respondToEventInvitation
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveProfileVisibility({
+    required String userId,
+    required String profileVisibility,
+    required String registrationVisibility,
+  }) {
+    // TODO: implement saveProfileVisibility
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int> sendEventInvitations({
+    required String eventId,
+    required List<String> userIds,
+  }) {
+    // TODO: implement sendEventInvitations
+    throw UnimplementedError();
+  }
 }

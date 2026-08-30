@@ -1,4 +1,3 @@
-import 'package:bdo_event/core/util/event.resource.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
@@ -55,11 +54,11 @@ class EventCard extends StatelessWidget {
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return _buildImagePlaceholder();
+                            return _buildImagePlaceholder(context);
                           },
                         ),
                       )
-                    : _buildImagePlaceholder(),
+                    : _buildImagePlaceholder(context),
               ),
 
               // Floating Date Badge (Top Right)
@@ -142,35 +141,6 @@ class EventCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-              // if (onUpdate != null && onDelete != null)
-              //   Positioned(
-              //     top: 54,
-              //     right: 12,
-              //     child: PopupMenuButton<String>(
-              //       tooltip: AppText.manageEvent,
-              //       onSelected: (value) {
-              //         if (value == 'update') onUpdate!();
-              //         if (value == 'delete') onDelete!();
-              //       },
-              //       itemBuilder: (context) => const [
-              //         PopupMenuItem(
-              //           value: 'update',
-              //           child: Text(AppText.update),
-              //         ),
-              //         PopupMenuItem(
-              //           value: 'delete',
-              //           child: Text(AppText.delete),
-              //         ),
-              //       ],
-              //       child: const CircleAvatar(
-              //         radius: 18,
-              //         backgroundColor: Colors.white70,
-              //         child: Icon(Icons.more_horiz, color: Colors.black87),
-              //       ),
-              //     ),
-              //   ),
-
             ],
           ),
 
@@ -272,7 +242,7 @@ class EventCard extends StatelessWidget {
   }
 
   // Helper widget to cleanly format fallback images
-  Widget _buildImagePlaceholder() {
+  Widget _buildImagePlaceholder(BuildContext context) {
     return Container(
       height: 200,
       width: double.infinity,
@@ -284,5 +254,4 @@ class EventCard extends StatelessWidget {
       ),
     );
   }
-
 }

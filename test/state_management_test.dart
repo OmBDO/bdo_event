@@ -65,108 +65,125 @@ void main() {
     await cubit.close();
   });
 
-  test('event registration clears isSubmitting when the repository throws', () async {
-    final repository = FakeRegistrationRepository()..throwOnRegister = true;
-    final cubit = EventDetailCubit(
-      registerForEvent: RegisterForEvent(repository),
-      cancelEventRegistration: CancelEventRegistration(repository),
-      eventStore: FakeEventStore(),
-      authRepository: FakeAuthRepository(),
-    );
+  test(
+    'event registration clears isSubmitting when the repository throws',
+    () async {
+      final repository = FakeRegistrationRepository()..throwOnRegister = true;
+      final cubit = EventDetailCubit(
+        registerForEvent: RegisterForEvent(repository),
+        cancelEventRegistration: CancelEventRegistration(repository),
+        eventStore: FakeEventStore(),
+        authRepository: FakeAuthRepository(),
+      );
 
-    final error = await cubit.register(event);
+      final error = await cubit.register(event);
 
-    expect(error, AppText.unableToSaveRegistration);
-    expect(cubit.state.isSubmitting, isFalse);
-    expect(cubit.state.error, AppText.unableToSaveRegistration);
-    await cubit.close();
-  });
+      expect(error, AppText.unableToSaveRegistration);
+      expect(cubit.state.isSubmitting, isFalse);
+      expect(cubit.state.error, AppText.unableToSaveRegistration);
+      await cubit.close();
+    },
+  );
 
-  test('ticket cancellation clears isCancelling when the repository throws', () async {
-    final repository = FakeRegisteredEventRepository()..throwOnCancel = true;
-    final cubit = RegisteredEventCubit(
-      cancelRegisteredEvent: CancelRegisteredEvent(repository),
-      authRepository: FakeAuthRepository(),
-      eventStore: FakeEventStore(),
-    );
+  test(
+    'ticket cancellation clears isCancelling when the repository throws',
+    () async {
+      final repository = FakeRegisteredEventRepository()..throwOnCancel = true;
+      final cubit = RegisteredEventCubit(
+        cancelRegisteredEvent: CancelRegisteredEvent(repository),
+        authRepository: FakeAuthRepository(),
+        eventStore: FakeEventStore(),
+      );
 
-    final cancelled = await cubit.cancel(event);
+      final cancelled = await cubit.cancel(event);
 
-    expect(cancelled, isFalse);
-    expect(cubit.state.isCancelling, isFalse);
-    expect(cubit.state.error, AppText.unableToCancelRegistration);
-    await cubit.close();
-  });
+      expect(cancelled, isFalse);
+      expect(cubit.state.isCancelling, isFalse);
+      expect(cubit.state.error, AppText.unableToCancelRegistration);
+      await cubit.close();
+    },
+  );
 
-  test('scanner ignores a second QR validation while the first is pending', () async {
-    final resultCompleter = Completer<Map<String, dynamic>?>();
-    final store = FakeEventStore()..validationResult = resultCompleter.future;
-    final repository = WatcherRepository(WatcherRemoteDataSourceImpl(store));
-    final cubit = WatcherScanCubit(
-      validateRegistration: ValidateRegistration(repository),
-      checkInRegistration: CheckInRegistration(repository),
-      loadScanDashboard: LoadScanDashboard(repository),
-      authRepository: FakeAuthRepository(roles: {UserRole.watcher}),
-    );
-    final qr = jsonEncode({
-      'type': AppIdentifiers.qrRegistrationType,
-      'eventId': event.id,
-      'token': 'token-1',
-    });
+  test(
+    'scanner ignores a second QR validation while the first is pending',
+    () async {
+      final resultCompleter = Completer<Map<String, dynamic>?>();
+      final store = FakeEventStore()..validationResult = resultCompleter.future;
+      final repository = WatcherRepository(WatcherRemoteDataSourceImpl(store));
+      final cubit = WatcherScanCubit(
+        validateRegistration: ValidateRegistration(repository),
+        checkInRegistration: CheckInRegistration(repository),
+        loadScanDashboard: LoadScanDashboard(repository),
+        authRepository: FakeAuthRepository(roles: {UserRole.watcher}),
+      );
+      final qr = jsonEncode({
+        'type': AppIdentifiers.qrRegistrationType,
+        'eventId': event.id,
+        'token': 'token-1',
+      });
 
-    final first = cubit.validate(qr);
-    await Future<void>.delayed(Duration.zero);
-    final second = cubit.validate(qr);
+      final first = cubit.validate(qr);
+      await Future<void>.delayed(Duration.zero);
+      final second = cubit.validate(qr);
 
-    expect(cubit.state.status, WatcherScanStatus.scanning);
-    expect(store.validationCalls, 1);
+      expect(cubit.state.status, WatcherScanStatus.scanning);
+      expect(store.validationCalls, 1);
 
-    resultCompleter.complete({'event_id': event.id, 'user_id': 'user-1'});
-    await Future.wait([first, second]);
+      resultCompleter.complete({'event_id': event.id, 'user_id': 'user-1'});
+      await Future.wait([first, second]);
 
-    expect(cubit.state.status, WatcherScanStatus.valid);
-    expect(store.validationCalls, 1);
-    await cubit.close();
-  });
+      expect(cubit.state.status, WatcherScanStatus.valid);
+      expect(store.validationCalls, 1);
+      await cubit.close();
+    },
+  );
 
-  test('watcher dashboard loads aggregate counts without attendee profiles', () async {
-    final store = FakeEventStore()
-      ..attendanceCount = 12
-      ..checkedInCount = 4;
-    final repository = WatcherRepository(WatcherRemoteDataSourceImpl(store));
+  test(
+    'watcher dashboard loads aggregate counts without attendee profiles',
+    () async {
+      final store = FakeEventStore()
+        ..attendanceCount = 12
+        ..checkedInCount = 4;
+      final repository = WatcherRepository(WatcherRemoteDataSourceImpl(store));
 
-    final dashboard = await repository.loadDashboard(event.id);
+      final dashboard = await repository.loadDashboard(event.id);
 
-    expect(dashboard.expectedCount, 12);
-    expect(dashboard.checkedInCount, 4);
-    expect(store.attendanceCountCalls, 1);
-    expect(store.attendeeCalls, 0);
-  });
+      expect(dashboard.expectedCount, 12);
+      expect(dashboard.checkedInCount, 4);
+      expect(store.attendanceCountCalls, 1);
+      expect(store.attendeeCalls, 0);
+    },
+  );
 
-  test('event attendance ignores a stale response from an older request', () async {
-    final firstResult = Completer<int>();
-    final secondResult = Completer<int>();
-    final store = FakeEventStore()
-      ..attendanceResults['event-1'] = firstResult.future
-      ..attendanceResults['event-2'] = secondResult.future;
-    final cubit = EventDetailCubit(
-      registerForEvent: RegisterForEvent(FakeRegistrationRepository()),
-      cancelEventRegistration: CancelEventRegistration(FakeRegistrationRepository()),
-      eventStore: store,
-      authRepository: FakeAuthRepository(),
-    );
-    final firstEvent = event.copyWith(id: 'event-1', creatorId: 'user-1');
-    final secondEvent = event.copyWith(id: 'event-2', creatorId: 'user-1');
+  test(
+    'event attendance ignores a stale response from an older request',
+    () async {
+      final firstResult = Completer<int>();
+      final secondResult = Completer<int>();
+      final store = FakeEventStore()
+        ..attendanceResults['event-1'] = firstResult.future
+        ..attendanceResults['event-2'] = secondResult.future;
+      final cubit = EventDetailCubit(
+        registerForEvent: RegisterForEvent(FakeRegistrationRepository()),
+        cancelEventRegistration: CancelEventRegistration(
+          FakeRegistrationRepository(),
+        ),
+        eventStore: store,
+        authRepository: FakeAuthRepository(),
+      );
+      final firstEvent = event.copyWith(id: 'event-1', creatorId: 'user-1');
+      final secondEvent = event.copyWith(id: 'event-2', creatorId: 'user-1');
 
-    final firstLoad = cubit.loadAttendanceCount(firstEvent);
-    final secondLoad = cubit.loadAttendanceCount(secondEvent);
-    secondResult.complete(2);
-    firstResult.complete(1);
-    await Future.wait([firstLoad, secondLoad]);
+      final firstLoad = cubit.loadAttendanceCount(firstEvent);
+      final secondLoad = cubit.loadAttendanceCount(secondEvent);
+      secondResult.complete(2);
+      firstResult.complete(1);
+      await Future.wait([firstLoad, secondLoad]);
 
-    expect(cubit.state.attendanceCount, 2);
-    await cubit.close();
-  });
+      expect(cubit.state.attendanceCount, 2);
+      await cubit.close();
+    },
+  );
 
   test('ticket token ignores a stale response from an older request', () async {
     final firstResult = Completer<String?>();
@@ -175,9 +192,12 @@ void main() {
       ..tokenResults['event-1'] = firstResult.future
       ..tokenResults['event-2'] = secondResult.future;
     final cubit = RegisteredEventCubit(
-      cancelRegisteredEvent: CancelRegisteredEvent(FakeRegisteredEventRepository()),
+      cancelRegisteredEvent: CancelRegisteredEvent(
+        FakeRegisteredEventRepository(),
+      ),
       authRepository: FakeAuthRepository(),
       eventStore: store,
+      reminderNotifications: null,
     );
 
     final firstLoad = cubit.loadToken('event-1');
@@ -192,7 +212,8 @@ void main() {
 }
 
 class FakeAuthRepository implements AuthRepositoryContract {
-  FakeAuthRepository({Set<UserRole>? roles}) : _roles = roles ?? {UserRole.admin};
+  FakeAuthRepository({Set<UserRole>? roles})
+    : _roles = roles ?? {UserRole.admin};
 
   final Set<UserRole> _roles;
   final User user = User(
@@ -220,7 +241,10 @@ class FakeAuthRepository implements AuthRepositoryContract {
   Future<void> initialize() async {}
 
   @override
-  Future<String?> login({required String email, required String password}) async => null;
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async => null;
 
   @override
   Future<void> logout() async {}
@@ -232,6 +256,27 @@ class FakeAuthRepository implements AuthRepositoryContract {
     required String password,
     required UserRole requestedRole,
   }) async => null;
+
+  @override
+  Future<String?> logoutEverywhere() {
+    // TODO: implement logoutEverywhere
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> updatePassword(String password) {
+    // TODO: implement updatePassword
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+  }) {
+    // TODO: implement updateProfile
+    throw UnimplementedError();
+  }
 }
 
 class FakeEventRepository implements EventRepositoryContract {
@@ -273,7 +318,8 @@ class FakeRegistrationRepository implements RegistrationRepositoryContract {
   Future<String?> cancelRegistration(Event event) async => null;
 }
 
-class FakeRegisteredEventRepository implements RegisteredEventRepositoryContract {
+class FakeRegisteredEventRepository
+    implements RegisteredEventRepositoryContract {
   bool throwOnCancel = false;
 
   @override
@@ -309,8 +355,9 @@ class FakeEventStore implements EventStore {
   Future<List<Event>> loadRegistrations(String userId) async => const [];
 
   @override
-  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async =>
-      const {};
+  Future<Map<String, int>> loadRegistrationCounts(
+    List<String> eventIds,
+  ) async => const {};
 
   @override
   Future<void> activateRegistration(String userId, Event event) async {}
@@ -366,4 +413,50 @@ class FakeEventStore implements EventStore {
     required String eventId,
     required ArrivalStatus status,
   }) async {}
+
+  @override
+  Future<List<Map<String, String>>> loadInvitationRecipients() {
+    // TODO: implement loadInvitationRecipients
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Map<String, String>> loadProfileVisibility(String userId) {
+    // TODO: implement loadProfileVisibility
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> recordLoginActivity({String? deviceLabel, String? platform}) {
+    // TODO: implement recordLoginActivity
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> respondToEventInvitation({
+    required String eventId,
+    required bool accepted,
+  }) {
+    // TODO: implement respondToEventInvitation
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> saveProfileVisibility({
+    required String userId,
+    required String profileVisibility,
+    required String registrationVisibility,
+  }) {
+    // TODO: implement saveProfileVisibility
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<int> sendEventInvitations({
+    required String eventId,
+    required List<String> userIds,
+  }) {
+    // TODO: implement sendEventInvitations
+    throw UnimplementedError();
+  }
 }
