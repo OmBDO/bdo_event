@@ -299,11 +299,8 @@ abstract final class AppText {
 abstract final class AppAssets {
   static const logo = 'assets/logo/bdo_event.png';
   static const defaultAvatarUrl =
-      'https://yt3.ggpht.com/yti/ANjgQV_bOKivh_MVo0VJcxLjy_iAfiAyY4wThz34mHihfEe6ow=s88-c-k-c0x00ffffff-no-rj';
+      'https://static.vecteezy.com/system/resources/previews/018/765/757/non_2x/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg';
   static const assetPathPrefix = 'assets/';
-  static const mayDay = 'assets/festivals/1_may.png';
-  static const diwali = 'assets/festivals/diwali.png';
-  static const ganapati = 'assets/festivals/ganapati.png';
 }
 
 abstract final class AppStorageKeys {

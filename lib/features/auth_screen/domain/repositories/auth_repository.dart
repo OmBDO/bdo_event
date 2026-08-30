@@ -26,6 +26,10 @@ abstract interface class AuthRepositoryContract {
   Future<String?> updateProfile({
     required String displayName,
     required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
   });
 
   Future<void> logout();

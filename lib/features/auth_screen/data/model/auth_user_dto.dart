@@ -27,6 +27,9 @@ class AuthUserDto {
           metadata['photo_url'] as String? ??
           metadata['avatar_url'] as String? ??
           metadata['picture'] as String?,
+      phoneNumber: metadata['phone_number'] as String?,
+      bio: metadata['bio'] as String?,
+      locale: metadata['locale'] as String? ?? 'en-IN',
       createdAt: DateTime.tryParse(user.createdAt) ?? DateTime.now(),
       lastSignedInAt: user.lastSignInAt == null
           ? null
