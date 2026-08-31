@@ -1,5 +1,5 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:bdo_event/features/event_detail_screen/data/model/registered_event_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 

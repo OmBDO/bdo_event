@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_state.dart';
@@ -34,7 +34,10 @@ void main() {
       final repository = FakeAuthRepository(loginResult: 'Invalid credentials');
       final cubit = SignInCubit(authRepository: repository);
 
-      final result = await cubit.submit(email: 'bad@example.com', password: 'x');
+      final result = await cubit.submit(
+        email: 'bad@example.com',
+        password: 'x',
+      );
 
       expect(result, isFalse);
       expect(cubit.state.isSubmitting, isFalse);
@@ -48,7 +51,10 @@ void main() {
       final cubit = SignInCubit(authRepository: repository);
 
       final first = cubit.submit(email: 'a@example.com', password: 'secret');
-      final second = await cubit.submit(email: 'b@example.com', password: 'secret');
+      final second = await cubit.submit(
+        email: 'b@example.com',
+        password: 'secret',
+      );
       completer.complete(null);
 
       expect(await first, isTrue);
@@ -77,47 +83,55 @@ void main() {
       await cubit.close();
     });
 
-    test('returns duplicate-submit message while registration is pending', () async {
-      final completer = Completer<String?>();
-      final repository = FakeAuthRepository(registerFuture: completer.future);
-      final cubit = SignUpCubit(authRepository: repository);
+    test(
+      'returns duplicate-submit message while registration is pending',
+      () async {
+        final completer = Completer<String?>();
+        final repository = FakeAuthRepository(registerFuture: completer.future);
+        final cubit = SignUpCubit(authRepository: repository);
 
-      final first = cubit.submit(
-        name: 'Asha',
-        email: 'asha@example.com',
-        password: 'secret',
-        requestedRole: UserRole.user,
-      );
-      final second = await cubit.submit(
-        name: 'Other',
-        email: 'other@example.com',
-        password: 'secret',
-        requestedRole: UserRole.user,
-      );
-      completer.complete(null);
+        final first = cubit.submit(
+          name: 'Asha',
+          email: 'asha@example.com',
+          password: 'secret',
+          requestedRole: UserRole.user,
+        );
+        final second = await cubit.submit(
+          name: 'Other',
+          email: 'other@example.com',
+          password: 'secret',
+          requestedRole: UserRole.user,
+        );
+        completer.complete(null);
 
-      expect(await first, isNull);
-      expect(second, AppText.pleaseWait);
-      expect(repository.registerCalls, 1);
-      await cubit.close();
-    });
+        expect(await first, isNull);
+        expect(second, AppText.pleaseWait);
+        expect(repository.registerCalls, 1);
+        await cubit.close();
+      },
+    );
   });
 
   group('AuthScreenCubit', () {
-    test('selects authenticated step when initialization restores a user', () async {
-      final cubit = AuthScreenCubit(
-        authRepository: FakeAuthRepository(currentUser: testUser),
-      );
+    test(
+      'selects authenticated step when initialization restores a user',
+      () async {
+        final cubit = AuthScreenCubit(
+          authRepository: FakeAuthRepository(currentUser: testUser),
+        );
 
-      await cubit.checkActiveSession();
+        await cubit.checkActiveSession();
 
-      expect(cubit.state.step, AuthStep.authenticated);
-      await cubit.close();
-    });
+        expect(cubit.state.step, AuthStep.authenticated);
+        await cubit.close();
+      },
+    );
 
     test('falls back to sign-in when initialization fails', () async {
       final cubit = AuthScreenCubit(
-        authRepository: FakeAuthRepository(initializeError: StateError('offline')),
+        authRepository: FakeAuthRepository(
+          initializeError: StateError('offline'),
+        ),
       );
 
       await cubit.checkActiveSession();
@@ -126,24 +140,26 @@ void main() {
       await cubit.close();
     });
 
-    test('supports sign-up, pre-filled sign-in, logout, and logout-everywhere',
-        () async {
-      final repository = FakeAuthRepository(logoutEverywhereResult: null);
-      final cubit = AuthScreenCubit(authRepository: repository);
+    test(
+      'supports sign-up, pre-filled sign-in, logout, and logout-everywhere',
+      () async {
+        final repository = FakeAuthRepository(logoutEverywhereResult: null);
+        final cubit = AuthScreenCubit(authRepository: repository);
 
-      cubit.showSignUp();
-      expect(cubit.state.step, AuthStep.signUp);
-      cubit.showSignIn('person@example.com');
-      expect(cubit.state.preFilledEmail, 'person@example.com');
-      cubit.authenticationSucceeded();
-      expect(cubit.state.step, AuthStep.authenticated);
-      await cubit.logout();
-      expect(cubit.state.step, AuthStep.signIn);
-      cubit.authenticationSucceeded();
-      expect(await cubit.logoutEverywhere(), isNull);
-      expect(cubit.state.step, AuthStep.signIn);
-      await cubit.close();
-    });
+        cubit.showSignUp();
+        expect(cubit.state.step, AuthStep.signUp);
+        cubit.showSignIn('person@example.com');
+        expect(cubit.state.preFilledEmail, 'person@example.com');
+        cubit.authenticationSucceeded();
+        expect(cubit.state.step, AuthStep.authenticated);
+        await cubit.logout();
+        expect(cubit.state.step, AuthStep.signIn);
+        cubit.authenticationSucceeded();
+        expect(await cubit.logoutEverywhere(), isNull);
+        expect(cubit.state.step, AuthStep.signIn);
+        await cubit.close();
+      },
+    );
   });
 }
 
@@ -181,7 +197,8 @@ class FakeAuthRepository implements AuthRepositoryContract {
   UserRole? registerRole;
 
   @override
-  bool can(UserPermission permission) => currentUser?.hasPermission(permission) ?? false;
+  bool can(UserPermission permission) =>
+      currentUser?.hasPermission(permission) ?? false;
   @override
   bool canDelete(Event event) => false;
   @override
@@ -190,23 +207,38 @@ class FakeAuthRepository implements AuthRepositoryContract {
   Future<void> initialize() async {
     if (initializeError != null) throw initializeError!;
   }
+
   @override
-  Future<String?> register({required String name, required String email, required String password, required UserRole requestedRole}) {
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole requestedRole,
+  }) {
     registerCalls++;
     registerName = name;
     registerRole = requestedRole;
     return registerFuture ?? Future.value(registerResult);
   }
+
   @override
   Future<String?> login({required String email, required String password}) {
     loginCalls++;
     loginEmail = email;
     return loginFuture ?? Future.value(loginResult);
   }
+
   @override
   Future<String?> updatePassword(String password) async => null;
   @override
-  Future<String?> updateProfile({required String displayName, required String email, String? photoUrl, String? phoneNumber, String? bio, String? locale}) async => null;
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
+  }) async => null;
   @override
   Future<void> logout() async {}
   @override

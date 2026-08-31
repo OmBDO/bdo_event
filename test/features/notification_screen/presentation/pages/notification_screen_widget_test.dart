@@ -6,6 +6,7 @@ import 'package:bdo_event/core/model/notification_model/notification_model.dart'
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

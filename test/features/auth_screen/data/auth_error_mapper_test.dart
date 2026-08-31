@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/data/auth_error_mapper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -13,7 +13,10 @@ void main() {
       AppText.emailOrPasswordIncorrect,
     );
     expect(
-      mapAuthError(const AuthException('invalid credentials'), signingUp: false),
+      mapAuthError(
+        const AuthException('invalid credentials'),
+        signingUp: false,
+      ),
       AppText.emailOrPasswordIncorrect,
     );
   });
@@ -41,7 +44,10 @@ void main() {
       AppText.unableToCreateAccount,
     );
     expect(
-      mapAuthError(const AuthException('invalid login credentials'), signingUp: true),
+      mapAuthError(
+        const AuthException('invalid login credentials'),
+        signingUp: true,
+      ),
       AppText.emailOrPasswordIncorrect,
     );
   });

@@ -1,7 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
 import 'package:bdo_event/features/event_detail_screen/data/repositories/registered_event_repository.dart';
@@ -82,7 +82,10 @@ void main() {
         authRepository: FakeAuthRepository(user),
       );
 
-      expect(await repository.registerEvent(event()), AppText.alreadyRegistered);
+      expect(
+        await repository.registerEvent(event()),
+        AppText.alreadyRegistered,
+      );
       expect(dataSource.activateCalls, 0);
       expect(dataSource.loadCalls, 1);
     });
@@ -220,7 +223,10 @@ void main() {
         authRepository: FakeAuthRepository(user),
       );
 
-      expect(await repository.cancelRegistration(event()), AppText.notRegistered);
+      expect(
+        await repository.cancelRegistration(event()),
+        AppText.notRegistered,
+      );
       expect(dataSource.revokeCalls, 0);
     });
 

@@ -1,6 +1,5 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
-import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/account_section.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/organizer_tools_section.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/support_section.dart';
@@ -12,8 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../cubit/profile_screen_cubit_test.dart' as fixtures;
 
 void main() {
-  testWidgets('renders watcher settings and delegates control changes',
-      (tester) async {
+  testWidgets('renders watcher settings and delegates control changes', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await tester.pumpWidget(
       MaterialApp(
@@ -38,7 +38,9 @@ void main() {
       of: find.text('Mute scanning voice'),
       matching: find.byType(ListTile),
     );
-    await tester.tap(find.descendant(of: muteTile, matching: find.byType(Switch)).first);
+    await tester.tap(
+      find.descendant(of: muteTile, matching: find.byType(Switch)).first,
+    );
     await tester.pump();
     expect(cubit.state.isWatcherVoiceMuted, isTrue);
 
@@ -48,8 +50,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('shows organizer tools only for users with organizer roles',
-      (tester) async {
+  testWidgets('shows organizer tools only for users with organizer roles', (
+    tester,
+  ) async {
     final admin = User(
       id: 'admin-1',
       displayName: 'Admin',

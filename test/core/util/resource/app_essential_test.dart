@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_essential.dart';
 import 'package:bdo_event/dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 

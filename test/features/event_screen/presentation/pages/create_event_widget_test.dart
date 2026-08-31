@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../cubit/event_screen_cubit_test.dart' as fixtures;
 
 void main() {
-  testWidgets('shows required validation errors for an empty event form',
-      (tester) async {
+  testWidgets('shows required validation errors for an empty event form', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit(
       repository: fixtures.FakeEventRepository(),
     );
@@ -30,7 +32,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('hydrates edit form fields from an existing event', (tester) async {
+  testWidgets('hydrates edit form fields from an existing event', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit(
       repository: fixtures.FakeEventRepository(),
     );
@@ -55,8 +59,8 @@ void main() {
     );
     expect(
       find.byWidgetPredicate(
-        (widget) => widget is TextFormField &&
-            widget.controller?.text == '31/12/2099',
+        (widget) =>
+            widget is TextFormField && widget.controller?.text == '31/12/2099',
       ),
       findsOneWidget,
     );
@@ -64,8 +68,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('rejects an end time that is not after the start time',
-      (tester) async {
+  testWidgets('rejects an end time that is not after the start time', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit(
       repository: fixtures.FakeEventRepository(),
     );
@@ -96,8 +101,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('rejects a registration deadline that is no longer in future',
-      (tester) async {
+  testWidgets('rejects a registration deadline that is no longer in future', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit(
       repository: fixtures.FakeEventRepository(),
     );

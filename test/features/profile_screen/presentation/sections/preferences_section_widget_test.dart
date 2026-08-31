@@ -1,4 +1,5 @@
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/preferences_section.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../cubit/profile_screen_cubit_test.dart' as fixtures;
 
 void main() {
-  testWidgets('renders preference controls from the supplied state',
-      (tester) async {
+  testWidgets('renders preference controls from the supplied state', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await pumpPreferences(tester, cubit);
 
@@ -24,8 +26,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('delegates dark-mode changes to the profile Cubit',
-      (tester) async {
+  testWidgets('delegates dark-mode changes to the profile Cubit', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await pumpPreferences(tester, cubit);
 
@@ -33,15 +36,18 @@ void main() {
       of: find.text(AppText.darkThemeMode),
       matching: find.byType(ListTile),
     );
-    await tester.tap(find.descendant(of: darkModeTile, matching: find.byType(Switch)).first);
+    await tester.tap(
+      find.descendant(of: darkModeTile, matching: find.byType(Switch)).first,
+    );
     await tester.pump();
 
     expect(cubit.state.isDarkModeEnabled, isTrue);
     await cubit.close();
   });
 
-  testWidgets('selects and persists a date format from the dialog',
-      (tester) async {
+  testWidgets('selects and persists a date format from the dialog', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await pumpPreferences(tester, cubit);
 
@@ -67,8 +73,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('shows feedback when biometric authentication is unavailable',
-      (tester) async {
+  testWidgets('shows feedback when biometric authentication is unavailable', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await pumpPreferences(tester, cubit);
 
@@ -76,7 +83,9 @@ void main() {
       of: find.text('Biometric lock'),
       matching: find.byType(ListTile),
     );
-    await tester.tap(find.descendant(of: biometricTile, matching: find.byType(Switch)).first);
+    await tester.tap(
+      find.descendant(of: biometricTile, matching: find.byType(Switch)).first,
+    );
     await tester.pumpAndSettle();
 
     expect(
