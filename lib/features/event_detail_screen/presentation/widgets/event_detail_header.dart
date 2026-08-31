@@ -1,22 +1,29 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/common/clipboard_share.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
 
 class EventDetailHeader extends StatelessWidget {
-  const EventDetailHeader({super.key, required this.event});
+  const EventDetailHeader({
+    super.key,
+    required this.event,
+    this.clipboardAdapter,
+    this.shareAdapter,
+  });
 
   final Event event;
+  final ClipboardAdapter? clipboardAdapter;
+  final ShareAdapter? shareAdapter;
 
   String get _eventLink => EventDeepLinkService.eventUri(event.id).toString();
 
   Future<void> _shareEvent(BuildContext context) async {
-    await SharePlus.instance.share(
+    await tryShareContent(
+      shareAdapter ?? const SharePlusAdapter(),
       ShareParams(
         title: event.title,
         subject: event.title,
@@ -53,13 +60,19 @@ class EventDetailHeader extends StatelessWidget {
       return;
     }
     if (action != 'copy') return;
-    await Clipboard.setData(
-      ClipboardData(
-        text:
-            '${event.title}\n${formatEventDate(event.date, context.read<ProfileScreenCubit>().state.dateFormat)}\n${event.location}',
+    final details = [
+      event.title,
+      formatEventDate(
+        event.date,
+        context.read<ProfileScreenCubit>().state.dateFormat,
       ),
+      event.location,
+    ].join('\n');
+    final copied = await tryCopyText(
+      clipboardAdapter ?? const SystemClipboardAdapter(),
+      details,
     );
-    if (!context.mounted) return;
+    if (!copied || !context.mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text(AppText.eventDetailsCopied)));

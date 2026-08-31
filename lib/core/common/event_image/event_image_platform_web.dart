@@ -32,7 +32,11 @@ Future<String> resolveStoredImageUrl(String path) async {
 }
 
 Future<void> deleteStoredImage(String path) async {
-  if (path.startsWith('http://') || path.startsWith('https://')) return;
+  if (path.startsWith('http://') ||
+      path.startsWith('https://') ||
+      path.startsWith(AppAssets.assetPathPrefix)) {
+    return;
+  }
   await Supabase.instance.client.storage
       .from(AppStorageBuckets.eventImages)
       .remove([path]);

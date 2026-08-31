@@ -54,6 +54,7 @@ class _BiometricLockGateState extends State<BiometricLockGate>
 
   Future<void> _authenticate() async {
     if (!_isLocked || _isAuthenticating || !mounted) return;
+    if (!getIt.isRegistered<BiometricLockService>()) return;
     _isAuthenticating = true;
     final unlocked = await getIt<BiometricLockService>().unlock();
     _isAuthenticating = false;

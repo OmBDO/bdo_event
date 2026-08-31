@@ -7,6 +7,9 @@ Build deterministic unit, state, widget, integration, and manual coverage for th
 ## Measurement
 
 - Test-plan completeness: 100%; every planned area has an implementation or concrete test-case specification.
+- Expanded full-slice status: 24 of 30 planned slices (80%) are implemented at their planned scope. All six P2 slices have deterministic seams or host tests, but their device portions remain unverified on supported hardware.
+- P2 host-contract status: 6 of 6 cases have deterministic seam or host coverage; P2 device-runtime status: 0 of 6 cases verified.
+- Named priority catalog: 24 IDs total (`10 P0 + 8 P1 + 6 P2`); this is a separate planning denominator and is not the denominator for the 80% figure.
 - Executed line/branch coverage: not measured; no coverage report has been generated.
 - Runtime validation: blocked because Windows denies the Flutter/Dart executables before tests or analysis start.
 - A `[~]` item means implemented, partially covered, or specified; it does not mean that a runtime test has passed.
@@ -30,6 +33,7 @@ Tests mirror the production ownership tree under `lib`:
 - `test/core/` contains shared model and utility tests.
 - `test/features/<feature>/` mirrors the feature's `data`, `domain`, and `presentation` layers, including `cubit`, `pages`, and `widgets` folders.
 - `test/shared/` contains legacy cross-feature and service tests until they can be split by owner.
+- [Integration test blueprint](../test/integration_test/INTEGRATION_TEST_PLAN.md) defines the cross-layer harness, case catalog, folder structure, and execution gates.
 
 ## Current Batch
 
@@ -81,11 +85,11 @@ Known follow-ups exposed by this batch:
 - [~] Event save errors, unauthenticated save protection, delete rollback, duplicate loads, and closed-state save behavior.
 - [~] Event detail registration, cancellation, duplicate submission protection, owner-only attendance authorization, and stale-result handling.
 - [~] Calendar search normalization, clear-state behavior, and signed-out loading.
-- [~] Reminder policy parsing and preference boundaries are covered. Calendar reconciliation and platform-service failure resilience remain pending.
+- [~] Reminder policy parsing, preference boundaries, adapter-backed calendar reconciliation, and non-fatal notification initialization/permission/scheduling/cancellation failures are covered. OS notification delivery remains pending.
 - [~] Watcher permission denial, JSON/compact-code validation, malformed input, check-in history, status mapping, auto-open behavior, partial failure, dashboard isolation, reset/clear-state, and closed-state behavior.
 - [~] Authentication DTO/Cubit success and error mapping, duplicate-request suppression, role forwarding, session restore failure, navigation, logout, and logout-everywhere behavior.
 - [~] Profile Cubit preference hydration/persistence, display toggles, volume clamping, reminder boundaries, profile update success/error, password delegation, notification success/rollback, and clear-state behavior.
-- [~] Biometric gating for unavailable devices and disabling the lock, plus profile visibility load/save persistence. Reminder reconciliation and authenticated platform-service failure paths remain pending.
+- [~] Biometric gating for unavailable devices, startup/pause/resume lock behavior, failed authentication retention, missing-service fail-closed behavior, disabling the lock, profile visibility load/save persistence, and adapter-backed biometric service outcomes are covered. OS prompts and authenticated platform-service failure paths remain pending.
 - [~] Main navigation loading completion, tab transitions, duplicate-tab no-op, and closed-state guard.
 
 ## Batch 4: Widgets
@@ -99,11 +103,11 @@ Known follow-ups exposed by this batch:
 - [~] Successful cancellation and ticket-page close after refresh orchestration. Calendar refresh success and reminder cleanup remain pending.
 - [~] Notification empty/loading/content/invitation states, load errors, arrival success/failure, and invitation recipient selection/send success/failure. Invitation refresh edge cases remain pending.
 - [~] Event create/edit required-field validation and edit-mode field hydration.
-- [~] Event required-field, time-range, capacity and past-deadline validation, edit hydration, and successful save. Image lifecycle, date/time pickers, location search, and deadline picker coverage remain pending.
-- [~] Attendee loading/empty/error states, list rendering, avatar fallback, attendance summary/overflow, CSV generation, and clipboard copy. Platform share invocation and broader ticket-display coverage remain pending.
+- [~] Event required-field, time-range, capacity and past-deadline validation, edit hydration, successful save, image lifecycle, and location-search dispatch are covered. Native picker and date/time/deadline channel execution remain pending.
+- [~] Attendee loading/empty/error states, list rendering, avatar fallback, attendance summary/overflow, CSV generation, clipboard copy/failure handling, and adapter-backed platform share dispatch/failure handling are covered. Device share-sheet behavior and broader ticket-display coverage remain pending.
 - [~] Event-detail location expansion, unavailable-coordinate fallback, coordinate map/marker rendering, and map-line painter output.
-- [~] Profile details hydration/locale/save/error/photo-removal, preference controls, account/support callbacks, watcher settings/history controls, organizer-tool role visibility, and main-screen destination/shell navigation are covered. Platform photo picking, camera/scanner-page behavior, and remaining shared components remain pending.
-- [~] Watcher scanner dashboard counters, history badge, icon-button wiring, and target-overlay rendering. Camera lifecycle and scan callbacks remain pending.
+- [~] Profile details hydration/locale/save/error/photo-removal, preference controls, account/support callbacks, watcher settings/history controls, organizer-tool role visibility, main-screen destination/shell navigation, and adapter-backed profile image upload/removal are covered. Native picker, device camera lifecycle, QR frames, and permissions remain pending.
+- [~] Watcher scanner dashboard counters, history badge, icon-button wiring, target-overlay rendering, adapter-backed manual-entry journey, scanner callback routing, cooldown protection, torch/camera controls, voice/haptic dispatch, native failure containment, and adapter disposal are covered. Camera lifecycle, real QR frames, and device permissions remain pending.
 
 ## Batch 5: Analytics
 
@@ -128,7 +132,7 @@ Known follow-ups exposed by this batch:
 - [~] Ticket QR/manual code, cancellation, and calendar-refresh cases are specified; ticket/cancellation coverage exists and full refresh execution remains pending.
 - [~] Invitation accept/decline cases are specified; accept/send coverage exists and decline/device execution remains pending.
 - [~] Watcher scan and check-in-all cases are specified; Cubit/history coverage exists and camera execution remains pending.
-- [~] Notification, camera, biometric, deep-link, sharing, clipboard, image, and responsive cases are specified; deterministic portions are covered and platform execution remains pending.
+- [~] Notification, camera, biometric, deep-link, sharing, clipboard, image, and responsive cases are specified; deterministic adapter/host portions are covered and platform execution remains pending.
 
 ## Final Execution Matrix
 

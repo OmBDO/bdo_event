@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/event_schedule.dart';
 
 class EventScreenState {
   final int selectedTab;
@@ -30,19 +31,15 @@ class EventScreenState {
 
   List<Event> get currentTabEvents {
     final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
     if (selectedTab == 2) {
-      return events.where((event) {
-        final date = _parseEventDate(event.date);
-        return date != null && date.isBefore(today);
-      }).toList();
+      return events
+          .where((event) => EventSchedule.isFinished(event, now: now))
+          .toList();
     }
 
-    final upcomingEvents = events.where((event) {
-      final date = _parseEventDate(event.date);
-      return date != null && !date.isBefore(today);
-    });
+    final upcomingEvents = events.where(
+      (event) => EventSchedule.isUpcoming(event, now: now),
+    );
 
     if (selectedTab == 1) {
       return upcomingEvents
@@ -53,19 +50,6 @@ class EventScreenState {
     return upcomingEvents
         .where((event) => !registeredEventIds.contains(event.id))
         .toList();
-  }
-
-  static DateTime? _parseEventDate(String value) {
-    final parts = value.split('/');
-    if (parts.length == 3) {
-      final day = int.tryParse(parts[0]);
-      final month = int.tryParse(parts[1]);
-      final year = int.tryParse(parts[2]);
-      if (day != null && month != null && year != null) {
-        return DateTime(year, month, day);
-      }
-    }
-    return DateTime.tryParse(value);
   }
 
   EventScreenState copyWith({

@@ -50,7 +50,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final getIt = GetIt.instance;
 
-void configureDependencies({SharedPreferences? preferences}) {
+Future<void> resetDependencies() => getIt.reset();
+
+void configureDependencies({
+  SharedPreferences? preferences,
+  bool registerNativeServices = true,
+}) {
   if (getIt.isRegistered<AuthScreenCubit>()) return;
 
   if (preferences != null) {
@@ -59,12 +64,16 @@ void configureDependencies({SharedPreferences? preferences}) {
   getIt.registerLazySingleton<RecentEventStore>(
     () => RecentEventStore(preferences),
   );
-  getIt.registerLazySingleton<BiometricLockService>(BiometricLockService.new);
+  if (registerNativeServices) {
+    getIt.registerLazySingleton<BiometricLockService>(BiometricLockService.new);
+  }
 
   getIt.registerLazySingleton<SupabaseRequestLogger>(SupabaseRequestLogger.new);
-  getIt.registerLazySingleton<EventReminderNotificationService>(
-    EventReminderNotificationService.new,
-  );
+  if (registerNativeServices) {
+    getIt.registerLazySingleton<EventReminderNotificationService>(
+      EventReminderNotificationService.new,
+    );
+  }
   getIt.registerLazySingleton<SupabaseStore>(
     () => SupabaseStore(logger: getIt()),
   );
@@ -162,18 +171,29 @@ void configureDependencies({SharedPreferences? preferences}) {
 
   getIt.registerSingleton<AuthScreenCubit>(
     AuthScreenCubit(authRepository: getIt()),
+    dispose: (cubit) => cubit.close(),
   );
-  getIt.registerSingleton<SignInCubit>(SignInCubit(authRepository: getIt()));
-  getIt.registerSingleton<SignUpCubit>(SignUpCubit(authRepository: getIt()));
+  getIt.registerSingleton<SignInCubit>(
+    SignInCubit(authRepository: getIt()),
+    dispose: (cubit) => cubit.close(),
+  );
+  getIt.registerSingleton<SignUpCubit>(
+    SignUpCubit(authRepository: getIt()),
+    dispose: (cubit) => cubit.close(),
+  );
   getIt.registerSingleton<CalendarScreenCubit>(
     CalendarScreenCubit(
       loadRegisteredEvents: getIt(),
       authRepository: getIt(),
-      reminderNotifications: getIt(),
+      reminderNotifications:
+          getIt.isRegistered<EventReminderNotificationService>()
+              ? getIt<EventReminderNotificationService>()
+              : null,
       preferences: getIt.isRegistered<SharedPreferences>()
           ? getIt<SharedPreferences>()
           : null,
     ),
+    dispose: (cubit) => cubit.close(),
   );
   getIt.registerFactory<EventDetailCubit>(
     () => EventDetailCubit(
@@ -194,25 +214,39 @@ void configureDependencies({SharedPreferences? preferences}) {
       recentEventStore: getIt(),
       preferences: preferences,
     ),
+    dispose: (cubit) => cubit.close(),
   );
-  getIt.registerSingleton<MainScreenCubit>(MainScreenCubit());
+  getIt.registerSingleton<MainScreenCubit>(
+    MainScreenCubit(),
+    dispose: (cubit) => cubit.close(),
+  );
   getIt.registerSingleton<ProfileScreenCubit>(
     ProfileScreenCubit(
       authRepository: getIt(),
       loadProfilePreferences: getIt(),
       saveProfilePreferences: getIt(),
-      reminderNotifications: getIt(),
-      biometricLockService: getIt(),
+      reminderNotifications:
+          getIt.isRegistered<EventReminderNotificationService>()
+              ? getIt<EventReminderNotificationService>()
+              : null,
+      biometricLockService: getIt.isRegistered<BiometricLockService>()
+          ? getIt<BiometricLockService>()
+          : null,
       eventStore: getIt(),
     ),
+    dispose: (cubit) => cubit.close(),
   );
   getIt.registerFactory<RegisteredEventCubit>(
     () => RegisteredEventCubit(
       cancelRegisteredEvent: getIt(),
       authRepository: getIt(),
       eventStore: getIt(),
-      reminderNotifications: getIt(),
+      reminderNotifications:
+          getIt.isRegistered<EventReminderNotificationService>()
+              ? getIt<EventReminderNotificationService>()
+              : null,
     ),
+    dispose: (cubit) => cubit.close(),
   );
 
   getIt.registerSingleton<WatcherScanCubit>(
@@ -222,5 +256,6 @@ void configureDependencies({SharedPreferences? preferences}) {
       loadScanDashboard: getIt(),
       authRepository: getIt(),
     ),
+    dispose: (cubit) => cubit.close(),
   );
 }

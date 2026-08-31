@@ -12,6 +12,7 @@ import 'package:bdo_event/features/registered_screen/presentation/cubit/register
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/event_schedule.dart';
 
 class BottomEventRegisterSection extends StatelessWidget {
   const BottomEventRegisterSection({
@@ -33,9 +34,11 @@ class BottomEventRegisterSection extends StatelessWidget {
     final cubit = context.read<EventDetailCubit>();
     final bool isFull =
         event.capacity != null && event.attendeeCount >= event.capacity!;
+    final now = DateTime.now();
+    final isEventFinished = EventSchedule.isFinished(event, now: now);
     final bool isPastRegistrationDeadline =
         event.registrationDeadline != null &&
-        !DateTime.now().isBefore(event.registrationDeadline!);
+      !now.isBefore(event.registrationDeadline!);
 
     return BlocBuilder<EventDetailCubit, EventDetailState>(
       bloc: cubit,
@@ -64,7 +67,10 @@ class BottomEventRegisterSection extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => BlocProvider(
                   create: (_) => getIt<RegisteredEventCubit>(),
-                  child: RegisteredEventPage(event: event),
+                  child: RegisteredEventPage(
+                    event: event,
+                    clipboardAdapter: widget.widget.clipboardAdapter,
+                  ),
                 ),
               ),
             );
@@ -75,6 +81,11 @@ class BottomEventRegisterSection extends StatelessWidget {
           };
         } else if (!event.isAvailable) {
           statusText = AppText.unavailable;
+          statusColor = textGrey;
+          buttonText = AppText.registrationClosed;
+          buttonAction = null;
+        } else if (isEventFinished) {
+          statusText = AppText.registrationClosed;
           statusColor = textGrey;
           buttonText = AppText.registrationClosed;
           buttonAction = null;

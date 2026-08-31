@@ -1,8 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
-import 'package:bdo_event/dotenv.dart' show DotEnvInitialization;
-import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
+import 'package:bdo_event/core/bootstrap/application_bootstrap.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_state.dart';
 import 'package:bdo_event/features/auth_screen/presentation/pages/auth_screen.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
@@ -19,39 +18,28 @@ import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_sca
 import 'package:bdo_event/core/common/configuration_error_app/configuration_error_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:async';
 
 import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
+import 'package:bdo_event/core/deep_link/deep_link_source.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Run isolated configuration container
-  final env = await DotEnvInitialization.initialize();
-  if (env == null) {
+  final initialized = await ApplicationBootstrap().initialize();
+  if (!initialized) {
     runApp(const ConfigurationErrorApp());
     return;
   }
-  // Initialize native integrations with valid configuration parameters
-  await Supabase.initialize(
-    url: env.supabaseUrl,
-    publishableKey: env.supabaseAnonKey,
-  );
-  final preferences = await SharedPreferences.getInstance();
-  configureDependencies(preferences: preferences);
-  await getIt<EventReminderNotificationService>().initialize();
-  await getIt<AuthScreenCubit>().checkActiveSession();
-  getIt<ProfileScreenCubit>().refresh();
-  await getIt<CalendarScreenCubit>().loadRegistrations();
-  getIt<MainScreenCubit>().finishLoading();
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, this.deepLinkSource, this.home});
+
+  final DeepLinkSource? deepLinkSource;
+  final Widget? home;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -59,16 +47,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _navigatorKey = GlobalKey<NavigatorState>();
-  final _deepLinkService = EventDeepLinkService();
+  late final DeepLinkSource _deepLinkSource;
   StreamSubscription<Uri>? _deepLinkSubscription;
   String? _pendingEventId;
 
   @override
   void initState() {
     super.initState();
-    _deepLinkSubscription = _deepLinkService.uriStream.listen(_handleUri);
-    _deepLinkService.initialUri.then((uri) {
-      if (uri != null) _handleUri(uri);
+    _deepLinkSource = widget.deepLinkSource ?? EventDeepLinkService();
+    _deepLinkSubscription = _deepLinkSource.uriStream.listen(_handleUri);
+    _deepLinkSource.initialUri.then((uri) {
+      if (mounted && uri != null) _handleUri(uri);
     });
   }
 
@@ -147,7 +136,7 @@ class _MyAppState extends State<MyApp> {
                 child: child!,
               ),
               debugShowCheckedModeBanner: false,
-              home: const AuthScreen(),
+              home: widget.home ?? const AuthScreen(),
             ),
           );
         },

@@ -9,7 +9,7 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   CalendarScreenCubit({
     required LoadRegisteredEvents loadRegisteredEvents,
     required AuthRepositoryContract authRepository,
-    required EventReminderNotificationService reminderNotifications,
+    EventReminderNotificationService? reminderNotifications,
     SharedPreferences? preferences,
   }) : _loadRegisteredEvents = loadRegisteredEvents,
        _authRepository = authRepository,
@@ -19,7 +19,7 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
 
   final LoadRegisteredEvents _loadRegisteredEvents;
   final AuthRepositoryContract _authRepository;
-  final EventReminderNotificationService _reminderNotifications;
+  final EventReminderNotificationService? _reminderNotifications;
   final SharedPreferences? _preferences;
 
   Future<void> loadRegistrations() async {
@@ -32,16 +32,9 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
     emit(state.copyWith(status: CalendarScreenStatus.loading));
     try {
       final events = await _loadRegisteredEvents(userId);
-      try {
-        await _reminderNotifications.reconcileEventReminders(
-          events,
-          enabled: _preferences?.getBool('event_reminders_enabled') ?? true,
-          leadTime: Duration(
-            minutes: _preferences?.getInt('event_reminder_lead_time') ?? 1440,
-          ),
-        );
-      } on Object {
-        return;
+      final reminderNotifications = _reminderNotifications;
+      if (reminderNotifications != null) {
+        await _reconcileReminders(reminderNotifications, events);
       }
       if (!isClosed) {
         emit(
@@ -57,6 +50,23 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> _reconcileReminders(
+    EventReminderNotificationService reminderNotifications,
+    List<Event> events,
+  ) async {
+    try {
+      await reminderNotifications.reconcileEventReminders(
+        events,
+        enabled: _preferences?.getBool('event_reminders_enabled') ?? true,
+        leadTime: Duration(
+          minutes: _preferences?.getInt('event_reminder_lead_time') ?? 1440,
+        ),
+      );
+    } on Object {
+      return;
     }
   }
 

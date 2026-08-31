@@ -83,6 +83,7 @@ abstract final class AppText {
     static const eventAnalysis = 'Event analysis';
     static const operationsEventAnalysis = 'OPERATIONS / EVENT ANALYSIS';
     static const refreshAnalytics = 'Refresh analytics';
+    static const retry = 'Retry';
     static const unableToLoadAnalytics = 'Unable to load analytics';
     static const inviteUsers = 'Invite users';
     static const unableToSendInvitations = 'Unable to send invitations';
@@ -95,6 +96,7 @@ abstract final class AppText {
     static const englishIndiaFull = 'English (India)';
     static const englishUnitedStates = 'English (United States)';
     static const unableToUploadProfilePhoto = 'Unable to upload profile photo';
+    static const unableToDeleteProfilePhoto = 'Unable to delete profile photo';
     static const change = 'Change';
     static const remove = 'Remove';
     static const fieldCannotBeChanged = 'This field cannot be changed';
