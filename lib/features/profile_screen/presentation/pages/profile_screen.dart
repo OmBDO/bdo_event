@@ -43,35 +43,82 @@ class ProfileScreen extends StatelessWidget {
     listener: (context, state) =>
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(state.errorMessage!))),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    backgroundColor: isDarkMode
-                        ? theme.colorScheme.surfaceContainerHighest
-                        : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  icon: const Icon(Icons.logout_rounded, size: 20),
-                  label: const Text(
-                    AppText.logout,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSize.text15,
+    builder: (context, state) {
+      final theme = Theme.of(context);
+      final isDarkMode = theme.brightness == Brightness.dark;
+      final user = state.user;
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Gap(AppSpace.space30),
+              ProfileHeaderSection(user: user),
+              const Gap(AppSpace.space10),
+              ProfileAccountSection(
+                onEditProfile: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProfileDetailsPage(
+                      user: user,
+                      imagePicker: imagePicker,
+                      storeImage: storeImage,
+                      deleteImage: deleteImage,
                     ),
                   ),
                 ),
+                onChangePassword: () => _showChangePasswordDialog(context),
               ),
-              ValueListenableBuilder<double>(
-                valueListenable: FooterHeightTracker.heightNotifier,
-                builder: (context, dynamicHeight, child) =>
-                    SizedBox(height: dynamicHeight + AppSpace.space24),
+              const Gap(AppSpace.space16),
+              ProfilePreferencesSection(
+                state: state,
+                onReminderLeadTime: (minutes) =>
+                    _showReminderLeadTimeDialog(context, minutes),
+                onShowLanguageInfo: () => _showInfoDialog(
+                  context,
+                  title: AppText.appLanguage,
+                  message: AppText.onlyAvailableLanguage,
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+              if (user?.hasPermission(UserPermission.scanRegistrations) ??
+                  false) ...[
+                const Gap(AppSpace.space16),
+                ProfileWatcherSettingsSection(state: state),
+              ],
+              if (user?.hasPermission(UserPermission.createEvents) ??
+                  false) ...[
+                const Gap(AppSpace.space16),
+                ProfileOrganizerToolsSection(user: user!),
+              ],
+              const Gap(AppSpace.space16),
+              ProfileSupportSection(
+                onShowInfo: ({required title, required message}) =>
+                    _showInfoDialog(context, title: title, message: message),
+                onSignOutEverywhere: () => _signOutEverywhere(context),
+              ),
+              const Gap(AppSpace.space24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextButton.icon(
+                  onPressed: () => _logout(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: isDarkMode
+                        ? theme.colorScheme.onSurface
+                        : Colors.black54,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
+                    ),
+                    onChangePassword: () => _showChangePasswordDialog(context),
+                  ),
+                  const Gap(AppSpace.space16),
+                  ProfilePreferencesSection(
+                    state: state,
+                    onReminderLeadTime: (minutes) =>
+                        _showReminderLeadTimeDialog(context, minutes),
+                    onShowLanguageInfo: () => _showInfoDialog(
+                      context,
+                      title: AppText.appLanguage,
+                      message: AppText.onlyAvailableLanguage,
                     ),
                   ),
                   if (user?.hasPermission(UserPermission.scanRegistrations) ??

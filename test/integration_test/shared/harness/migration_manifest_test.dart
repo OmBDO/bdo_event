@@ -16,7 +16,7 @@ void main() {
     expect(MigrationManifest.missingFrom(files), isEmpty);
     expect(MigrationManifest.unexpectedDuplicates(files), isEmpty);
     expect(MigrationManifest.containsLatest(files), isTrue);
-    expect(MigrationManifest.latestVersion, '20260830010000');
+      expect(MigrationManifest.latestVersion, '20260901005000');
   });
 
   test('reports missing migrations from an available-file list', () {

@@ -173,6 +173,34 @@ void main() {
     );
   });
 
+  test('a user cannot delete a registration row directly', () async {
+    final event = await _createEvent();
+    final registration = RegistrationFixture(context).draft(
+      testId: 'direct-delete',
+      actor: user.definition,
+      event: event,
+    );
+    registrationCleanup!.track(registration);
+
+    await _activate(event);
+    await userClient
+        .from(AppDatabase.eventRegistrationsTable)
+        .delete()
+        .eq(AppDatabase.eventId, event.eventId)
+        .eq(AppDatabase.userId, user.userId!);
+
+    final rows = await cleanupClient
+        .from(AppDatabase.eventRegistrationsTable)
+        .select(AppDatabase.registrationStatus)
+        .eq(AppDatabase.eventId, event.eventId)
+        .eq(AppDatabase.userId, user.userId!);
+    expect(rows, hasLength(1));
+    expect(
+      rows.single[AppDatabase.registrationStatus],
+      AppDatabase.activeRegistration,
+    );
+  });
+
   Future<EventFixtureData> _createEvent() async {
     final event = EventFixture(context).draft(
       testId: 'registration-event',

@@ -224,13 +224,8 @@ class AuthRepository implements AuthRepositoryContract {
   void _logUserClaims(String source, supabase.User authUser, User mappedUser) {
     developer.log(
       'auth.userClaims $source '
-      '{userId: ${authUser.id}, '
-      'email: ${authUser.email}, '
-      'appMetadata.roles: ${authUser.appMetadata['roles']}, '
-      'userMetadata.requested_role: '
-      '${authUser.userMetadata?['requested_role']}, '
-      'mappedRoles: ${mappedUser.roles.map((role) => role.storageValue).toList()}, '
-      'displayName: ${mappedUser.displayName}}',
+      '{hasEmail: ${authUser.email != null}, '
+      'mappedRoleCount: ${mappedUser.roles.length}}',
       name: 'bdo_event.supabase',
     );
   }

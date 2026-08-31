@@ -15,6 +15,13 @@ abstract final class MigrationManifest {
     '20260830008000_watcher_registration_name_fallback.sql',
     '20260830009000_product_capabilities.sql',
     '20260830010000_profile_image_storage.sql',
+    '20260831000000_enforce_event_completion.sql',
+    '20260901000000_invitation_registration_admission.sql',
+    '20260901001000_restrict_registration_delete.sql',
+    '20260901002000_use_current_roles_for_privileged_access.sql',
+    '20260901003000_enforce_event_end_time.sql',
+    '20260901004000_enforce_event_availability.sql',
+    '20260901005000_restrict_invitation_table_mutations.sql',
   ];
 
   static String get latestFile => requiredFiles.last;

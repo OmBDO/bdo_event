@@ -105,6 +105,8 @@ abstract final class AppText {
     static const dateFormat = 'Date format';
     static const profileVisibility = 'Profile visibility';
     static const registrationVisibility = 'Registration visibility';
+    static const unableToSaveVisibility =
+        'Unable to save visibility settings';
     static const viewAttendees = 'View attendees';
     static const viewEventAnalytics = 'View event analytics';
     static const exploreEvents = 'Explore events';

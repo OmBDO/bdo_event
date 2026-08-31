@@ -12,6 +12,7 @@ import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_
 import 'package:bdo_event/core/prefs/recent_event_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 void main() {
   final pastEvent = event('past', '01/01/2020');
@@ -46,6 +47,29 @@ void main() {
     await Future.wait([first, second]);
 
     expect(repository.loadCalls, 1);
+    await cubit.close();
+  });
+
+  test('forced loads keep the latest response when they finish out of order', () async {
+    final firstResult = Completer<List<Event>>();
+    final secondResult = Completer<List<Event>>();
+    var loadNumber = 0;
+    final repository = FakeEventRepository(
+      loadEventsOverride: () {
+        loadNumber++;
+        return loadNumber == 1 ? firstResult.future : secondResult.future;
+      },
+    );
+    final cubit = createCubit(repository: repository);
+
+    final firstLoad = cubit.load(force: true);
+    final secondLoad = cubit.load(force: true);
+    secondResult.complete([pastEvent]);
+    await secondLoad;
+    firstResult.complete([futureEvent]);
+    await firstLoad;
+
+    expect(cubit.state.events, [pastEvent]);
     await cubit.close();
   });
 
@@ -187,11 +211,13 @@ class FakeEventRepository implements EventRepositoryContract {
     this.events = const [],
     this.deleteResult,
     this.saveResult,
+    this.loadEventsOverride,
   });
 
   final List<Event> events;
   final EventOperationResult? deleteResult;
   final EventOperationResult? saveResult;
+  final Future<List<Event>> Function()? loadEventsOverride;
   int loadCalls = 0;
   int createCalls = 0;
   int updateCalls = 0;
@@ -199,6 +225,7 @@ class FakeEventRepository implements EventRepositoryContract {
   @override
   Future<List<Event>> loadEvents() async {
     loadCalls++;
+    if (loadEventsOverride != null) return loadEventsOverride!();
     return events;
   }
 

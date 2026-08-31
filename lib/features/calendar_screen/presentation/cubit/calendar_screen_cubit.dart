@@ -21,28 +21,33 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   final AuthRepositoryContract _authRepository;
   final EventReminderNotificationService? _reminderNotifications;
   final SharedPreferences? _preferences;
+  int _loadGeneration = 0;
 
   Future<void> loadRegistrations() async {
+    if (isClosed) return;
     final userId = _authRepository.currentUser?.id;
     if (userId == null) {
+      _loadGeneration++;
       emit(state.copyWith(status: CalendarScreenStatus.ready));
       return;
     }
 
+    final loadGeneration = ++_loadGeneration;
     emit(state.copyWith(status: CalendarScreenStatus.loading));
     try {
       final events = await _loadRegisteredEvents(userId);
+      if (isClosed || loadGeneration != _loadGeneration) return;
       final reminderNotifications = _reminderNotifications;
       if (reminderNotifications != null) {
         await _reconcileReminders(reminderNotifications, events);
       }
-      if (!isClosed) {
+      if (!isClosed && loadGeneration == _loadGeneration) {
         emit(
           state.copyWith(events: events, status: CalendarScreenStatus.ready),
         );
       }
     } on Object catch (error) {
-      if (!isClosed) {
+      if (!isClosed && loadGeneration == _loadGeneration) {
         emit(
           state.copyWith(
             status: CalendarScreenStatus.failure,
@@ -75,6 +80,7 @@ class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   }
 
   void clearState() {
+    _loadGeneration++;
     emit(const CalendarScreenState(status: CalendarScreenStatus.ready));
   }
 }

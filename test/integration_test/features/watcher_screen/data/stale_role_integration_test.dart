@@ -170,6 +170,20 @@ void main() {
       ),
       throwsA(isA<supabase.PostgrestException>()),
     );
+    await expectLater(
+      watcherClient.rpc(
+        'load_event_attendance_count',
+        params: {'requested_event_id': eventId},
+      ),
+      throwsA(isA<supabase.PostgrestException>()),
+    );
+    await expectLater(
+      watcherClient.rpc(
+        'load_event_check_in_count',
+        params: {'requested_event_id': eventId},
+      ),
+      throwsA(isA<supabase.PostgrestException>()),
+    );
   }
 
   Future<EventFixtureData> _createEvent() async {
