@@ -2,7 +2,9 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
+
 abstract interface class EventDataSource {
   Future<List<Event>> loadEvents();
   Future<EventOperationResult> create(Event event, User user);
@@ -11,13 +13,18 @@ abstract interface class EventDataSource {
 }
 
 class EventRemoteDataSource implements EventDataSource {
-  EventRemoteDataSource(this._store);
+  EventRemoteDataSource(
+    this._store, {
+    Future<void> Function(String path)? deleteImage,
+  }) : _deleteImage = deleteImage ?? deleteStoredImage;
 
   final EventStore _store;
+  final Future<void> Function(String path) _deleteImage;
 
   @override
   Future<List<Event>> loadEvents() async {
     final events = await _store.readCreatedEvents();
+    if (events.isEmpty) return const [];
     final counts = await _store.loadRegistrationCounts(
       events.map((event) => event.id).toList(),
     );
@@ -38,7 +45,7 @@ class EventRemoteDataSource implements EventDataSource {
     try {
       await _store.createEvent(created);
     } on LocalStorageException {
-      return const EventOperationResult([], 'Unable to save the event');
+      return const EventOperationResult([], AppText.unableToSaveEvent);
     }
     return EventOperationResult(await loadEvents());
   }
@@ -48,7 +55,7 @@ class EventRemoteDataSource implements EventDataSource {
     final events = await _store.readCreatedEvents();
     final index = events.indexWhere((created) => created.id == event.id);
     if (index == -1) {
-      return const EventOperationResult([], 'Event could not be found');
+      return const EventOperationResult([], AppText.eventNotFound);
     }
 
     final existing = events[index];
@@ -77,7 +84,7 @@ class EventRemoteDataSource implements EventDataSource {
     try {
       await _store.updateEvent(events[index]);
     } on LocalStorageException {
-      return const EventOperationResult([], 'Unable to update the event');
+      return const EventOperationResult([], AppText.unableToUpdateEvent);
     }
     return EventOperationResult(await loadEvents());
   }
@@ -89,9 +96,13 @@ class EventRemoteDataSource implements EventDataSource {
     try {
       await _store.deleteEvent(event.id);
     } on LocalStorageException {
-      return const EventOperationResult([], 'Unable to delete the event');
+      return const EventOperationResult([], AppText.unableToDeleteEvent);
     }
-    await deleteStoredImage(event.imageUrl);
+    try {
+      await _deleteImage(event.imageUrl);
+    } on Object {
+      return const EventOperationResult([], AppText.unableToDeleteEvent);
+    }
     return EventOperationResult(await loadEvents());
   }
 }

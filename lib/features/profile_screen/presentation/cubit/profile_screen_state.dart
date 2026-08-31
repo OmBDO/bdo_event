@@ -1,7 +1,12 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
 
-enum ProfileScreenStatus { ready, savingNotificationPreference, notificationPreferenceError }
+enum ProfileScreenStatus {
+  ready,
+  savingNotificationPreference,
+  notificationPreferenceError,
+}
 
 class ProfileScreenState {
   final User? user;
@@ -36,7 +41,7 @@ class ProfileScreenState {
     this.isWatcherKeepHistoryVisibleAfterCheckIn = false,
     this.isEventRemindersEnabled = true,
     this.eventReminderLeadTimeMinutes = 1440,
-    this.dateFormat = 'dd/MM/yyyy',
+    this.dateFormat = AppDateFormats.dayMonthYear,
     this.isBiometricLockEnabled = false,
     this.profileVisibility = ProfileVisibility.private,
     this.registrationVisibility = RegistrationVisibility.private,
@@ -67,30 +72,29 @@ class ProfileScreenState {
   }) => ProfileScreenState(
     user: user ?? this.user,
     status: status ?? this.status,
-    isNotificationEnabled:
-        isNotificationEnabled ?? this.isNotificationEnabled,
+    isNotificationEnabled: isNotificationEnabled ?? this.isNotificationEnabled,
     isDarkModeEnabled: isDarkModeEnabled ?? this.isDarkModeEnabled,
     isLargeTextEnabled: isLargeTextEnabled ?? this.isLargeTextEnabled,
     isHighContrastEnabled: isHighContrastEnabled ?? this.isHighContrastEnabled,
     isWatcherVoiceMuted: isWatcherVoiceMuted ?? this.isWatcherVoiceMuted,
     isWatcherVibrationEnabled:
-      isWatcherVibrationEnabled ?? this.isWatcherVibrationEnabled,
+        isWatcherVibrationEnabled ?? this.isWatcherVibrationEnabled,
     watcherSoundVolume: watcherSoundVolume ?? this.watcherSoundVolume,
     isWatcherAutoOpenNextEnabled:
-      isWatcherAutoOpenNextEnabled ?? this.isWatcherAutoOpenNextEnabled,
+        isWatcherAutoOpenNextEnabled ?? this.isWatcherAutoOpenNextEnabled,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      isWatcherKeepHistoryVisibleAfterCheckIn ??
-      this.isWatcherKeepHistoryVisibleAfterCheckIn,
+        isWatcherKeepHistoryVisibleAfterCheckIn ??
+        this.isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled:
-      isEventRemindersEnabled ?? this.isEventRemindersEnabled,
+        isEventRemindersEnabled ?? this.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes:
-      eventReminderLeadTimeMinutes ?? this.eventReminderLeadTimeMinutes,
+        eventReminderLeadTimeMinutes ?? this.eventReminderLeadTimeMinutes,
     dateFormat: dateFormat ?? this.dateFormat,
     isBiometricLockEnabled:
-      isBiometricLockEnabled ?? this.isBiometricLockEnabled,
+        isBiometricLockEnabled ?? this.isBiometricLockEnabled,
     profileVisibility: profileVisibility ?? this.profileVisibility,
     registrationVisibility:
-      registrationVisibility ?? this.registrationVisibility,
+        registrationVisibility ?? this.registrationVisibility,
     errorMessage: clearErrorMessage ? null : errorMessage ?? this.errorMessage,
   );
 }

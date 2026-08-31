@@ -1,4 +1,6 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class SectionHeader extends StatelessWidget {
   final String subtitle;
@@ -22,26 +24,26 @@ class SectionHeader extends StatelessWidget {
           subtitle,
           style: TextStyle(
             color: theme.colorScheme.primary,
-            fontSize: 12,
+            fontSize: AppSize.text12,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.8,
           ),
         ),
-        const SizedBox(height: 10),
+        const Gap(AppSpace.space10),
         Text(
           title,
           style: TextStyle(
             color: theme.colorScheme.onSurface,
-            fontSize: 30,
+            fontSize: AppSize.text30,
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 8),
+        const Gap(AppSpace.space8),
         Text(
           description,
           style: TextStyle(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-            fontSize: 15,
+            fontSize: AppSize.text15,
           ),
         ),
       ],

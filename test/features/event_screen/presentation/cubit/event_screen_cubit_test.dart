@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/calendar_screen/domain/repositories/calendar_repository.dart';
 import 'package:bdo_event/features/calendar_screen/domain/usecases/load_registered_events.dart';
@@ -16,7 +17,9 @@ void main() {
   final futureEvent = event('future', '01/01/2099');
 
   test('load populates events, registered IDs, and saved IDs', () async {
-    SharedPreferences.setMockInitialValues({'saved_event_ids': ['saved']});
+    SharedPreferences.setMockInitialValues({
+      'saved_event_ids': ['saved'],
+    });
     final repository = FakeEventRepository(events: [pastEvent, futureEvent]);
     final cubit = createCubit(
       repository: repository,
@@ -45,16 +48,19 @@ void main() {
     await cubit.close();
   });
 
-  test('currentTabEvents separates upcoming, registered, and past events', () async {
-    final state = EventScreenState(
-      events: [pastEvent, futureEvent],
-      registeredEventIds: {'future'},
-    );
+  test(
+    'currentTabEvents separates upcoming, registered, and past events',
+    () async {
+      final state = EventScreenState(
+        events: [pastEvent, futureEvent],
+        registeredEventIds: {'future'},
+      );
 
-    expect(state.currentTabEvents, [futureEvent]);
-    expect(state.copyWith(selectedTab: 1).currentTabEvents, [futureEvent]);
-    expect(state.copyWith(selectedTab: 2).currentTabEvents, [pastEvent]);
-  });
+      expect(state.currentTabEvents, [futureEvent]);
+      expect(state.copyWith(selectedTab: 1).currentTabEvents, [futureEvent]);
+      expect(state.copyWith(selectedTab: 2).currentTabEvents, [pastEvent]);
+    },
+  );
 
   test('delete rolls back the event when the repository fails', () async {
     final repository = FakeEventRepository(
@@ -72,21 +78,24 @@ void main() {
     await cubit.close();
   });
 
-  test('save maps create and edit operation errors and clears saving state', () async {
-    final repository = FakeEventRepository(
-      saveResult: const EventOperationResult([], 'save failed'),
-    );
-    final cubit = createCubit(repository: repository);
+  test(
+    'save maps create and edit operation errors and clears saving state',
+    () async {
+      final repository = FakeEventRepository(
+        saveResult: const EventOperationResult([], 'save failed'),
+      );
+      final cubit = createCubit(repository: repository);
 
-    expect(await cubit.save(futureEvent, isEditing: false), 'save failed');
-    expect(cubit.state.isSaving, isFalse);
-    expect(cubit.state.error, 'save failed');
+      expect(await cubit.save(futureEvent, isEditing: false), 'save failed');
+      expect(cubit.state.isSaving, isFalse);
+      expect(cubit.state.error, 'save failed');
 
-    expect(await cubit.save(futureEvent, isEditing: true), 'save failed');
-    expect(cubit.state.isSaving, isFalse);
-    expect(cubit.state.error, 'save failed');
-    await cubit.close();
-  });
+      expect(await cubit.save(futureEvent, isEditing: true), 'save failed');
+      expect(cubit.state.isSaving, isFalse);
+      expect(cubit.state.error, 'save failed');
+      await cubit.close();
+    },
+  );
 
   test('save requires an authenticated user', () async {
     final cubit = createCubit(
@@ -107,14 +116,17 @@ void main() {
     final cubit = createCubit(repository: repository);
     await cubit.close();
 
-    expect(await cubit.save(futureEvent, isEditing: false), AppText.unableToSaveEvent);
+    expect(
+      await cubit.save(futureEvent, isEditing: false),
+      AppText.unableToSaveEvent,
+    );
     expect(repository.createCalls, 0);
   });
 
   test('toggleSavedEvent persists add and remove operations', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
-    final cubit = createCubit(preferences: preferences);
+    final cubit = createCubit(preferences: preferences, repository: null);
 
     cubit.toggleSavedEvent(futureEvent);
     expect(cubit.state.savedEventIds, {'future'});
@@ -127,13 +139,8 @@ void main() {
   });
 }
 
-Event event(String id, String date) => Event(
-  id: id,
-  title: id,
-  date: date,
-  location: 'Pune',
-  imageUrl: '',
-);
+Event event(String id, String date) =>
+    Event(id: id, title: id, date: date, location: 'Pune', imageUrl: '');
 
 EventScreenCubit createCubit({
   required FakeEventRepository repository,
@@ -184,7 +191,10 @@ class FakeEventRepository implements EventRepositoryContract {
   Future<EventOperationResult> deleteEvent(Event event) async =>
       deleteResult ?? const EventOperationResult([]);
 
-  Future<EventOperationResult> _save(Event event, {required bool editing}) async {
+  Future<EventOperationResult> _save(
+    Event event, {
+    required bool editing,
+  }) async {
     if (editing) {
       updateCalls++;
     } else {
@@ -226,13 +236,28 @@ class FakeAuthRepository implements AuthRepositoryContract {
   @override
   Future<void> initialize() async {}
   @override
-  Future<String?> register({required String name, required String email, required String password, required UserRole requestedRole}) async => null;
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole requestedRole,
+  }) async => null;
   @override
-  Future<String?> login({required String email, required String password}) async => null;
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async => null;
   @override
   Future<String?> updatePassword(String password) async => null;
   @override
-  Future<String?> updateProfile({required String displayName, required String email, String? photoUrl, String? phoneNumber, String? bio, String? locale}) async => null;
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
+  }) async => null;
   @override
   Future<void> logout() async {}
   @override

@@ -1,4 +1,6 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +55,7 @@ class ScanHistorySheet extends StatelessWidget {
                     child: Text(
                       AppText.scanHistory,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: AppSize.text18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

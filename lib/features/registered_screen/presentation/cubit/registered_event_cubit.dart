@@ -1,23 +1,19 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_registered_event.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_state.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisteredEventCubit extends Cubit<RegisteredEventState> {
   RegisteredEventCubit({
-    required CancelRegisteredEvent cancelRegisteredEvent,
-    required AuthRepositoryContract authRepository,
-    required EventStore eventStore,
-    required EventReminderNotificationService? reminderNotifications,
-  }) : _cancelRegisteredEvent = cancelRegisteredEvent,
-       _authRepository = authRepository,
-       _eventStore = eventStore,
-       _reminderNotifications = reminderNotifications,
-       super(const RegisteredEventState());
+    required this._cancelRegisteredEvent,
+    required this._authRepository,
+    required this._eventStore,
+    required this._reminderNotifications,
+  }) : super(const RegisteredEventState());
 
   final CancelRegisteredEvent _cancelRegisteredEvent;
   final AuthRepositoryContract _authRepository;

@@ -1,9 +1,11 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -88,7 +90,7 @@ class EventCard extends StatelessWidget {
                     formatEventDate(event.date, dateFormat),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: AppSize.text12,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -135,7 +137,7 @@ class EventCard extends StatelessWidget {
                       '${event.attendeeCount} attending',
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: AppSize.text12,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -164,13 +166,13 @@ class EventCard extends StatelessWidget {
                         maxLines: 1, // Restricting to 1 line limits height spillover bugs
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: AppSize.text18,
                           fontWeight: FontWeight.w800,
                           color: theme.colorScheme.onSurface,
                           height: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const Gap(AppSpace.space10),
                       Row(
                         children: [
                           Container(
@@ -189,7 +191,7 @@ class EventCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const Gap(AppSpace.space8),
                           Expanded(
                             child: Text(
                               event.location,
@@ -199,7 +201,7 @@ class EventCard extends StatelessWidget {
                                 color: theme.colorScheme.onSurface.withValues(
                                   alpha: 0.6,
                                 ),
-                                fontSize: 13,
+                                fontSize: AppSize.text13,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -210,7 +212,7 @@ class EventCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 16),
+                const Gap(AppSpace.space16),
 
                 // Diagonal Arrow Circular Button
                 GestureDetector(

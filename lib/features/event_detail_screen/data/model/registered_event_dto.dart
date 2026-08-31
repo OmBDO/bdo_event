@@ -1,11 +1,8 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
 
 class RegisteredEventDto {
-  const RegisteredEventDto({
-    required this.userId,
-    required this.event,
-  });
+  const RegisteredEventDto({required this.userId, required this.event});
 
   final String userId;
   final Event event;

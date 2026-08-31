@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_preferences.dart';
 
 class ProfilePreferencesModel extends ProfilePreferences {
@@ -27,7 +28,7 @@ class ProfilePreferencesModel extends ProfilePreferences {
     required bool isWatcherKeepHistoryVisibleAfterCheckIn,
     required bool isEventRemindersEnabled,
     required int eventReminderLeadTimeMinutes,
-    String dateFormat = 'dd/MM/yyyy',
+    String dateFormat = AppDateFormats.dayMonthYear,
     bool isBiometricLockEnabled = false,
   }) => ProfilePreferencesModel(
     isDarkModeEnabled: isDarkModeEnabled,
@@ -38,7 +39,7 @@ class ProfilePreferencesModel extends ProfilePreferences {
     watcherSoundVolume: watcherSoundVolume,
     isWatcherAutoOpenNextEnabled: isWatcherAutoOpenNextEnabled,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      isWatcherKeepHistoryVisibleAfterCheckIn,
+        isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled: isEventRemindersEnabled,
     eventReminderLeadTimeMinutes: eventReminderLeadTimeMinutes,
     dateFormat: dateFormat,

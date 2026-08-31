@@ -1,5 +1,7 @@
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key});
@@ -20,12 +22,12 @@ class BrandMark extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSecondary,
           ),
         ),
-        const SizedBox(width: 12),
+        const Gap(AppSpace.space12),
         Text(
           AppText.brandName,
           style: TextStyle(
             color: Theme.of(context).colorScheme.secondary,
-            fontSize: 20,
+            fontSize: AppSize.text20,
             fontWeight: FontWeight.w800,
           ),
         ),

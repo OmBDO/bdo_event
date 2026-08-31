@@ -1,9 +1,10 @@
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/pages/watcher_scan_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SearchBarWidget extends StatefulWidget {
@@ -74,14 +75,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   onChanged: widget.onChanged,
                   style: TextStyle(
                     color: textColor,
-                    fontSize: 15,
+                    fontSize: AppSize.text15,
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
                     hintText: widget.hintText,
                     hintStyle: TextStyle(
                       color: textColor.withValues(alpha: 0.4),
-                      fontSize: 15,
+                      fontSize: AppSize.text15,
                       fontWeight: FontWeight.w400,
                     ),
                     prefixIcon: Icon(

@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/registration_code_codec.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/pages/registered_event_page.dart';
@@ -20,8 +21,9 @@ import '../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dar
 import '../cubit/registered_event_cubit_test.dart' as registered_fixtures;
 
 void main() {
-  testWidgets('shows the preparing ticket while token is unavailable',
-      (tester) async {
+  testWidgets('shows the preparing ticket while token is unavailable', (
+    tester,
+  ) async {
     final cubit = registered_fixtures.createCubit();
     await pumpPage(tester, cubit);
 
@@ -31,8 +33,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('shows QR and manual registration code after token loads',
-      (tester) async {
+  testWidgets('shows QR and manual registration code after token loads', (
+    tester,
+  ) async {
     final cubit = registered_fixtures.createCubit(
       store: registered_fixtures.FakeEventStore(token: 'token-1'),
     );
@@ -40,7 +43,9 @@ void main() {
 
     expect(find.text(AppText.registrationCode), findsOneWidget);
     expect(
-      find.text(RegistrationCodeCodec.encode(eventId: 'event-1', token: 'token-1')),
+      find.text(
+        RegistrationCodeCodec.encode(eventId: 'event-1', token: 'token-1'),
+      ),
       findsOneWidget,
     );
     expect(find.byType(QrImageView), findsOneWidget);
@@ -59,8 +64,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('copies the manual registration code and shows confirmation',
-      (tester) async {
+  testWidgets('copies the manual registration code and shows confirmation', (
+    tester,
+  ) async {
     final cubit = registered_fixtures.createCubit(
       store: registered_fixtures.FakeEventStore(token: 'token-1'),
     );
@@ -73,8 +79,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('opens cancellation confirmation and keeps registration',
-      (tester) async {
+  testWidgets('opens cancellation confirmation and keeps registration', (
+    tester,
+  ) async {
     final cubit = registered_fixtures.createCubit();
     await pumpPage(tester, cubit);
     final cancelButton = find.text(AppText.cancelRegistrationButton);
@@ -91,9 +98,11 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('cancels registration, refreshes screens, and closes ticket',
-      (tester) async {
-    final registrationRepository = registered_fixtures.FakeRegistrationRepository();
+  testWidgets('cancels registration, refreshes screens, and closes ticket', (
+    tester,
+  ) async {
+    final registrationRepository =
+        registered_fixtures.FakeRegistrationRepository();
     final registeredCubit = registered_fixtures.createCubit(
       repository: registrationRepository,
     );

@@ -3,12 +3,14 @@ import 'package:bdo_event/core/common/form_elements/auth_button.dart';
 import 'package:bdo_event/core/common/form_elements/auth_scaffold.dart';
 import 'package:bdo_event/core/common/form_elements/auth_switch.dart';
 import 'package:bdo_event/core/util/helpers/validation_email.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/signup_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/signup_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 class SignupScreen extends StatefulWidget {
   final ValueChanged<String> onShowSignin;
@@ -95,7 +97,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ? AppText.enterFullName
                     : null,
               ),
-              const SizedBox(height: 16),
+              const Gap(AppSpace.space16),
               DropdownButtonFormField<UserRole>(
                 initialValue: _requestedRole,
                 decoration: const InputDecoration(labelText: AppText.role),
@@ -122,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: Text(AppText.roleRequestNote),
                 ),
               ),
-              const SizedBox(height: 16),
+              const Gap(AppSpace.space16),
               AppTextField(
                 controller: _emailController,
                 label: AppText.emailAddress,
@@ -130,7 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 keyboardType: TextInputType.emailAddress,
                 validator: validateEmail,
               ),
-              const SizedBox(height: 16),
+              const Gap(AppSpace.space16),
               AppTextField(
                 controller: _passwordController,
                 label: AppText.password,
@@ -149,7 +151,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       setState(() => _showPassword = !_showPassword),
                 ),
               ),
-              const SizedBox(height: 16),
+              const Gap(AppSpace.space16),
               AppTextField(
                 controller: _confirmPasswordController,
                 label: AppText.confirmPassword,
@@ -169,7 +171,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const Gap(AppSpace.space8),
 
               Material(
                 color: Colors.transparent,
@@ -184,7 +186,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
 
               if (state.error != null) ...[
-                const SizedBox(height: 8),
+                const Gap(AppSpace.space8),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -195,14 +197,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ],
-              const SizedBox(height: 18),
+              const Gap(AppSpace.space18),
 
               AppButton(
                 label: AppText.createAccount,
                 isLoading: state.isSubmitting,
                 onPressed: _submit,
               ),
-              const SizedBox(height: 18),
+              const Gap(AppSpace.space18),
 
               AuthSwitch(
                 prompt: AppText.alreadyHaveAccount,

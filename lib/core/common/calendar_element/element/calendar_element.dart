@@ -1,16 +1,13 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
 import 'package:bdo_event/core/common/calendar_element/widgets/event_tooltip.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/theme/app_colors.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarElement extends StatefulWidget {
-  const CalendarElement({
-    super.key,
-    this.events = const [],
-    this.onEventTap,
-  });
+  const CalendarElement({super.key, this.events = const [], this.onEventTap});
 
   final List<Event> events;
   final Future<void> Function(Event event)? onEventTap;
@@ -25,12 +22,10 @@ class _CalendarElementState extends State<CalendarElement> {
   DateTime? _selectedDay;
   OverlayEntry? _eventTooltip;
 
-  List<Event> _getEventsForDay(DateTime day) => widget.events
-      .where((event) {
-        final eventDate = _parseEventDate(event.date);
-        return eventDate != null && isSameDay(eventDate, day);
-      })
-      .toList();
+  List<Event> _getEventsForDay(DateTime day) => widget.events.where((event) {
+    final eventDate = _parseEventDate(event.date);
+    return eventDate != null && isSameDay(eventDate, day);
+  }).toList();
 
   static DateTime? _parseEventDate(String value) {
     final parts = value.split('/');
@@ -103,15 +98,13 @@ class _CalendarElementState extends State<CalendarElement> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final primaryColor = isDarkMode
-      ? theme.colorScheme.primary
-      : Colors.black;
+    final primaryColor = isDarkMode ? theme.colorScheme.primary : Colors.black;
     final accentColor = isDarkMode
-      ? theme.colorScheme.tertiary
-      : const Color(0xFFFF6584);
+        ? theme.colorScheme.tertiary
+        : const Color(0xFFFF6584);
     final textColor = isDarkMode
-      ? theme.colorScheme.onSurface
-      : AppColors.secondaryLight;
+        ? theme.colorScheme.onSurface
+        : AppColors.secondaryLight;
 
     return Container(
       margin: const EdgeInsets.only(top: 10, left: 16, right: 16),
@@ -166,7 +159,7 @@ class _CalendarElementState extends State<CalendarElement> {
           titleTextStyle: TextStyle(
             color: textColor,
             fontWeight: FontWeight.w800,
-            fontSize: 18,
+            fontSize: AppSize.text18,
             letterSpacing: 0.5,
           ),
           leftChevronIcon: Icon(
@@ -187,12 +180,12 @@ class _CalendarElementState extends State<CalendarElement> {
           weekdayStyle: TextStyle(
             color: textColor.withValues(alpha: 0.55),
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: AppSize.text13,
           ),
           weekendStyle: TextStyle(
             color: accentColor,
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: AppSize.text13,
           ),
         ),
 

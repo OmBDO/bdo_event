@@ -1,17 +1,16 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_screen/data/datasource/event_remote_data_source.dart';
 import 'package:bdo_event/features/event_screen/domain/entities/event_operation_result.dart';
 import 'package:bdo_event/features/event_screen/domain/repositories/event_repository.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class EventRepository implements EventRepositoryContract {
   EventRepository({
     required EventDataSource dataSource,
-    required AuthRepositoryContract authRepository,
-  }) : _eventDataSource = dataSource,
-       _authRepository = authRepository;
+    required this._authRepository,
+  }) : _eventDataSource = dataSource;
 
   final EventDataSource _eventDataSource;
   final AuthRepositoryContract _authRepository;

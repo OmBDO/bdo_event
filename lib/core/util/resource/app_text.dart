@@ -37,7 +37,14 @@ abstract final class AppText {
 
   static const upcoming = 'Upcoming';
   static const myEvents = 'My Events';
-  static const past = 'Past';
+    static const past = 'Past';
+    static const eventTabs = [upcoming, myEvents, past];
+    static const recentlyViewed = 'Recently viewed';
+    static const upcomingEvents = 'Upcoming Events';
+    static const pastEvents = 'Past Events';
+    static const quietMoment = 'A quiet moment';
+    static const eventsWillAppearHere =
+            '{tabTitle} will appear here when there is something to explore.';
   static const event = 'Event';
   static const register = 'Register';
   static const create = 'Create';
@@ -56,8 +63,67 @@ abstract final class AppText {
       'Add the essential details and publish your next event.';
   static const addEventImage = 'Add event image';
   static const eventTitle = 'Event title';
-  static const eventDate = 'Event date';
+    static const eventDate = 'Event date';
+    static const startTime = 'Start time';
+    static const endTime = 'End time';
+    static const chooseStartTime = 'Choose a start time';
+    static const chooseEndTime = 'Choose an end time';
+    static const chooseStartAndEndTime = 'Choose a start and end time';
+    static const endTimeMustBeAfterStart = 'End time must be after start time';
+    static const limitSeats = 'Limit seats';
+    static const seats = 'Seats';
+    static const positiveNumber = 'Enter a positive number';
+    static const registrationDeadline = 'Registration deadline';
+    static const chooseRegistrationDeadline = 'Choose a registration deadline';
+    static const deadlineMustBeInFuture = 'Deadline must be in the future';
+    static const deadlineDateAndTime = 'Deadline date and time';
   static const location = 'Location';
+    static const selectLocation = 'Select location';
+    static const searchAddressOrPlace = 'Search an address or place';
+    static const eventAnalysis = 'Event analysis';
+    static const operationsEventAnalysis = 'OPERATIONS / EVENT ANALYSIS';
+    static const refreshAnalytics = 'Refresh analytics';
+    static const unableToLoadAnalytics = 'Unable to load analytics';
+    static const inviteUsers = 'Invite users';
+    static const unableToSendInvitations = 'Unable to send invitations';
+    static const unableToLoadUsers = 'Unable to load users';
+    static const noUsersAvailableToInvite = 'No users available to invite';
+    static const selectAllUsers = 'Select all users';
+    static const noSavedEvents = 'You have not saved any events yet.';
+    static const phoneNumber = 'Phone number';
+    static const bio = 'Bio';
+    static const englishIndiaFull = 'English (India)';
+    static const englishUnitedStates = 'English (United States)';
+    static const unableToUploadProfilePhoto = 'Unable to upload profile photo';
+    static const change = 'Change';
+    static const remove = 'Remove';
+    static const fieldCannotBeChanged = 'This field cannot be changed';
+    static const biometricAuthenticationUnavailable =
+            'Biometric authentication is unavailable.';
+    static const dateFormat = 'Date format';
+    static const profileVisibility = 'Profile visibility';
+    static const registrationVisibility = 'Registration visibility';
+    static const viewAttendees = 'View attendees';
+    static const viewEventAnalytics = 'View event analytics';
+    static const exploreEvents = 'Explore events';
+    static const eventAttendees = 'Event attendees';
+    static const unableToLoadAttendees = 'Unable to load attendees';
+    static const noAttendeesRegistered = 'No attendees registered yet';
+    static const shareCsv = 'Share CSV';
+    static const copyAttendeeListAsCsv = 'Copy attendee list as CSV';
+    static const attendeeCsvCopied = 'Attendee CSV copied';
+    static const shareEvent = 'Share event';
+    static const unlockApp = 'Unlock app';
+    static const unableToUpdateInvitation = 'Unable to update invitation';
+    static const wouldYouLikeToAttend = 'Would you like to attend?';
+    static const accept = 'Accept';
+    static const decline = 'Decline';
+    static const eventDatePrefix = 'Event date:';
+
+    static String registeredForEvent(String eventTitle) =>
+            'Registered for $eventTitle';
+    static String attendeeListFor(String eventTitle) =>
+            'Attendee list for $eventTitle';
   static const description = 'Description';
   static const selectCategory = 'Select Category';
   static const pleaseSelectCategory = 'Please select a category';
@@ -282,6 +348,7 @@ abstract final class AppText {
   static const unableToCancelRegistration = 'Unable to cancel the registration';
   static const updateInProgress = 'An update is already in progress';
   static const unableToSaveEvent = 'Unable to save the event';
+    static const unableToFindLocation = 'Unable to find that location';
   static const unableToUploadEventImage = 'Unable to upload the event image';
   static const unableToLoadEvents = 'Unable to load events';
   static const unableToUpdateEvent = 'Unable to update the event';
@@ -296,6 +363,32 @@ abstract final class AppText {
   static const noEventsCreated = 'No events created yet';
   static const noRegisteredEvents = 'No registered events yet';
   static const noMatchingEvents = 'No matching events found';
+  static const noEventsFound = 'No events found';
+  static const calendarReady = 'Your calendar is ready';
+  static const registeredEventsWillAppearHere =
+      'Registered events will appear here so you can find every ticket in one place.';
+  static const capacityTrajectory = 'Capacity trajectory';
+  static const registrationsMappedAgainstCapacity =
+      'Current registrations mapped against event capacity';
+  static const operationalInsight = 'Operational insight';
+  static const quickReadOnEventState = 'A quick read on the current event state';
+  static const capacityReached = 'Capacity reached';
+  static const attendanceIsActive = 'Attendance is active';
+  static const readyForEventDay = 'Ready for event day';
+  static const eventAtCapacityInsight =
+      'Your event is at capacity. Keep an eye on check-in throughput.';
+  static const noCheckInsRecorded =
+      'No check-ins recorded yet. This panel will become live when attendees arrive.';
+  static const attendanceMix = 'Attendance mix';
+  static const registrationToArrivalConversion =
+      'Registration to arrival conversion';
+  static const analyticsCheckedIn = 'Checked in';
+  static const awaitingArrival = 'Awaiting arrival';
+
+  static String invitationsSent(int count) => '$count invitation(s) sent';
+  static String sendToUsers(int count) => 'Send to $count users';
+  static String attendeesArrived(int count) =>
+      '$count attendee${count == 1 ? '' : 's'} have arrived. The live conversion signal is updating.';
   static const searchFestivalsOrEvents = 'Search festivals or events...';
   static const noNewNotifications = 'No new notifications';
   static const notifications = 'Notifications';
@@ -318,110 +411,4 @@ abstract final class AppText {
   static const nullCount = '--';
   static const profileUnavailable = 'Profile unavailable';
   static const empty = '';
-}
-
-abstract final class AppAssets {
-  static const logo = 'assets/logo/bdo_event.png';
-  static const defaultAvatarUrl =
-      'https://static.vecteezy.com/system/resources/previews/018/765/757/non_2x/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg';
-  static const assetPathPrefix = 'assets/';
-}
-
-abstract final class AppStorageKeys {
-  static const displayName = 'display_name';
-  static const notificationsEnabled = 'notifications_enabled';
-}
-
-abstract final class AppEssentials {
-  // ENV
-
-  static const supabaseURLKEY = 'SUPABASE_URL';
-  static const supabaseAnonKEY = 'SUPABASE_URL';
-  static const bdoinitialQr = 'bdo-event-ticket-preparing';
-}
-
-abstract final class AppDatabase {
-  static const eventsTable = 'events';
-  static const eventRegistrationsTable = 'event_registrations';
-  static const id = 'id';
-  static const eventId = 'event_id';
-  static const userId = 'user_id';
-  static const creatorId = 'creator_id';
-  static const createdAt = 'created_at';
-  static const registeredAt = 'registered_at';
-  static const registrationStatus = 'status';
-  static const cancelledAt = 'cancelled_at';
-  static const registrationToken = 'registration_token';
-  static const checkInsTable = 'event_check_ins';
-  static const checkedInAt = 'checked_in_at';
-  static const checkedInBy = 'checked_in_by';
-  static const activeRegistration = 'active';
-  static const revokedRegistration = 'revoked';
-  static const payload = 'payload';
-  static const isCheckedIn = 'is_checked_in';
-}
-
-abstract final class AppIdentifiers {
-  static const qrRegistrationType = 'bdo_event_registration';
-  static const createdEventPrefix = 'created-';
-  static const profileMenuValue = 'profile';
-  static const logoutMenuValue = 'logout';
-  static const storedEventFilePrefix = 'event_';
-  static const storedEventFileExtension = '.jpg';
-
-  static const readytocheckIn = 'Ready to check in';
-}
-
-abstract final class AppLocations {
-  static const mumbaiZoneOneId = 'mumbai-zone-1';
-  static const bangaloreEastId = 'bangalore-east';
-  static const kolkataNorthId = 'kolkata-north';
-  static const mumbaiZoneTwoId = 'mumbai-zone-2';
-  static const bangaloreWestId = 'bangalore-west';
-  static const kolkataSouthId = 'kolkata-south';
-  static const bdoRiseHyderabadId = 'Hyderabad-south';
-  static const bdoRiseAhmedabadId = 'Ahmedabad';
-  static const bdoRiseGurugramId = 'Gurugram';
-
-  static const delhiNcrId = 'delhi-ncr';
-
-  static const bdoRiseMumbaiId = 'bdo-rise-mumbai';
-  static const bdoRiseBengaluruId = 'bdo-rise-bengaluru';
-  static const bdoRiseKolkataId = 'bdo-rise-kolkata';
-  static const bdoRiseDelhiNcrId = 'bdo-rise-delhi-ncr';
-  static const bdoRiseOffice = 'BDO RISE Office';
-  static const mumbai = 'Mumbai';
-  static const bangalore = 'Bangalore';
-  static const kolkata = 'Kolkata';
-  static const delhi = 'Delhi';
-  static const hyderabad = 'hyderabad';
-  static const ahmedabad = 'ahmedabad';
-  static const gurugram = 'gurugram';
-
-  static const india = 'India';
-  static const zoneOne = 'Zone 1';
-  static const zoneTwo = 'Zone 2';
-  static const east = 'East';
-  static const west = 'West';
-  static const north = 'North';
-  static const south = 'South';
-  static const ncr = 'NCR';
-}
-
-abstract final class AppModelKeys {
-  static const type = 'type';
-  static const eventId = 'eventId';
-  static const token = 'token';
-  static const userId = 'user_id';
-  static const eventUnderscoreId = 'event_id';
-  static const displayName = "display_name";
-  static const checkedIn = "checked_in";
-  static const alreadyCheckedIn = "already_checked_in";
-  static const event = 'event';
-  static const date = 'date';
-  static const location = 'location';
-}
-
-abstract final class AppUtil {
-  static const monospace = 'monospace';
 }

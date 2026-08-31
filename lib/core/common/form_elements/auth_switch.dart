@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 class AuthSwitch extends StatelessWidget {
@@ -20,8 +21,8 @@ class AuthSwitch extends StatelessWidget {
         alignment: WrapAlignment.center, // Centers items horizontally
         crossAxisAlignment:
             WrapCrossAlignment.center, // Centers items vertically
-        spacing: 4, // Horizontal space between items
-        runSpacing: 4, // Vertical space if wrapped to new line
+        spacing: AppSpace.space4, // Horizontal space between items
+        runSpacing: AppSpace.space4, // Vertical space if wrapped to new line
         children: [
           Text(
             prompt,

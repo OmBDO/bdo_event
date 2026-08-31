@@ -1,4 +1,6 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 class EventDropdown extends StatelessWidget {
   final String selectedLocation;
@@ -21,7 +23,7 @@ class EventDropdown extends StatelessWidget {
         children: [
           const Icon(Icons.location_on, size: 18),
 
-          const SizedBox(width: 4),
+          const Gap(AppSpace.space4),
 
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -35,7 +37,7 @@ class EventDropdown extends StatelessWidget {
                   child: Text(
                     location,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: AppSize.text14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

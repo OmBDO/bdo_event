@@ -6,6 +6,7 @@ import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_
 import 'package:bdo_event/features/event_screen/presentation/widgets/event_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 
 class SavedEventsPage extends StatelessWidget {
   const SavedEventsPage({super.key});
@@ -13,7 +14,7 @@ class SavedEventsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Saved events')),
+      appBar: AppBar(title: const Text(AppText.savedEvents)),
       body: BlocBuilder<EventScreenCubit, EventScreenState>(
         builder: (context, state) {
           final savedEvents = state.events
@@ -21,9 +22,7 @@ class SavedEventsPage extends StatelessWidget {
               .toList();
 
           if (savedEvents.isEmpty) {
-            return const Center(
-              child: Text('You have not saved any events yet.'),
-            );
+            return const Center(child: Text(AppText.noSavedEvents));
           }
 
           return ListView.builder(
@@ -34,9 +33,8 @@ class SavedEventsPage extends StatelessWidget {
               return EventCard(
                 event: event,
                 isSaved: true,
-                onSave: () => context
-                    .read<EventScreenCubit>()
-                    .toggleSavedEvent(event),
+                onSave: () =>
+                    context.read<EventScreenCubit>().toggleSavedEvent(event),
                 onTap: (_) async {
                   await Navigator.of(context).push(
                     MaterialPageRoute(

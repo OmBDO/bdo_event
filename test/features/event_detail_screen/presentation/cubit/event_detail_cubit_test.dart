@@ -5,7 +5,7 @@ import 'package:bdo_event/core/model/notification_model/notification_model.dart'
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/repositories/registration_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/registration_use_cases.dart';
@@ -44,21 +44,26 @@ void main() {
     await cubit.close();
   });
 
-  test('registration errors clear submitting state and preserve status', () async {
-    final cubit = createCubit(
-      repository: FakeRegistrationRepository(error: AppText.eventAtCapacity),
-    );
+  test(
+    'registration errors clear submitting state and preserve status',
+    () async {
+      final cubit = createCubit(
+        repository: FakeRegistrationRepository(error: AppText.eventAtCapacity),
+      );
 
-    expect(await cubit.register(event), AppText.eventAtCapacity);
-    expect(cubit.state.isSubmitting, isFalse);
-    expect(cubit.state.isRegistered, isFalse);
-    expect(cubit.state.error, AppText.eventAtCapacity);
-    await cubit.close();
-  });
+      expect(await cubit.register(event), AppText.eventAtCapacity);
+      expect(cubit.state.isSubmitting, isFalse);
+      expect(cubit.state.isRegistered, isFalse);
+      expect(cubit.state.error, AppText.eventAtCapacity);
+      await cubit.close();
+    },
+  );
 
   test('duplicate submissions return update-in-progress', () async {
     final completer = Completer<String?>();
-    final repository = FakeRegistrationRepository(pendingResult: completer.future);
+    final repository = FakeRegistrationRepository(
+      pendingResult: completer.future,
+    );
     final cubit = createCubit(repository: repository);
 
     final first = cubit.register(event);
@@ -107,10 +112,9 @@ void main() {
   test('latest attendance response wins', () async {
     final first = Completer<int>();
     final second = Completer<int>();
-    final store = FakeEventStore(attendanceResults: {
-      'event-1': first.future,
-      'event-2': second.future,
-    });
+    final store = FakeEventStore(
+      attendanceResults: {'event-1': first.future, 'event-2': second.future},
+    );
     final cubit = createCubit(store: store);
     final secondEvent = event.copyWith(id: 'event-2');
 
@@ -131,8 +135,8 @@ EventDetailCubit createCubit({
   AuthRepositoryContract? authRepository,
   bool registered = false,
 }) {
-  final resolvedRepository = repository ??
-      FakeRegistrationRepository(registered: registered);
+  final resolvedRepository =
+      repository ?? FakeRegistrationRepository(registered: registered);
   return EventDetailCubit(
     registerForEvent: RegisterForEvent(resolvedRepository),
     cancelEventRegistration: CancelEventRegistration(resolvedRepository),
@@ -195,13 +199,28 @@ class FakeAuthRepository implements AuthRepositoryContract {
   @override
   Future<void> initialize() async {}
   @override
-  Future<String?> register({required String name, required String email, required String password, required UserRole requestedRole}) async => null;
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole requestedRole,
+  }) async => null;
   @override
-  Future<String?> login({required String email, required String password}) async => null;
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async => null;
   @override
   Future<String?> updatePassword(String password) async => null;
   @override
-  Future<String?> updateProfile({required String displayName, required String email, String? photoUrl, String? phoneNumber, String? bio, String? locale}) async => null;
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
+  }) async => null;
   @override
   Future<void> logout() async {}
   @override
@@ -234,17 +253,26 @@ class FakeEventStore implements EventStore {
   @override
   Future<List<Event>> loadRegistrations(String userId) async => [];
   @override
-  Future<Map<String, int>> loadRegistrationCounts(List<String> eventIds) async => {};
+  Future<Map<String, int>> loadRegistrationCounts(
+    List<String> eventIds,
+  ) async => {};
   @override
   Future<void> activateRegistration(String userId, Event event) async {}
   @override
   Future<void> revokeRegistration(String userId, String eventId) async {}
   @override
-  Future<String?> loadRegistrationToken(String userId, String eventId) async => null;
+  Future<String?> loadRegistrationToken(String userId, String eventId) async =>
+      null;
   @override
-  Future<Map<String, dynamic>?> validateRegistration({required String token, required String eventId}) async => null;
+  Future<Map<String, dynamic>?> validateRegistration({
+    required String token,
+    required String eventId,
+  }) async => null;
   @override
-  Future<String> checkInRegistration({required String token, required String eventId}) async => 'checked_in';
+  Future<String> checkInRegistration({
+    required String token,
+    required String eventId,
+  }) async => 'checked_in';
   @override
   Future<int> loadCheckedInCount(String eventId) async => 0;
   @override
@@ -256,17 +284,33 @@ class FakeEventStore implements EventStore {
   @override
   Future<void> markNotificationRead(String notificationId) async {}
   @override
-  Future<void> updateArrivalStatus({required String eventId, required ArrivalStatus status}) async {}
+  Future<void> updateArrivalStatus({
+    required String eventId,
+    required ArrivalStatus status,
+  }) async {}
   @override
-  Future<void> recordLoginActivity({String? deviceLabel, String? platform}) async {}
+  Future<void> recordLoginActivity({
+    String? deviceLabel,
+    String? platform,
+  }) async {}
   @override
   Future<Map<String, String>> loadProfileVisibility(String userId) async => {};
   @override
-  Future<void> saveProfileVisibility({required String userId, required String profileVisibility, required String registrationVisibility}) async {}
+  Future<void> saveProfileVisibility({
+    required String userId,
+    required String profileVisibility,
+    required String registrationVisibility,
+  }) async {}
   @override
   Future<List<Map<String, String>>> loadInvitationRecipients() async => [];
   @override
-  Future<int> sendEventInvitations({required String eventId, required List<String> userIds}) async => 0;
+  Future<int> sendEventInvitations({
+    required String eventId,
+    required List<String> userIds,
+  }) async => 0;
   @override
-  Future<void> respondToEventInvitation({required String eventId, required bool accepted}) async {}
+  Future<void> respondToEventInvitation({
+    required String eventId,
+    required bool accepted,
+  }) async {}
 }

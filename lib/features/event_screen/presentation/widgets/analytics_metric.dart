@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 class AnalyticsMetric extends StatelessWidget {
@@ -20,7 +21,10 @@ class AnalyticsMetric extends StatelessWidget {
       title: Text(label),
       trailing: Text(
         value,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+        style: const TextStyle(
+          fontSize: AppSize.text18,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     ),
   );

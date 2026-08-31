@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_model_key.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/features/watcher_screen/domain/model/scan_history_entry.dart';
@@ -68,7 +70,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
       emit(
         state.copyWith(
           status: WatcherScanStatus.valid,
-          eventId: result[AppModelKeys.eventId] as String?,
+          eventId: result[AppModelKeys.eventUnderscoreId] as String?,
           registrationToken: payload[AppModelKeys.token] as String,
           userId: result[AppModelKeys.userId] as String?,
           message: AppText.registrationValid,
@@ -84,7 +86,7 @@ class WatcherScanCubit extends Cubit<WatcherScanState> {
           ],
         ),
       );
-      await _loadDashboard(result[AppModelKeys.eventId] as String);
+      await _loadDashboard(result[AppModelKeys.eventUnderscoreId] as String);
     } on Object {
       emit(
         state.copyWith(

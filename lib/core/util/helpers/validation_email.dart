@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 
 String? validateEmail(String? value) {
   final email = value?.trim() ?? '';

@@ -1,12 +1,14 @@
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -69,7 +71,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     } on LocalStorageException {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to update invitation')),
+          const SnackBar(content: Text(AppText.unableToUpdateInvitation)),
         );
       }
     }
@@ -99,7 +101,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               itemCount: notifications.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const Gap(AppSpace.space12),
               itemBuilder: (context, index) {
                 final notification = notifications[index];
                 return _NotificationCard(
@@ -153,7 +155,7 @@ class _NotificationCard extends StatelessWidget {
                       : Icons.notifications_active_rounded,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(width: 10),
+                const Gap(AppSpace.space10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +164,7 @@ class _NotificationCard extends StatelessWidget {
                         notification.title,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      const SizedBox(height: 3),
+                      const Gap(AppSpace.space3),
                       Text(
                         _categoryLabel(notification.category),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -175,42 +177,42 @@ class _NotificationCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const Gap(AppSpace.space10),
             Text(notification.message),
-            const SizedBox(height: 6),
+            const Gap(AppSpace.space6),
             Text(
-              'Event date: ${formatEventDate(notification.eventDate.toLocal().toIso8601String(), context.watch<ProfileScreenCubit>().state.dateFormat)}',
+              '${AppText.eventDatePrefix} ${formatEventDate(notification.eventDate.toLocal().toIso8601String(), context.watch<ProfileScreenCubit>().state.dateFormat)}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
             if (isInvitation) ...[
-              const SizedBox(height: 14),
+              const Gap(AppSpace.space14),
               Text(
-                'Would you like to attend?',
+                AppText.wouldYouLikeToAttend,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 8),
+              const Gap(AppSpace.space8),
               Wrap(
-                spacing: 8,
+                spacing: AppSpace.space8,
                 children: [
                   FilledButton(
                     onPressed: () => onInvitationResponse(true),
-                    child: const Text('Accept'),
+                    child: const Text(AppText.accept),
                   ),
                   TextButton(
                     onPressed: () => onInvitationResponse(false),
-                    child: const Text('Decline'),
+                    child: const Text(AppText.decline),
                   ),
                 ],
               ),
             ] else if (!hasResponse) ...[
-              const SizedBox(height: 14),
+              const Gap(AppSpace.space14),
               Text(
                 AppText.arrivalConfirmation,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 8),
+              const Gap(AppSpace.space8),
               Wrap(
-                spacing: 8,
+                spacing: AppSpace.space8,
                 children: [
                   OutlinedButton(
                     onPressed: () => onConfirm(ArrivalStatus.attending),
@@ -243,6 +245,6 @@ class _NotificationCard extends StatelessWidget {
     NotificationCategory.reminder => 'Reminder',
     NotificationCategory.system => 'System',
     NotificationCategory.event => 'Event',
-    NotificationCategory.invitation => throw UnimplementedError(),
+    NotificationCategory.invitation => 'Invitation',
   };
 }

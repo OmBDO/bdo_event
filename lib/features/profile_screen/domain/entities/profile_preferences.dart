@@ -1,3 +1,5 @@
+import 'package:bdo_event/core/util/resource/app_other.dart';
+
 class ProfilePreferences {
   static const reminderLeadTimeOptions = <int>[60, 1440, 10080];
 
@@ -12,7 +14,7 @@ class ProfilePreferences {
     this.isWatcherKeepHistoryVisibleAfterCheckIn = false,
     this.isEventRemindersEnabled = true,
     this.eventReminderLeadTimeMinutes = 1440,
-    this.dateFormat = 'dd/MM/yyyy',
+    this.dateFormat = AppDateFormats.dayMonthYear,
     this.isBiometricLockEnabled = false,
   });
 
@@ -51,16 +53,16 @@ class ProfilePreferences {
         isWatcherVibrationEnabled ?? this.isWatcherVibrationEnabled,
     watcherSoundVolume: watcherSoundVolume ?? this.watcherSoundVolume,
     isWatcherAutoOpenNextEnabled:
-      isWatcherAutoOpenNextEnabled ?? this.isWatcherAutoOpenNextEnabled,
+        isWatcherAutoOpenNextEnabled ?? this.isWatcherAutoOpenNextEnabled,
     isWatcherKeepHistoryVisibleAfterCheckIn:
-      isWatcherKeepHistoryVisibleAfterCheckIn ??
-      this.isWatcherKeepHistoryVisibleAfterCheckIn,
+        isWatcherKeepHistoryVisibleAfterCheckIn ??
+        this.isWatcherKeepHistoryVisibleAfterCheckIn,
     isEventRemindersEnabled:
         isEventRemindersEnabled ?? this.isEventRemindersEnabled,
     eventReminderLeadTimeMinutes:
         eventReminderLeadTimeMinutes ?? this.eventReminderLeadTimeMinutes,
     dateFormat: dateFormat ?? this.dateFormat,
     isBiometricLockEnabled:
-      isBiometricLockEnabled ?? this.isBiometricLockEnabled,
+        isBiometricLockEnabled ?? this.isBiometricLockEnabled,
   );
 }

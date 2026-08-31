@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
@@ -20,7 +21,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('shows unavailable state without an enabled action', (tester) async {
+  testWidgets('shows unavailable state without an enabled action', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await pumpSection(tester, cubit, event(isAvailable: false));
 
@@ -42,7 +45,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('shows closed state after the registration deadline', (tester) async {
+  testWidgets('shows closed state after the registration deadline', (
+    tester,
+  ) async {
     final cubit = fixtures.createCubit();
     await pumpSection(
       tester,

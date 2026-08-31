@@ -3,6 +3,8 @@ import 'package:bdo_event/core/common/app_scroll_tracker/app_scroll_tracker.dart
 import 'package:bdo_event/core/common/footer_height_tracker/footer_height_tracker.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
@@ -13,7 +15,7 @@ import 'package:bdo_event/features/event_screen/presentation/widgets/event_tab.d
 import 'package:bdo_event/features/event_screen/presentation/widgets/recent_event_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:gap/gap.dart';
 
 class EventPage extends StatelessWidget {
   const EventPage({super.key});
@@ -110,11 +112,11 @@ class _EventPageViewState extends State<_EventPageView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Recently viewed',
+                        AppText.recentlyViewed,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w800),
                       ),
-                      const SizedBox(height: 10),
+                      const Gap(AppSpace.space10),
                       SizedBox(
                         height: 166,
                         child: ListView.builder(
@@ -219,9 +221,9 @@ class _EventPageViewState extends State<_EventPageView> {
 
   SliverToBoxAdapter _buildEmptyState(BuildContext context, int selectedTab) {
     final tabTitle = switch (selectedTab) {
-      1 => 'My Events',
-      2 => 'Past Events',
-      _ => 'Upcoming Events',
+      1 => AppText.myEvents,
+      2 => AppText.pastEvents,
+      _ => AppText.upcomingEvents,
     };
 
     return SliverToBoxAdapter(
@@ -244,17 +246,20 @@ class _EventPageViewState extends State<_EventPageView> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 22),
+              const Gap(AppSpace.space22),
               Text(
-                'A quiet moment',
+                AppText.quietMoment,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 8),
+              const Gap(AppSpace.space8),
               Text(
-                '$tabTitle will appear here when there is something to explore.',
+                AppText.eventsWillAppearHere.replaceFirst(
+                  '{tabTitle}',
+                  tabTitle,
+                ),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface

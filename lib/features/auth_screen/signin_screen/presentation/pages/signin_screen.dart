@@ -3,12 +3,14 @@ import 'package:bdo_event/core/common/form_elements/auth_button.dart';
 import 'package:bdo_event/core/common/form_elements/auth_scaffold.dart';
 import 'package:bdo_event/core/common/form_elements/auth_switch.dart';
 import 'package:bdo_event/core/util/helpers/validation_email.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_cubit.dart';
 import 'package:bdo_event/features/auth_screen/signin_screen/presentation/cubit/signin_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 class SigninScreen extends StatefulWidget {
   final String? initialEmail;
@@ -85,7 +87,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 keyboardType: TextInputType.emailAddress,
                 validator: validateEmail,
               ),
-              const SizedBox(height: 16),
+              const Gap(AppSpace.space16),
               AppTextField(
                 controller: _passwordController,
                 label: AppText.password,
@@ -108,7 +110,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 ),
               ),
               if (state.error != null) ...[
-                const SizedBox(height: 12),
+                const Gap(AppSpace.space12),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -120,14 +122,14 @@ class _SigninScreenState extends State<SigninScreen> {
                   ),
                 ),
               ],
-              const SizedBox(height: 24),
+              const Gap(AppSpace.space24),
               AppButton(
                 label: AppText.signIn,
                 isLoading: state.isSubmitting,
                 onPressed: () =>
                     _submit(), // Protect against double-tapping submission
               ),
-              const SizedBox(height: 24),
+              const Gap(AppSpace.space24),
               AuthSwitch(
                 prompt: AppText.newToApp,
                 action: AppText.createAccountTitle,

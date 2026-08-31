@@ -2,7 +2,8 @@ import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class AttendanceProfileWidget extends StatelessWidget {
                 child: Text(
                   _roundedCount(attendees.length),
                   style: const TextStyle(
-                    fontSize: 9,
+                    fontSize: AppSize.text9,
                     fontWeight: FontWeight.bold,
                     color: Colors.amber,
                   ),
@@ -87,7 +88,7 @@ class AttendanceProfileWidget extends StatelessWidget {
             return Row(
               children: [
                 _buildAvatarStack(attendees),
-                const Gap(12),
+                const Gap(AppSpace.space12),
                 Text(
                   snapshot.hasData
                       ? '${attendees.length} ${AppText.attendees}'
@@ -95,7 +96,7 @@ class AttendanceProfileWidget extends StatelessWidget {
                   style: TextStyle(
                     color: widget
                         .primaryDark, // Used widget.primaryDark consistently
-                    fontSize: 14,
+                    fontSize: AppSize.text14,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

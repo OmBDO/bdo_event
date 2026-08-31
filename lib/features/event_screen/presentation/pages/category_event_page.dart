@@ -1,9 +1,11 @@
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 // 1. Define a structured model for Categories
 
@@ -30,10 +32,8 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CreateEventPage(
-          catagory: category,
-          popParentOnCreateSuccess: true,
-        ),
+        builder: (context) =>
+            CreateEventPage(catagory: category, popParentOnCreateSuccess: true),
       ),
     );
   }
@@ -50,8 +50,8 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
         itemCount: _categories.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // 2 columns
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          crossAxisSpacing: AppSpace.space16,
+          mainAxisSpacing: AppSpace.space16,
           childAspectRatio: 1.1, // Aspect ratio for card shapes
         ),
         itemBuilder: (context, index) {
@@ -75,11 +75,11 @@ class _CategoryEventPageState extends State<CategoryEventPage> {
                     ),
                     child: Icon(category.icon, size: 36, color: category.color),
                   ),
-                  const SizedBox(height: 12),
+                  const Gap(AppSpace.space12),
                   Text(
                     category.name,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: AppSize.text16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

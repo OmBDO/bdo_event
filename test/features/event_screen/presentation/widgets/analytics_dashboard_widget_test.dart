@@ -1,8 +1,11 @@
+import 'dart:ui' as ui;
+
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/event_screen/presentation/widgets/analytics_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dart'
     as profile_fixtures;
@@ -114,6 +117,40 @@ void main() {
         .painter;
 
     expect(firstPainter, isNot(same(secondPainter)));
+    await profileCubit.close();
+  });
+
+  testWidgets('paints visible chart and donut pixels', (tester) async {
+    final profileCubit = profile_fixtures.createCubit();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: RepaintBoundary(
+          child: SizedBox(
+            width: 400,
+            height: 900,
+            child: BlocProvider.value(
+              value: profileCubit,
+              child: AnalyticsDashboard(
+                event: analyticsEvent(attendeeCount: 8, capacity: 20),
+                checkedIn: 4,
+                isLoadingCheckIns: false,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final boundary = tester.renderObject<RenderRepaintBoundary>(
+      find.byType(RepaintBoundary),
+    );
+    final image = await boundary.toImage(pixelRatio: 1);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    final pixels = byteData!.buffer.asUint8List();
+
+    expect(pixels.any((pixel) => pixel != 0), isTrue);
+    image.dispose();
     await profileCubit.close();
   });
 

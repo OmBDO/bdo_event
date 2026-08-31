@@ -1,6 +1,8 @@
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/theme/app_colors.dart';
+import 'package:bdo_event/core/util/resource/app_assets.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
@@ -50,22 +52,22 @@ class ProfileHeaderSection extends StatelessWidget {
               ),
             ],
           ),
-          const Gap(16),
+          const Gap(AppSpace.space16),
           Text(
             user?.displayName ?? AppText.profileUnavailable,
             style: TextStyle(
               color: theme.colorScheme.onSurface,
-              fontSize: 22,
+              fontSize: AppSize.text22,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.5,
             ),
           ),
-          const Gap(4),
+          const Gap(AppSpace.space4),
           Text(
             user?.email ?? AppText.empty,
             style: TextStyle(
               color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 14,
+              fontSize: AppSize.text14,
               fontWeight: FontWeight.w500,
             ),
           ),

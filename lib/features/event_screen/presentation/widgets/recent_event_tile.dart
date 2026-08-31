@@ -1,9 +1,11 @@
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 class RecentEventTile extends StatelessWidget {
   const RecentEventTile({super.key, required this.event, required this.onTap});
@@ -40,13 +42,14 @@ class RecentEventTile extends StatelessWidget {
                     : EventImage(
                         path: event.imageUrl,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => ColoredBox(
-                          color: theme.colorScheme.surfaceContainerHighest,
-                          child: Icon(
-                            Icons.event_rounded,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            ColoredBox(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              child: Icon(
+                                Icons.event_rounded,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                       ),
               ),
               Padding(
@@ -62,7 +65,7 @@ class RecentEventTile extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const Gap(AppSpace.space4),
                     Text(
                       formatEventDate(event.date, dateFormat),
                       maxLines: 1,

@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/model/location_model/location_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class LocationDropdown extends StatefulWidget {
   final Location selectedValue;
@@ -82,12 +83,12 @@ class _LocationDropdownState extends State<LocationDropdown> {
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 10,
                     ),
-                    horizontalTitleGap: 6,
+                    horizontalTitleGap: AppSpace.space6,
                     minLeadingWidth: 0,
                     title: Text(
                       location.displayName,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: AppSize.text14,
                         fontWeight: FontWeight.w500,
                         color: theme.colorScheme.onSurface,
                       ),
@@ -99,7 +100,7 @@ class _LocationDropdownState extends State<LocationDropdown> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: AppSize.text11,
                               color: theme.colorScheme.onSurface.withValues(
                                 alpha: 0.6,
                               ),
@@ -127,7 +128,7 @@ class _LocationDropdownState extends State<LocationDropdown> {
                     AppText.location,
                     style: TextStyle(
                       color: theme.colorScheme.primary,
-                      fontSize: 11,
+                      fontSize: AppSize.text11,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -137,7 +138,7 @@ class _LocationDropdownState extends State<LocationDropdown> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: theme.colorScheme.onSurface,
-                      fontSize: 14,
+                      fontSize: AppSize.text14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

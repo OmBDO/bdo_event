@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 class AnalyticsMetricData {
@@ -33,8 +34,8 @@ class AnalyticsMetricGrid extends StatelessWidget {
     itemCount: metrics.length,
     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: isWide ? 4 : 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
+      crossAxisSpacing: AppSpace.space12,
+      mainAxisSpacing: AppSpace.space12,
       childAspectRatio: isWide ? 1.65 : 1.38,
     ),
     itemBuilder: (_, index) => _AnalyticsMetricTile(data: metrics[index]),
@@ -63,7 +64,7 @@ class _AnalyticsMetricTile extends StatelessWidget {
           data.value,
           style: TextStyle(
             color: data.color,
-            fontSize: 24,
+            fontSize: AppSize.text24,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -73,7 +74,7 @@ class _AnalyticsMetricTile extends StatelessWidget {
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface
                 .withValues(alpha: .55),
-            fontSize: 10,
+            fontSize: AppSize.text10,
           ),
         ),
       ],

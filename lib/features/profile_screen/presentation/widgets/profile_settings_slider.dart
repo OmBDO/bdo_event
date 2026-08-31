@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bdo_event/core/theme/app_colors.dart';
@@ -31,19 +32,14 @@ class ProfileSettingsSlider extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Slider(
-              value: value,
-              min: 0,
-              max: 1,
-              onChanged: onChanged,
-            ),
+            child: Slider(value: value, min: 0, max: 1, onChanged: onChanged),
           ),
           SizedBox(
             width: 34,
             child: Text(
               '${(value * 100).round()}%',
               textAlign: TextAlign.end,
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: AppSize.text12),
             ),
           ),
         ],
@@ -65,17 +61,17 @@ class ProfileSettingsSlider extends StatelessWidget {
     style: TextStyle(
       color: Theme.of(context).colorScheme.onSurface,
       fontWeight: FontWeight.w600,
-      fontSize: 15,
+      fontSize: AppSize.text15,
     ),
   );
 
   Widget _settingsSubtitle(BuildContext context) => Text(
     subtitle,
     style: TextStyle(
-        color: Theme.of(context).brightness == Brightness.dark
+      color: Theme.of(context).brightness == Brightness.dark
           ? AppColors.mutedTextDark
           : AppColors.profileSubtitleLight,
-      fontSize: 12,
+      fontSize: AppSize.text12,
       fontWeight: FontWeight.w400,
     ),
   );

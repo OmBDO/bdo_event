@@ -5,8 +5,12 @@ import 'package:bdo_event/core/model/location_model/location_model.dart';
 import 'package:bdo_event/core/model/location_model/location_catalog.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/notification_count_formatter.dart';
+import 'package:bdo_event/core/util/resource/app_assets.dart';
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_location.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/notification_screen/presentation/pages/notification_screen.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter/material.dart';
@@ -67,11 +71,11 @@ class _HeaderElementState extends State<HeaderElement> {
         final theme = Theme.of(context);
         final colorScheme = theme.colorScheme;
         final profilePhotoUrl = context
-          .watch<ProfileScreenCubit>()
-          .state
-          .user
-          ?.photoUrl
-          ?.trim();
+            .watch<ProfileScreenCubit>()
+            .state
+            .user
+            ?.photoUrl
+            ?.trim();
         final controlBackground = colorScheme.surface.withValues(alpha: 0.9);
         final controlIconColor = colorScheme.onSurface;
         // 1. Establish the scrolling condition parameter flag
@@ -123,7 +127,7 @@ class _HeaderElementState extends State<HeaderElement> {
                             size: 20,
                           ),
                         ),
-                        const Gap(10),
+                        const Gap(AppSpace.space10),
                         Expanded(
                           child: LocationDropdown(
                             selectedValue: selectedLocation,
@@ -143,7 +147,7 @@ class _HeaderElementState extends State<HeaderElement> {
                 ),
               ),
 
-              const Gap(16),
+              const Gap(AppSpace.space16),
 
               // 2. Notification Squircle Button Block
               Container(
@@ -199,7 +203,7 @@ class _HeaderElementState extends State<HeaderElement> {
                               badgeText,
                               style: TextStyle(
                                 color: colorScheme.onError,
-                                fontSize: 9,
+                                fontSize: AppSize.text9,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
@@ -211,7 +215,7 @@ class _HeaderElementState extends State<HeaderElement> {
                 ),
               ),
 
-              const Gap(12),
+              const Gap(AppSpace.space12),
 
               // 3. User Avatar Block (Right Side)
               PopupMenuButton<String>(
@@ -241,7 +245,7 @@ class _HeaderElementState extends State<HeaderElement> {
                     child: Row(
                       children: [
                         Icon(Icons.person_outline_rounded, size: 21),
-                        SizedBox(width: 12),
+                        Gap(AppSpace.space12),
                         Text(
                           AppText.profile,
                           style: TextStyle(fontWeight: FontWeight.w600),
@@ -255,7 +259,7 @@ class _HeaderElementState extends State<HeaderElement> {
                     child: Row(
                       children: [
                         Icon(Icons.logout_rounded, size: 21),
-                        SizedBox(width: 12),
+                        Gap(AppSpace.space12),
                         Text(
                           AppText.logOut,
                           style: TextStyle(fontWeight: FontWeight.w600),

@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/overlay_section.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -29,7 +30,7 @@ class _LocationSectionState extends State<LocationSection> {
               size: 16,
             ),
           ),
-          const Gap(6),
+          const Gap(AppSpace.space6),
           // Takes up all remaining room left by the icon
           Expanded(
             child: Row(
@@ -51,32 +52,40 @@ class _LocationSectionState extends State<LocationSection> {
                             ? TextOverflow.visible
                             : TextOverflow.ellipsis,
                         color: widget.widget.textGrey,
-                        fontSize: 14,
+                        fontSize: AppSize.text14,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
                       ),
                     ),
                   ),
                 ),
-                IconButton(
-                  alignment: Alignment.topCenter,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  style: const ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                Semantics(
+                  button: true,
+                  toggled: _isExpanded,
+                  label: _isExpanded ? 'Collapse address' : 'Expand address',
+                  child: IconButton(
+                    tooltip: _isExpanded
+                        ? 'Collapse address'
+                        : 'Expand address',
+                    alignment: Alignment.topCenter,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    style: const ButtonStyle(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    icon: Icon(
+                      _isExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: widget.widget.textGrey,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isExpanded = !_isExpanded;
+                      });
+                    },
                   ),
-                  icon: Icon(
-                    _isExpanded
-                        ? Icons.keyboard_arrow_up
-                        : Icons.keyboard_arrow_down,
-                    color: widget.widget.textGrey,
-                    size: 20,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isExpanded = _isExpanded;
-                    });
-                  },
                 ),
               ],
             ),

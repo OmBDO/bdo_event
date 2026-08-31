@@ -5,10 +5,15 @@ import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
+import 'package:bdo_event/core/util/resource/app_file.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/build_attendee_csv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:gap/gap.dart';
 
 class EventAttendeesPage extends StatelessWidget {
   const EventAttendeesPage({super.key, required this.event});
@@ -18,7 +23,7 @@ class EventAttendeesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Event attendees')),
+      appBar: AppBar(title: const Text(AppText.eventAttendees)),
       body: FutureBuilder<List<EventAttendee>>(
         future: getIt<EventStore>().loadEventAttendees(event.id),
         builder: (context, snapshot) {
@@ -26,12 +31,12 @@ class EventAttendeesPage extends StatelessWidget {
             return const AttendeeListShimmer();
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Unable to load attendees'));
+            return const Center(child: Text(AppText.unableToLoadAttendees));
           }
 
           final attendees = snapshot.data ?? const <EventAttendee>[];
           if (attendees.isEmpty) {
-            return const Center(child: Text('No attendees registered yet'));
+            return const Center(child: Text(AppText.noAttendeesRegistered));
           }
 
           return Column(
@@ -43,13 +48,13 @@ class EventAttendeesPage extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.ios_share_outlined),
-                        label: const Text('Share CSV'),
+                        label: const Text(AppText.shareCsv),
                         onPressed: () => _shareCsv(context, event, attendees),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const Gap(AppSpace.space10),
                     IconButton(
-                      tooltip: 'Copy attendee list as CSV',
+                      tooltip: AppText.copyAttendeeListAsCsv,
                       icon: const Icon(Icons.copy_all_outlined),
                       onPressed: () => _copyCsv(context, event, attendees),
                     ),
@@ -60,7 +65,7 @@ class EventAttendeesPage extends StatelessWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                   itemCount: attendees.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const Gap(AppSpace.space10),
                   itemBuilder: (context, index) {
                     final attendee = attendees[index];
                     return ListTile(
@@ -73,7 +78,7 @@ class EventAttendeesPage extends StatelessWidget {
                         attendee.displayName,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      subtitle: Text('Registered for ${event.title}'),
+                      subtitle: Text(AppText.registeredForEvent(event.title)),
                     );
                   },
                 ),
@@ -94,15 +99,16 @@ class EventAttendeesPage extends StatelessWidget {
       eventTitle: event.title,
       attendees: attendees,
     );
-    final fileName = '${_safeFileName(event.title)}_attendees.csv';
+    final fileName =
+        '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
     await SharePlus.instance.share(
       ShareParams(
-        text: 'Attendee list for ${event.title}',
+        text: AppText.attendeeListFor(event.title),
         files: [
           XFile.fromData(
             utf8.encode(csv),
             name: fileName,
-            mimeType: 'text/csv',
+            mimeType: AppMimeTypes.csv,
           ),
         ],
         fileNameOverrides: [fileName],
@@ -121,8 +127,9 @@ class EventAttendeesPage extends StatelessWidget {
     );
     await Clipboard.setData(ClipboardData(text: csv));
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Attendee CSV copied')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppText.attendeeCsvCopied)));
     }
   }
 

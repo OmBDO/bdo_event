@@ -6,6 +6,7 @@ import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/repositories/registration_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/registration_use_cases.dart';

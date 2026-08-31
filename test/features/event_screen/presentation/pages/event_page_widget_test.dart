@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event.resource.dart';
+import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/event_screen.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_detail_screen.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/attendance_profile.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_location_map.dart';
@@ -6,7 +8,6 @@ import 'package:bdo_event/features/event_detail_screen/presentation/widgets/loca
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:gap/gap.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 
 class OverlayCurveSection extends StatefulWidget {
   const OverlayCurveSection({
@@ -60,7 +61,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                   widget.widget.event.title,
                   style: TextStyle(
                     color: widget.primaryDark,
-                    fontSize: 26,
+                    fontSize: AppSize.text26,
                     fontWeight: FontWeight.w800,
                     height: 1.25,
                     letterSpacing: -0.3,
@@ -71,7 +72,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                   AppText.upcomingEvent,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
-                    fontSize: 11,
+                    fontSize: AppSize.text11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.4,
                   ),
@@ -79,7 +80,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
               ],
             ),
 
-            Gap(10),
+            const Gap(AppSpace.space10),
 
             Row(
               crossAxisAlignment: CrossAxisAlignment
@@ -98,14 +99,14 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                           color: widget.textGrey,
                           size: 18,
                         ),
-                        const Gap(8),
+                        const Gap(AppSpace.space8),
                         Expanded(
                           // Prevents long time strings from crashing the layout
                           child: Text(
                             '${formatEventTime(widget.widget.event.startTime)} - ${formatEventTime(widget.widget.event.endTime)}',
                             style: TextStyle(
                               color: widget.textGrey,
-                              fontSize: 12,
+                              fontSize: AppSize.text12,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -117,29 +118,29 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
                 // Spacer between Time and Location if both exist
                 if (widget.widget.event.startTime != null ||
                     widget.widget.event.endTime != null)
-                  const Gap(12),
+                  const Gap(AppSpace.space12),
 
                 // 2. Location Section
                 LocationSection(widget: widget),
               ],
             ),
-            const Gap(12),
+            const Gap(AppSpace.space12),
 
             // Description Summary Details Text block
             Text(
               widget.widget.event.description,
               style: TextStyle(
                 color: widget.textGrey,
-                fontSize: 14,
+                fontSize: AppSize.text14,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
               ),
             ),
-            const Gap(24),
+            const Gap(AppSpace.space24),
 
             // 3. Attendance Counter Face Pile Badge Wrapper Block
             AttendanceProfileWidget(widget: widget),
-            const Gap(16),
+            const Gap(AppSpace.space16),
 
             EventLocationMap(event: widget.widget.event),
           ],

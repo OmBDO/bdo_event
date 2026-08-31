@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 
 class AppButton extends StatelessWidget {
@@ -23,10 +24,10 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-            backgroundColor: isDarkMode
+          backgroundColor: isDarkMode
               ? theme.colorScheme.primary
               : Colors.black87,
-            foregroundColor: isDarkMode
+          foregroundColor: isDarkMode
               ? theme.colorScheme.onPrimary
               : Colors.white,
           elevation: 2,
@@ -35,7 +36,7 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
-            fontSize: 16,
+            fontSize: AppSize.text16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
           ),
