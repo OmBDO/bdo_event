@@ -139,7 +139,7 @@ class _OverlayCurveSectionState extends State<OverlayCurveSection> {
             const Gap(AppSpace.space24),
 
             // 3. Attendance Counter Face Pile Badge Wrapper Block
-            AttendanceProfileWidget(widget: widget),
+            AttendanceProfileWidget(section: widget),
             const Gap(AppSpace.space16),
 
             EventLocationMap(event: widget.widget.event),

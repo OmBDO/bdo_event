@@ -4,6 +4,7 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/common/clipboard_share.dart';
 import 'package:bdo_event/core/common/loading_shimmer/loading_shimmer.dart';
 import 'package:bdo_event/core/util/resource/app_file.dart';
 import 'package:bdo_event/core/util/resource/app_other.dart';
@@ -16,9 +17,16 @@ import 'package:share_plus/share_plus.dart';
 import 'package:gap/gap.dart';
 
 class EventAttendeesPage extends StatelessWidget {
-  const EventAttendeesPage({super.key, required this.event});
+  const EventAttendeesPage({
+    super.key,
+    required this.event,
+    this.clipboardAdapter,
+    this.shareAdapter,
+  });
 
   final Event event;
+  final ClipboardAdapter? clipboardAdapter;
+  final ShareAdapter? shareAdapter;
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +108,9 @@ class EventAttendeesPage extends StatelessWidget {
       attendees: attendees,
     );
     final fileName =
-        '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
-    await SharePlus.instance.share(
+      '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
+    await tryShareContent(
+      shareAdapter ?? const SharePlusAdapter(),
       ShareParams(
         text: AppText.attendeeListFor(event.title),
         files: [
@@ -125,12 +134,14 @@ class EventAttendeesPage extends StatelessWidget {
       eventTitle: event.title,
       attendees: attendees,
     );
-    await Clipboard.setData(ClipboardData(text: csv));
-    if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppText.attendeeCsvCopied)));
-    }
+    final copied = await tryCopyText(
+      clipboardAdapter ?? const SystemClipboardAdapter(),
+      csv,
+    );
+    if (!copied || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text(AppText.attendeeCsvCopied)),
+    );
   }
 
   String _safeFileName(String title) {

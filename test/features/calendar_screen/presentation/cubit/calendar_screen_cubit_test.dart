@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/notifications/event_reminder_notification_service.dart';
@@ -39,21 +41,72 @@ void main() {
     expect(cubit.state.events, isEmpty);
     cubit.close();
   });
+
+  test('concurrent loads keep the latest response', () async {
+    final firstResult = Completer<List<Event>>();
+    final secondResult = Completer<List<Event>>();
+    var loadNumber = 0;
+    final repository = FakeCalendarRepository(
+      loadOverride: (_) {
+        loadNumber++;
+        return loadNumber == 1 ? firstResult.future : secondResult.future;
+      },
+    );
+    final cubit = createCubit(
+      authRepository: const FakeAuthRepository(testUser),
+      repository: repository,
+      reminderNotifications: null,
+    );
+
+    final firstLoad = cubit.loadRegistrations();
+    final secondLoad = cubit.loadRegistrations();
+    secondResult.complete([calendarEvent('latest')]);
+    await secondLoad;
+    firstResult.complete([calendarEvent('stale')]);
+    await firstLoad;
+
+    expect(cubit.state.events, [calendarEvent('latest')]);
+    cubit.close();
+  });
 }
 
-CalendarScreenCubit createCubit({AuthRepositoryContract? authRepository}) =>
+CalendarScreenCubit createCubit({
+  AuthRepositoryContract? authRepository,
+  CalendarRepositoryContract? repository,
+  EventReminderNotificationService? reminderNotifications,
+}) =>
     CalendarScreenCubit(
-      loadRegisteredEvents: LoadRegisteredEvents(const FakeCalendarRepository()),
+      loadRegisteredEvents: LoadRegisteredEvents(
+        repository ?? const FakeCalendarRepository(),
+      ),
       authRepository: authRepository ?? const FakeAuthRepository(null),
-      reminderNotifications: EventReminderNotificationService(),
+      reminderNotifications: reminderNotifications,
     );
 
 class FakeCalendarRepository implements CalendarRepositoryContract {
-  const FakeCalendarRepository();
+  const FakeCalendarRepository({this.loadOverride});
+
+  final Future<List<Event>> Function(String userId)? loadOverride;
 
   @override
-  Future<List<Event>> loadRegisteredEvents(String userId) async => [];
+  Future<List<Event>> loadRegisteredEvents(String userId) =>
+      loadOverride?.call(userId) ?? Future.value(const []);
 }
+
+Event calendarEvent(String id) => Event(
+  id: id,
+  title: id,
+  date: '01/01/2099',
+  location: 'Pune',
+  imageUrl: '',
+);
+
+final testUser = User(
+  id: 'user-1',
+  displayName: 'Asha',
+  email: 'asha@example.com',
+  createdAt: DateTime.utc(2026, 8, 1),
+);
 
 class FakeAuthRepository implements AuthRepositoryContract {
   const FakeAuthRepository(this.currentUser);

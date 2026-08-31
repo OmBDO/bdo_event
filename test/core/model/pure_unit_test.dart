@@ -12,6 +12,8 @@ void main() {
       expect(EventCategory.fromJson('sPoRtS').name, 'Sports');
       expect(EventCategory.fromJson({'name': 'food'}).name, 'Food Event');
       expect(EventCategory.fromJson({'name': 'gaming'}).name, 'Game Event');
+      expect(EventCategory.fromJson('music').name, 'Music');
+      expect(EventCategory.fromJson('business').name, 'Business');
     });
 
     test('falls back to Other for missing and unknown names', () {
@@ -53,7 +55,7 @@ void main() {
       expect(decoded.latitude, event.latitude);
       expect(decoded.attendeeCount, event.attendeeCount);
       expect(decoded.registrationDeadline, event.registrationDeadline);
-      expect(decoded.catagory?.name, 'Other');
+      expect(decoded.catagory?.name, 'Business');
     });
 
     test('creates a deterministic fallback id when id is absent', () {
@@ -80,6 +82,38 @@ void main() {
       expect(updated.title, 'New title');
       expect(updated.capacity, 25);
       expect(updated.location, event.location);
+    });
+
+    test('copyWith clears nullable fields when null is provided', () {
+      final event = Event(
+        id: 'event-1',
+        title: 'Event',
+        date: '01/09/2026',
+        startTime: '09:00',
+        endTime: '17:00',
+        location: 'Pune',
+        imageUrl: '',
+        capacity: 25,
+        registrationDeadline: DateTime.utc(2026, 8, 31),
+        organizerName: 'BDO',
+        catagory: EventCategory.fromJson('Business'),
+      );
+
+      final cleared = event.copyWith(
+        startTime: null,
+        endTime: null,
+        capacity: null,
+        registrationDeadline: null,
+        organizerName: null,
+        catagory: null,
+      );
+
+      expect(cleared.startTime, isNull);
+      expect(cleared.endTime, isNull);
+      expect(cleared.capacity, isNull);
+      expect(cleared.registrationDeadline, isNull);
+      expect(cleared.organizerName, isNull);
+      expect(cleared.catagory, isNull);
     });
   });
 
@@ -159,6 +193,34 @@ void main() {
       expect(decoded.lastSignedInAt, user.lastSignedInAt);
       expect(decoded.isAdministrator, isTrue);
     });
+
+    test('copyWith clears nullable profile fields when null is provided', () {
+      final user = User(
+        id: 'user-1',
+        displayName: 'Asha',
+        email: 'asha@example.com',
+        photoUrl: 'photo.png',
+        phoneNumber: '555-0100',
+        bio: 'Organizer',
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        lastSignedInAt: createdAt,
+      );
+
+      final cleared = user.copyWith(
+        photoUrl: null,
+        phoneNumber: null,
+        bio: null,
+        updatedAt: null,
+        lastSignedInAt: null,
+      );
+
+      expect(cleared.photoUrl, isNull);
+      expect(cleared.phoneNumber, isNull);
+      expect(cleared.bio, isNull);
+      expect(cleared.updatedAt, isNull);
+      expect(cleared.lastSignedInAt, isNull);
+    });
   });
 
   group('RegistrationCodeCodec', () {
@@ -196,6 +258,7 @@ void main() {
       expect(formatEventDate('01/09/2026', 'dd MMM yyyy'), '01 Sep 2026');
       expect(formatEventDate('2026-09-01', 'dd MMM yyyy'), '01 Sep 2026');
       expect(formatEventDate('not-a-date', 'dd MMM yyyy'), 'not-a-date');
+      expect(formatEventDate('31/02/2026', 'dd MMM yyyy'), '31/02/2026');
     });
 
     test('formats event times and preserves invalid values', () {

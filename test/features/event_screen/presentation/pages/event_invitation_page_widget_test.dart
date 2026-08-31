@@ -5,7 +5,7 @@ import 'package:bdo_event/features/event_screen/presentation/pages/event_invitat
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../notification_screen/presentation/pages/notification_screen_widget_test.dart';
+import '../../../../shared/fixtures/fake_notification_event_store.dart';
 
 void main() {
   tearDown(() async {

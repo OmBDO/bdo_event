@@ -1,6 +1,7 @@
 import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.dart';
 import 'package:bdo_event/core/common/calendar_element/widgets/event_tooltip.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/event_schedule.dart';
 import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/theme/app_colors.dart';
@@ -23,22 +24,9 @@ class _CalendarElementState extends State<CalendarElement> {
   OverlayEntry? _eventTooltip;
 
   List<Event> _getEventsForDay(DateTime day) => widget.events.where((event) {
-    final eventDate = _parseEventDate(event.date);
+    final eventDate = EventSchedule.eventDate(event);
     return eventDate != null && isSameDay(eventDate, day);
   }).toList();
-
-  static DateTime? _parseEventDate(String value) {
-    final parts = value.split('/');
-    if (parts.length == 3) {
-      final day = int.tryParse(parts[0]);
-      final month = int.tryParse(parts[1]);
-      final year = int.tryParse(parts[2]);
-      if (day != null && month != null && year != null) {
-        return DateTime(year, month, day);
-      }
-    }
-    return DateTime.tryParse(value);
-  }
 
   void _hideEventTooltip() {
     _eventTooltip?.remove();

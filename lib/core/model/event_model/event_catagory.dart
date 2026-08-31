@@ -69,6 +69,18 @@ class EventCategory {
           icon: Icons.sports_esports,
           color: Colors.blue,
         );
+      case 'music':
+        return const EventCategory(
+          name: 'Music',
+          icon: Icons.music_note,
+          color: Colors.green,
+        );
+      case 'business':
+        return const EventCategory(
+          name: 'Business',
+          icon: Icons.business_center,
+          color: Colors.teal,
+        );
       default:
         return const EventCategory(
           name: 'Other',

@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/security/biometric_lock_service.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 
 class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   ProfileScreenCubit({
@@ -49,6 +50,8 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   final EventReminderNotificationService? _reminderNotifications;
   final BiometricLockService? _biometricLockService;
   final EventStore? _eventStore;
+  int _visibilityLoadGeneration = 0;
+  int _visibilityMutationGeneration = 0;
 
   void refresh() {
     final user = _authRepository.currentUser;
@@ -66,9 +69,10 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   Future<void> loadVisibility() async {
     final userId = state.user?.id ?? _authRepository.currentUser?.id;
     if (userId == null || _eventStore == null) return;
+    final loadGeneration = ++_visibilityLoadGeneration;
     try {
       final values = await _eventStore.loadProfileVisibility(userId);
-      if (!isClosed) {
+      if (!isClosed && loadGeneration == _visibilityLoadGeneration) {
         emit(
           state.copyWith(
             profileVisibility: ProfileVisibility.fromStorage(
@@ -89,6 +93,10 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
     ProfileVisibility? profileVisibility,
     RegistrationVisibility? registrationVisibility,
   }) async {
+    _visibilityLoadGeneration++;
+    final mutationGeneration = ++_visibilityMutationGeneration;
+    final previousProfile = state.profileVisibility;
+    final previousRegistration = state.registrationVisibility;
     final nextProfile = profileVisibility ?? state.profileVisibility;
     final nextRegistration =
         registrationVisibility ?? state.registrationVisibility;
@@ -96,6 +104,7 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
       state.copyWith(
         profileVisibility: nextProfile,
         registrationVisibility: nextRegistration,
+        clearErrorMessage: true,
       ),
     );
     final userId = state.user?.id ?? _authRepository.currentUser?.id;
@@ -107,7 +116,15 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
         registrationVisibility: nextRegistration.storageValue,
       );
     } on Object {
-      return;
+      if (!isClosed && mutationGeneration == _visibilityMutationGeneration) {
+        emit(
+          state.copyWith(
+            profileVisibility: previousProfile,
+            registrationVisibility: previousRegistration,
+            errorMessage: AppText.unableToSaveVisibility,
+          ),
+        );
+      }
     }
   }
 
@@ -286,6 +303,8 @@ class ProfileScreenCubit extends Cubit<ProfileScreenState> {
   }
 
   void clearState() {
+    _visibilityLoadGeneration++;
+    _visibilityMutationGeneration++;
     emit(const ProfileScreenState(user: null, isNotificationEnabled: true));
   }
 

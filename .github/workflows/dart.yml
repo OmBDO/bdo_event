@@ -33,4 +33,117 @@ jobs:
         run: flutter analyze
 
       - name: Run tests
-        run: flutter test
+        run: flutter test test/core test/features test/shared
+
+  integration-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run integration harness contracts
+        run: flutter test test/integration_test/shared
+
+      - name: Run integration runner smoke test
+        run: flutter test test/integration_test/features/auth_screen/presentation/pages/integration_runner_smoke_test.dart
+
+  integration-p0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start disposable Supabase
+        run: supabase start > "$RUNNER_TEMP/supabase-start.log" 2>&1
+
+      - name: Apply migrations
+        run: supabase db reset --local > "$RUNNER_TEMP/supabase-reset.log" 2>&1
+
+      - name: Lint local database
+        run: supabase db lint --local --fail-on error
+
+      - name: Verify latest migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest_file="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' -printf '%f\n' | sort | tail -n 1)"
+          latest_version="${latest_file%%_*}"
+          test -n "$latest_version"
+          db_container="$(docker ps --filter 'name=supabase_db_' --format '{{.Names}}' | head -n 1)"
+          test -n "$db_container"
+          applied_version="$(docker exec "$db_container" psql -U postgres -d postgres -Atc \
+            "select version from supabase_migrations.schema_migrations where version = '$latest_version';")"
+          test "$applied_version" = "$latest_version"
+
+      - name: Export local test environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          status_env="$RUNNER_TEMP/supabase-env"
+          latest_file="$(find supabase/migrations -maxdepth 1 -type f -name '*.sql' -printf '%f\n' | sort | tail -n 1)"
+          latest_version="${latest_file%%_*}"
+          supabase status -o env > "$status_env"
+          source "$status_env"
+          {
+            printf 'SUPABASE_URL=%s\n' "$API_URL"
+            printf 'SUPABASE_ANON_KEY=%s\n' "$ANON_KEY"
+            printf 'SUPABASE_SERVICE_ROLE_KEY=%s\n' "$SERVICE_ROLE_KEY"
+            printf 'SUPABASE_TEST_PROJECT=local\n'
+            printf 'SUPABASE_MIGRATION_VERSION=%s\n' "$latest_version"
+          } >> "$GITHUB_ENV"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run P0 data and UI contracts
+        run: >-
+          flutter test
+          test/integration_test/features/auth_screen/data/auth_supabase_integration_test.dart
+          test/integration_test/features/auth_screen/presentation/pages/authentication_journey_test.dart
+          test/integration_test/features/event_detail_screen/presentation/pages/registration_journey_test.dart
+          test/integration_test/features/registered_screen/presentation/pages/ticket_cancellation_journey_test.dart
+          test/integration_test/features/event_screen/presentation/pages/event_invitation_journey_test.dart
+          test/integration_test/features/watcher_screen/presentation/pages/watcher_check_in_journey_test.dart
+          test/integration_test/features/event_screen/data/event_rls_integration_test.dart
+          test/integration_test/features/event_screen/data/event_watcher_rls_integration_test.dart
+          test/integration_test/features/event_screen/data/invitation_rpc_integration_test.dart
+          test/integration_test/features/event_detail_screen/data/registration_rpc_integration_test.dart
+          test/integration_test/features/event_detail_screen/data/capacity_race_integration_test.dart
+          test/integration_test/features/event_detail_screen/data/deadline_integration_test.dart
+          test/integration_test/features/watcher_screen/data/watcher_check_in_integration_test.dart
+          test/integration_test/features/watcher_screen/data/watcher_authorization_integration_test.dart
+          test/integration_test/features/watcher_screen/data/stale_role_integration_test.dart
+          test/integration_test/core/common/event_image/event_image_storage_integration_test.dart
+          test/integration_test/core/common/profile_image/profile_image_storage_integration_test.dart
+          test/integration_test/features/notification_screen/data/notification_rpc_integration_test.dart
+
+      - name: Stop disposable Supabase
+        if: always()
+        run: supabase stop
+
+      - name: Upload Supabase logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-integration-logs
+          path: ${{ runner.temp }}/supabase-*.log

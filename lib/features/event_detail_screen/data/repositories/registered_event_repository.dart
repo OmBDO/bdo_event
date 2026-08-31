@@ -4,6 +4,7 @@ import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/event_detail_screen/data/datasource/registration_remote_data_source.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/repositories/registration_repository.dart';
+import 'package:bdo_event/core/util/event_schedule.dart';
 
 class RegisteredEventRepository implements RegistrationRepositoryContract {
   RegisteredEventRepository({
@@ -38,8 +39,13 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
       return AppText.eventNoLongerAvailable;
     }
 
+    final now = _now();
+    if (EventSchedule.isFinished(event, now: now)) {
+      return AppText.eventNoLongerAvailable;
+    }
+
     if (event.registrationDeadline != null &&
-        !_now().isBefore(event.registrationDeadline!)) {
+      !now.isBefore(event.registrationDeadline!)) {
       return AppText.registrationDeadlinePassed;
     }
 
@@ -64,6 +70,9 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
       }
       if (error.message == 'Registration for this event has closed') {
         return AppText.registrationDeadlinePassed;
+      }
+      if (error.message == 'Event has ended') {
+        return AppText.eventNoLongerAvailable;
       }
       return AppText.unableToSaveRegistration;
     }

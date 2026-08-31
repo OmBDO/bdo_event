@@ -14,18 +14,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
-import 'package:flutter/services.dart';
 import 'package:bdo_event/core/util/registration_code_codec.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:bdo_event/core/common/clipboard_share.dart';
 import 'package:gap/gap.dart';
 
 class RegisteredEventPage extends StatefulWidget {
   final Event event;
+  final ClipboardAdapter? clipboardAdapter;
 
-  const RegisteredEventPage({super.key, required this.event});
+  const RegisteredEventPage({
+    super.key,
+    required this.event,
+    this.clipboardAdapter,
+  });
 
   @override
   State<RegisteredEventPage> createState() => _RegisteredEventPageState();
@@ -383,12 +388,12 @@ class _RegisteredEventPageState extends State<RegisteredEventPage> {
                               tooltip: AppText.copyRegistrationCode,
                               icon: const Icon(Icons.copy_rounded),
                               onPressed: () async {
-                                await Clipboard.setData(
-                                  ClipboardData(
-                                    text: _manualCode(state.registrationToken!),
-                                  ),
+                                final copied = await tryCopyText(
+                                  widget.clipboardAdapter ??
+                                      const SystemClipboardAdapter(),
+                                  _manualCode(state.registrationToken!),
                                 );
-                                if (!mounted) return;
+                                if (!copied || !mounted) return;
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

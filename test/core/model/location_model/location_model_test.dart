@@ -46,6 +46,31 @@ void main() {
     expect(withZone.displayName, 'Pune, India (West)');
   });
 
+  test('copyWith clears nullable location fields when null is provided', () {
+    const location = Location(
+      id: 'office-1',
+      name: 'BDO Rise Office',
+      city: 'Pune',
+      country: 'India',
+      zone: 'West',
+      address: 'Main Street',
+      latitude: 18.52,
+      longitude: 73.85,
+    );
+
+    final cleared = location.copyWith(
+      zone: null,
+      address: null,
+      latitude: null,
+      longitude: null,
+    );
+
+    expect(cleared.zone, isNull);
+    expect(cleared.address, isNull);
+    expect(cleared.latitude, isNull);
+    expect(cleared.longitude, isNull);
+  });
+
   test('finds catalog offices by id and returns null for unknown ids', () {
     final office = LocationCatalog.offices.first;
 

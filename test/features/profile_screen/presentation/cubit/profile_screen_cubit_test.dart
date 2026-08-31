@@ -9,6 +9,7 @@ import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_scr
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_visibility.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/core/model/notification_model/notification_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,6 +57,23 @@ void main() {
     expect(cubit.state.isWatcherVibrationEnabled, isFalse);
     expect(store.saved.last.dateFormat, 'yyyy-MM-dd');
     expect(store.saved.last.isWatcherKeepHistoryVisibleAfterCheckIn, isTrue);
+    await cubit.close();
+  });
+
+  test('rolls visibility settings back when persistence fails', () async {
+    final cubit = createCubit(
+      user: testUser,
+      eventStore: FakeVisibilityStore(saveError: StateError('offline')),
+    );
+
+    await cubit.updateVisibility(
+      profileVisibility: ProfileVisibility.public,
+      registrationVisibility: RegistrationVisibility.organizers,
+    );
+
+    expect(cubit.state.profileVisibility, ProfileVisibility.private);
+    expect(cubit.state.registrationVisibility, RegistrationVisibility.private);
+    expect(cubit.state.errorMessage, AppText.unableToSaveVisibility);
     await cubit.close();
   });
 
@@ -250,9 +268,10 @@ class FakePreferencesStore implements ProfilePreferencesRepositoryContract {
 }
 
 class FakeVisibilityStore implements EventStore {
-  FakeVisibilityStore({this.values = const {}});
+  FakeVisibilityStore({this.values = const {}, this.saveError});
 
   final Map<String, String> values;
+  final Object? saveError;
   String? loadedUserId;
   String? savedUserId;
   String? savedProfileVisibility;
@@ -270,6 +289,7 @@ class FakeVisibilityStore implements EventStore {
     required String profileVisibility,
     required String registrationVisibility,
   }) async {
+    if (saveError != null) throw saveError!;
     savedUserId = userId;
     savedProfileVisibility = profileVisibility;
     savedRegistrationVisibility = registrationVisibility;

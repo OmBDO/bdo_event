@@ -15,39 +15,98 @@ import 'package:bdo_event/features/profile_screen/presentation/sections/support_
 import 'package:bdo_event/features/profile_screen/presentation/sections/watcher_settings_section.dart';
 import 'package:bdo_event/features/profile_screen/presentation/pages/profile_details_page.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
+import 'package:bdo_event/core/common/profile_image/profile_image_picker.dart';
+import 'package:bdo_event/core/common/profile_image/profile_image_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({
+    super.key,
+    this.imagePicker,
+    this.storeImage,
+    this.deleteImage,
+  });
+
+  final ProfileImagePicker? imagePicker;
+  final StoreProfileImage? storeImage;
+  final DeleteProfileImage? deleteImage;
 
   @override
-  Widget build(BuildContext context) =>
-      BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
-        listenWhen: (previous, current) =>
-            previous.errorMessage != current.errorMessage &&
-            current.errorMessage != null,
-        listener: (context, state) =>
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.errorMessage!))),
-        builder: (context, state) {
-          final theme = Theme.of(context);
-          final isDarkMode = theme.brightness == Brightness.dark;
-          final user = state.user;
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Gap(AppSpace.space30),
-                  ProfileHeaderSection(user: user),
-                  const Gap(AppSpace.space10),
-                  ProfileAccountSection(
-                    onEditProfile: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => ProfileDetailsPage(user: user),
-                      ),
+  Widget build(
+    BuildContext context,
+  ) => BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
+    listenWhen: (previous, current) =>
+        previous.errorMessage != current.errorMessage &&
+        current.errorMessage != null,
+    listener: (context, state) =>
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(state.errorMessage!))),
+    builder: (context, state) {
+      final theme = Theme.of(context);
+      final isDarkMode = theme.brightness == Brightness.dark;
+      final user = state.user;
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Gap(AppSpace.space30),
+              ProfileHeaderSection(user: user),
+              const Gap(AppSpace.space10),
+              ProfileAccountSection(
+                onEditProfile: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProfileDetailsPage(
+                      user: user,
+                      imagePicker: imagePicker,
+                      storeImage: storeImage,
+                      deleteImage: deleteImage,
+                    ),
+                  ),
+                ),
+                onChangePassword: () => _showChangePasswordDialog(context),
+              ),
+              const Gap(AppSpace.space16),
+              ProfilePreferencesSection(
+                state: state,
+                onReminderLeadTime: (minutes) =>
+                    _showReminderLeadTimeDialog(context, minutes),
+                onShowLanguageInfo: () => _showInfoDialog(
+                  context,
+                  title: AppText.appLanguage,
+                  message: AppText.onlyAvailableLanguage,
+                ),
+              ),
+              if (user?.hasPermission(UserPermission.scanRegistrations) ??
+                  false) ...[
+                const Gap(AppSpace.space16),
+                ProfileWatcherSettingsSection(state: state),
+              ],
+              if (user?.hasPermission(UserPermission.createEvents) ??
+                  false) ...[
+                const Gap(AppSpace.space16),
+                ProfileOrganizerToolsSection(user: user!),
+              ],
+              const Gap(AppSpace.space16),
+              ProfileSupportSection(
+                onShowInfo: ({required title, required message}) =>
+                    _showInfoDialog(context, title: title, message: message),
+                onSignOutEverywhere: () => _signOutEverywhere(context),
+              ),
+              const Gap(AppSpace.space24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextButton.icon(
+                  onPressed: () => _logout(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: isDarkMode
+                        ? theme.colorScheme.onSurface
+                        : Colors.black54,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 16,
                     ),
                     onChangePassword: () => _showChangePasswordDialog(context),
                   ),

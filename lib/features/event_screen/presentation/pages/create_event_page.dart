@@ -8,15 +8,13 @@ import 'package:bdo_event/core/util/resource/app_identifier.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
+import 'package:bdo_event/core/common/event_image/event_image_picker.dart';
+import 'package:bdo_event/core/common/location_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:http/http.dart' as http;
 import 'package:gap/gap.dart';
-
-import 'dart:convert';
 
 import 'package:bdo_event/core/common/event_image/event_image.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
@@ -26,13 +24,21 @@ import 'package:bdo_event/core/model/event_model/event_model.dart';
 class CreateEventPage extends StatefulWidget {
   final Event? event;
   final bool popParentOnCreateSuccess;
-  EventCategory? catagory;
+  final EventImagePicker? imagePicker;
+  final StoreEventImage? storeImage;
+  final DeleteEventImage? deleteImage;
+  final LocationSearchAdapter? locationSearchAdapter;
+  final EventCategory? catagory;
 
-  CreateEventPage({
+  const CreateEventPage({
     super.key,
     this.event,
     this.catagory,
     this.popParentOnCreateSuccess = false,
+    EventImagePicker? imagePicker,
+    StoreEventImage? storeImage,
+    DeleteEventImage? deleteImage,
+    this.locationSearchAdapter,
   });
 
   @override
@@ -40,6 +46,14 @@ class CreateEventPage extends StatefulWidget {
 }
 
 class _CreateEventPageState extends State<CreateEventPage> {
+  late final EventImagePicker _imagePicker =
+    widget.imagePicker ?? GalleryEventImagePicker();
+  late final StoreEventImage _storeImage =
+    widget.storeImage ?? storePickedImage;
+  late final DeleteEventImage _deleteImage =
+    widget.deleteImage ?? deleteStoredImage;
+  late final LocationSearchAdapter _locationSearch =
+      widget.locationSearchAdapter ?? NominatimLocationSearchAdapter();
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _dateController = TextEditingController();
@@ -49,7 +63,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
   final _registrationDeadlineController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _imagePicker = ImagePicker();
   String? _selectedImagePath;
   String? _originalImagePath;
   final _pendingImagePaths = <String>{};
@@ -109,19 +122,16 @@ class _CreateEventPageState extends State<CreateEventPage> {
     _locationController.dispose();
     _descriptionController.dispose();
     _locationSearchController.dispose();
+    _locationSearch.dispose();
     super.dispose();
   }
 
   Future<void> _pickImage() async {
-    final image = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
-      maxWidth: 1600,
-    );
+    final image = await _imagePicker.pickImage();
     if (image == null) return;
 
     try {
-      final storedImagePath = await storePickedImage(image);
+      final storedImagePath = await _storeImage(image);
       if (mounted) {
         setState(() {
           _pendingImagePaths.add(storedImagePath);
@@ -215,7 +225,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
   Future<void> _tryDeleteImage(String path) async {
     try {
-      await deleteStoredImage(path);
+      await _deleteImage(path);
     } on Object catch (_) {}
   }
 
@@ -311,30 +321,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
     final query = _locationSearchController.text.trim();
     if (query.isEmpty) return;
     final requestId = ++_locationSearchRequest;
-    final uri = Uri.https('nominatim.openstreetmap.org', '/search', {
-      'q': query,
-      'format': 'jsonv2',
-      'limit': '1',
-    });
     try {
-      final response = await http.get(
-        uri,
-        headers: {'User-Agent': 'bdo-event'},
-      );
-      if (response.statusCode != 200) return;
-      final results = jsonDecode(response.body) as List<dynamic>;
-      if (results.isEmpty || !mounted || requestId != _locationSearchRequest) {
+      final result = await _locationSearch.search(query);
+      if (result == null || !mounted || requestId != _locationSearchRequest) {
         return;
       }
-      final result = results.first as Map<String, dynamic>;
-      final coordinates = LatLng(
-        double.parse(result['lat'] as String),
-        double.parse(result['lon'] as String),
-      );
       setState(() {
         _selectedLocation = null;
-        _selectedCoordinates = coordinates;
-        _locationController.text = result['display_name'] as String? ?? query;
+        _selectedCoordinates = result.coordinates;
+        _locationController.text = result.displayName;
       });
     } on Object {
       if (!mounted) return;

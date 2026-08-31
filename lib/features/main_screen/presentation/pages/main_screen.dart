@@ -47,8 +47,7 @@ class _MainScreenView extends StatelessWidget {
             user?.hasPermission(UserPermission.createEvents) ?? false;
         developer.log(
           'auth.frontendPermissions '
-          '{userId: ${user?.id}, roles: ${user?.roles.map((role) => role.storageValue).toList()}, '
-          'canCreateEvents: $canCreateEvents, canScan: $canScan}',
+          '{canCreateEvents: $canCreateEvents, canScan: $canScan}',
           name: 'bdo_event.supabase',
         );
 

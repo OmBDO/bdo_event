@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/common/form_elements/app_text_field.dart';
 import 'package:bdo_event/core/util/resource/app_assets.dart';
@@ -6,24 +8,39 @@ import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:bdo_event/core/common/profile_image/picker.dart';
 import 'package:bdo_event/core/common/profile_image/profile_image_platform.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:gap/gap.dart';
 
 class ProfileDetailsPage extends StatefulWidget {
-  const ProfileDetailsPage({required this.user, super.key});
+  const ProfileDetailsPage({
+    required this.user,
+    this.imagePicker,
+    this.storeImage,
+    this.deleteImage,
+    super.key,
+  });
 
   final User? user;
+  final ProfileImagePicker? imagePicker;
+  final StoreProfileImage? storeImage;
+  final DeleteProfileImage? deleteImage;
 
   @override
   State<ProfileDetailsPage> createState() => _ProfileDetailsPageState();
 }
 
 class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
+  late final ProfileImagePicker _imagePicker =
+      widget.imagePicker ?? GalleryProfileImagePicker();
+  late final StoreProfileImage _storeImage =
+      widget.storeImage ?? storePickedProfileImage;
+  late final DeleteProfileImage _deleteImage =
+      widget.deleteImage ?? deleteStoredProfileImage;
   late final TextEditingController _phoneNumberController;
   late final TextEditingController _bioController;
-  final _imagePicker = ImagePicker();
+  final _pendingPhotoUrls = <String>{};
   String? _photoUrl;
   bool _removePhoto = false;
   late String _locale;
@@ -44,6 +61,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
 
   @override
   void dispose() {
+    unawaited(_deletePendingPhotoUrls());
     _phoneNumberController.dispose();
     _bioController.dispose();
     super.dispose();
@@ -150,36 +168,58 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
   Future<void> _save() async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
+    final originalPhotoUrl = user?.photoUrl;
+    final nextPhotoUrl = _removePhoto ? '' : _photoUrl;
     final error = await context.read<ProfileScreenCubit>().updateProfile(
       displayName: user?.displayName ?? '',
       email: user?.email ?? '',
-      photoUrl: _removePhoto ? '' : _photoUrl,
+      photoUrl: nextPhotoUrl,
       phoneNumber: _phoneNumberController.text,
       bio: _bioController.text,
       locale: _locale,
     );
     if (!mounted) return;
     if (error != null) {
+      await _deletePendingPhotoUrls();
+      if (!mounted) return;
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error)));
       return;
     }
+    if (originalPhotoUrl?.isNotEmpty == true &&
+        originalPhotoUrl != nextPhotoUrl) {
+      try {
+        await _deleteImage(originalPhotoUrl!);
+      } on Object {
+        if (!mounted) return;
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppText.unableToDeleteProfilePhoto)),
+        );
+        return;
+      }
+    }
+    if (nextPhotoUrl?.isNotEmpty == true) {
+      _pendingPhotoUrls.remove(nextPhotoUrl);
+    }
+    await _deletePendingPhotoUrls();
+    if (!mounted) return;
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text(AppText.profileUpdated)));
     Navigator.of(context).pop();
   }
 
   Future<void> _pickPhoto() async {
-    final image = await _imagePicker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 85,
-      maxWidth: 1200,
-    );
+    final image = await _imagePicker.pickImage();
     if (image == null) return;
     try {
-      final url = await storePickedProfileImage(image);
-      if (!mounted) return;
+      final url = await _storeImage(image);
+      if (!mounted) {
+        await _deletePhotoQuietly(url);
+        return;
+      }
+      _pendingPhotoUrls.add(url);
       setState(() {
         _photoUrl = url;
         _removePhoto = false;
@@ -190,6 +230,20 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
           const SnackBar(content: Text(AppText.unableToUploadProfilePhoto)),
         );
       }
+    }
+  }
+
+  Future<void> _deletePendingPhotoUrls() async {
+    final urls = Set<String>.of(_pendingPhotoUrls);
+    _pendingPhotoUrls.clear();
+    await Future.wait(urls.map(_deletePhotoQuietly));
+  }
+
+  Future<void> _deletePhotoQuietly(String url) async {
+    try {
+      await _deleteImage(url);
+    } on Object {
+      return;
     }
   }
 }

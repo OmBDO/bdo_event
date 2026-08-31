@@ -16,6 +16,8 @@ void main() {
   );
 
   Event event({
+    String date = '01/09/2026',
+    String? endTime,
     bool isAvailable = true,
     int attendeeCount = 0,
     int? capacity,
@@ -23,7 +25,8 @@ void main() {
   }) => Event(
     id: 'event-1',
     title: 'Town Hall',
-    date: '01/09/2026',
+    date: date,
+    endTime: endTime,
     location: 'Pune',
     imageUrl: '',
     isAvailable: isAvailable,
@@ -166,6 +169,38 @@ void main() {
           event(registrationDeadline: now.subtract(const Duration(minutes: 1))),
         ),
         AppText.registrationDeadlinePassed,
+      );
+      expect(dataSource.activateCalls, 0);
+    });
+
+    test('rejects registration after the event date', () async {
+      final dataSource = FakeRegistrationDataSource();
+      final repository = RegisteredEventRepository(
+        dataSource: dataSource,
+        authRepository: FakeAuthRepository(user),
+        now: () => DateTime(2026, 8, 31, 12),
+      );
+
+      expect(
+        await repository.registerEvent(event(date: '30/08/2026')),
+        AppText.eventNoLongerAvailable,
+      );
+      expect(dataSource.activateCalls, 0);
+    });
+
+    test('rejects registration after the event end time', () async {
+      final dataSource = FakeRegistrationDataSource();
+      final repository = RegisteredEventRepository(
+        dataSource: dataSource,
+        authRepository: FakeAuthRepository(user),
+        now: () => DateTime(2026, 8, 31, 17),
+      );
+
+      expect(
+        await repository.registerEvent(
+          event(date: '31/08/2026', endTime: '17:00'),
+        ),
+        AppText.eventNoLongerAvailable,
       );
       expect(dataSource.activateCalls, 0);
     });

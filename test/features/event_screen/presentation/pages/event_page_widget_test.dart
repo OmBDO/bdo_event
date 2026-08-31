@@ -1,9 +1,11 @@
 import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/prefs/recent_event_store.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/event_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../cubit/event_screen_cubit_test.dart' as fixtures;
 
@@ -55,6 +57,26 @@ void main() {
     await tester.pump();
     expect(find.text('Past Gathering'), findsOneWidget);
     expect(find.text('Upcoming Registered'), findsNothing);
+    await cubit.close();
+  });
+
+  testWidgets('does not show finished events in recently viewed',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'recent_event_ids_user-1': ['past'],
+    });
+    final preferences = await SharedPreferences.getInstance();
+    final pastEvent = fixtures.event('past', '01/01/2020');
+    final cubit = fixtures.createCubit(
+      repository: fixtures.FakeEventRepository(events: [pastEvent]),
+      preferences: preferences,
+      recentEventStore: RecentEventStore(preferences),
+    );
+
+    await pumpPage(tester, cubit);
+
+    expect(find.text(AppText.recentlyViewed), findsNothing);
+    expect(find.text('past'), findsNothing);
     await cubit.close();
   });
 }

@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/common/location_search.dart';
 import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../cubit/event_screen_cubit_test.dart' as fixtures;
+import '../../../../shared/fixtures/location_search_adapter.dart';
 
 void main() {
   testWidgets('shows required validation errors for an empty event form', (
@@ -136,6 +138,41 @@ void main() {
 
     expect(repository.updateCalls, 1);
     expect(find.byType(CreateEventPage), findsNothing);
+    await cubit.close();
+  });
+
+  testWidgets('searches location through the injected adapter', (tester) async {
+    final cubit = fixtures.createCubit(
+      repository: fixtures.FakeEventRepository(),
+    );
+    final locationSearch = RecordingLocationSearchAdapter();
+    await pumpPage(
+      tester,
+      cubit,
+      CreateEventPage(
+        event: _validEvent(),
+        locationSearchAdapter: locationSearch,
+      ),
+    );
+
+    final searchField = find.byWidgetPredicate(
+      (widget) =>
+          widget is TextField &&
+          widget.decoration?.hintText == AppText.searchAddressOrPlace,
+    );
+    await tester.enterText(searchField, 'Pune station');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pump();
+
+    expect(locationSearch.query, 'Pune station');
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is TextFormField &&
+            widget.controller?.text == 'Found place',
+      ),
+      findsOneWidget,
+    );
     await cubit.close();
   });
 }

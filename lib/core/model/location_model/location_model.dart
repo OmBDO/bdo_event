@@ -1,3 +1,9 @@
+class _UnsetValue {
+  const _UnsetValue();
+}
+
+const _unsetValue = _UnsetValue();
+
 class Location {
   final String id;
   final String name;
@@ -29,20 +35,26 @@ class Location {
     String? name,
     String? city,
     String? country,
-    String? zone,
-    String? address,
-    double? latitude,
-    double? longitude,
+    Object? zone = _unsetValue,
+    Object? address = _unsetValue,
+    Object? latitude = _unsetValue,
+    Object? longitude = _unsetValue,
   }) {
     return Location(
       id: id ?? this.id,
       name: name ?? this.name,
       city: city ?? this.city,
       country: country ?? this.country,
-      zone: zone ?? this.zone,
-      address: address ?? this.address,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
+        zone: identical(zone, _unsetValue) ? this.zone : zone as String?,
+        address: identical(address, _unsetValue)
+          ? this.address
+          : address as String?,
+        latitude: identical(latitude, _unsetValue)
+          ? this.latitude
+          : latitude as double?,
+        longitude: identical(longitude, _unsetValue)
+          ? this.longitude
+          : longitude as double?,
     );
   }
 
