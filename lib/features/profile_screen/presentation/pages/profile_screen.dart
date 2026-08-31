@@ -108,81 +108,35 @@ class ProfileScreen extends StatelessWidget {
                       vertical: 14,
                       horizontal: 16,
                     ),
-                    onChangePassword: () => _showChangePasswordDialog(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    backgroundColor: isDarkMode
+                        ? theme.colorScheme.surfaceContainerHighest
+                        : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
+                    minimumSize: const Size(double.infinity, 50),
                   ),
-                  const Gap(AppSpace.space16),
-                  ProfilePreferencesSection(
-                    state: state,
-                    onReminderLeadTime: (minutes) =>
-                        _showReminderLeadTimeDialog(context, minutes),
-                    onShowLanguageInfo: () => _showInfoDialog(
-                      context,
-                      title: AppText.appLanguage,
-                      message: AppText.onlyAvailableLanguage,
+                  icon: const Icon(Icons.logout_rounded, size: 20),
+                  label: const Text(
+                    AppText.logout,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AppSize.text15,
                     ),
                   ),
-                  if (user?.hasPermission(UserPermission.scanRegistrations) ??
-                      false) ...[
-                    const Gap(AppSpace.space16),
-                    ProfileWatcherSettingsSection(state: state),
-                  ],
-                  if (user?.hasPermission(UserPermission.createEvents) ??
-                      false) ...[
-                    const Gap(AppSpace.space16),
-                    ProfileOrganizerToolsSection(user: user!),
-                  ],
-                  const Gap(AppSpace.space16),
-                  ProfileSupportSection(
-                    onShowInfo: ({required title, required message}) =>
-                        _showInfoDialog(
-                          context,
-                          title: title,
-                          message: message,
-                        ),
-                    onSignOutEverywhere: () => _signOutEverywhere(context),
-                  ),
-                  const Gap(AppSpace.space24),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TextButton.icon(
-                      onPressed: () => _logout(context),
-                      style: TextButton.styleFrom(
-                        foregroundColor: isDarkMode
-                            ? theme.colorScheme.onSurface
-                            : Colors.black54,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        backgroundColor: isDarkMode
-                            ? theme.colorScheme.surfaceContainerHighest
-                            : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      icon: const Icon(Icons.logout_rounded, size: 20),
-                      label: const Text(
-                        AppText.logout,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: AppSize.text15,
-                        ),
-                      ),
-                    ),
-                  ),
-                  ValueListenableBuilder<double>(
-                    valueListenable: FooterHeightTracker.heightNotifier,
-                    builder: (context, dynamicHeight, child) =>
-                        SizedBox(height: dynamicHeight + AppSpace.space24),
-                  ),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+              ValueListenableBuilder<double>(
+                valueListenable: FooterHeightTracker.heightNotifier,
+                builder: (context, dynamicHeight, child) =>
+                    SizedBox(height: dynamicHeight + AppSpace.space24),
+              ),
+            ],
+          ),
+        ),
       );
+    },
+  );
 
   Future<void> _logout(BuildContext context) async {
     await context.read<AuthScreenCubit>().logout();
