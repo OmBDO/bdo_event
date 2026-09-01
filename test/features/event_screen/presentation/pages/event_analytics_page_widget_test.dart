@@ -24,7 +24,17 @@ void main() {
     );
 
     expect(find.text('Event analysis'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Capacity trajectory'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Capacity trajectory'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Attendance mix'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Attendance mix'), findsOneWidget);
     expect(find.text('6'), findsAtLeastNWidgets(1));
   });

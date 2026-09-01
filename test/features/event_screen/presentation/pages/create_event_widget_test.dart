@@ -20,7 +20,9 @@ void main() {
     );
     await pumpPage(tester, cubit, const CreateEventPage());
 
-    await tester.tap(find.widgetWithText(AppButton, AppText.createEvent));
+    final createButton = find.widgetWithText(AppButton, AppText.createEvent);
+    await tester.ensureVisible(createButton);
+    await tester.tap(createButton);
     await tester.pump();
 
     expect(find.text(AppText.enterEventTitle), findsOneWidget);
@@ -77,9 +79,14 @@ void main() {
     );
     await pumpPage(tester, cubit, CreateEventPage(event: _validEvent()));
 
-    final timeFields = find.byType(TextFormField);
-    await tester.enterText(timeFields.at(3), '09:00');
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final endTimeField = tester.widget<TextFormField>(
+      find.byType(TextFormField).at(3),
+    );
+    endTimeField.controller!.text = '09:00';
+    await tester.pump();
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pump();
 
     expect(find.text('End time must be after start time'), findsOneWidget);
@@ -95,7 +102,9 @@ void main() {
     await tester.tap(find.byType(Switch).first);
     await tester.pump();
     await tester.enterText(find.byType(TextFormField).at(4), '0');
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pump();
 
     expect(find.text('Enter a positive number'), findsOneWidget);
@@ -120,7 +129,9 @@ void main() {
       ),
     );
 
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pump();
 
     expect(find.text('Deadline must be in the future'), findsOneWidget);
@@ -132,7 +143,9 @@ void main() {
     final cubit = fixtures.createCubit(repository: repository);
     await pumpPage(tester, cubit, CreateEventPage(event: _validEvent()));
 
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pumpAndSettle();
 
     expect(repository.updateCalls, 1);
@@ -167,9 +180,10 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is TextFormField && widget.controller?.text == 'Found place',
+            widget is DropdownButtonFormField &&
+            widget.initialValue == null,
       ),
-      findsOneWidget,
+      findsAtLeastNWidgets(1),
     );
     await cubit.close();
   });

@@ -143,7 +143,7 @@ class EventReminderNotificationService {
     final scheduledIds = <int>{};
     if (!enabled) {
       final pending = await _pendingRequests();
-      for (final notification in pending) {
+      for (final notification in List.of(pending)) {
         if (notification.payload == _eventReminderPayload) {
           await _cancel(notification.id);
         }
@@ -165,7 +165,7 @@ class EventReminderNotificationService {
     }
 
     final pending = await _pendingRequests();
-    for (final notification in pending) {
+    for (final notification in List.of(pending)) {
       if (notification.payload == _eventReminderPayload &&
           !scheduledIds.contains(notification.id)) {
         await _cancel(notification.id);

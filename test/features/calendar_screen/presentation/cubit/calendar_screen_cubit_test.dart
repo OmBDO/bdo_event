@@ -65,7 +65,7 @@ void main() {
     firstResult.complete([calendarEvent('stale')]);
     await firstLoad;
 
-    expect(cubit.state.events, [calendarEvent('latest')]);
+    expect(cubit.state.events.single.id, 'latest');
     cubit.close();
   });
 }

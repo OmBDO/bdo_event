@@ -62,7 +62,7 @@ void main() {
   test('duplicate submissions return update-in-progress', () async {
     final completer = Completer<String?>();
     final repository = FakeRegistrationRepository(
-      pendingResult: await completer.future,
+      pendingResult: completer.future,
     );
     final cubit = createCubit(repository: repository);
 
@@ -161,7 +161,7 @@ class FakeRegistrationRepository implements RegistrationRepositoryContract {
   });
 
   bool registered;
-  String? pendingResult;
+  Future<String?>? pendingResult;
   String? error;
   int registerCalls = 0;
   int cancelCalls = 0;
@@ -173,7 +173,7 @@ class FakeRegistrationRepository implements RegistrationRepositoryContract {
   Future<String?> registerEvent(Event event) async {
     registerCalls++;
 
-    final String? result = pendingResult ?? error;
+    final result = await pendingResult ?? error;
 
     if (result == null) {
       registered = true;

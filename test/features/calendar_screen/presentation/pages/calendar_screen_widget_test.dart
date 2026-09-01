@@ -79,6 +79,7 @@ Future<void> pumpPage(
   MainScreenCubit mainCubit,
 ) async {
   final profileCubit = profile_fixtures.createCubit();
+  addTearDown(profileCubit.close);
   await tester.pumpWidget(
     MaterialApp(
       home: MultiBlocProvider(
@@ -93,7 +94,6 @@ Future<void> pumpPage(
     ),
   );
   await tester.pumpAndSettle();
-  await profileCubit.close();
 }
 
 Future<void> closeCubits(

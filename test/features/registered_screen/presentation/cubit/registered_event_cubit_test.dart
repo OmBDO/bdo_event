@@ -12,13 +12,14 @@ import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_regi
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+final testUser = User(
+  id: 'user-1',
+  displayName: 'Asha',
+  email: 'asha@example.com',
+  createdAt: DateTime.utc(2026, 8, 1),
+);
+
 void main() {
-  final user = User(
-    id: 'user-1',
-    displayName: 'Asha',
-    email: 'asha@example.com',
-    createdAt: DateTime.utc(2026, 8, 1),
-  );
   final event = Event(
     id: 'event-1',
     title: 'Town Hall',
@@ -52,7 +53,7 @@ void main() {
 
     expect(cubit.state.isLoadingToken, isFalse);
     expect(cubit.state.registrationToken, 'token-1');
-    expect(store.tokenUserId, user.id);
+    expect(store.tokenUserId, testUser.id);
     expect(store.tokenEventId, event.id);
     await cubit.close();
   });
@@ -124,12 +125,12 @@ void main() {
 RegisteredEventCubit createCubit({
   FakeEventStore? store,
   FakeRegistrationRepository? repository,
-  User? user,
+  User? authenticatedUser,
 }) => RegisteredEventCubit(
   cancelRegisteredEvent: CancelRegisteredEvent(
     repository ?? FakeRegistrationRepository(),
   ),
-  authRepository: FakeAuthRepository(user),
+  authRepository: FakeAuthRepository(authenticatedUser ?? testUser),
   eventStore: store ?? FakeEventStore(),
   reminderNotifications: null,
 );

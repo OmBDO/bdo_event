@@ -52,7 +52,7 @@ class ApplicationBootstrap {
       publishableKey: environment.supabaseAnonKey,
     );
     final preferences = await loadPreferences();
-    configureDependencies(preferences: preferences);
+    configureDependenciesIN(preferences: preferences);
     await initializeNotifications();
     await restoreSession();
     refreshProfile();

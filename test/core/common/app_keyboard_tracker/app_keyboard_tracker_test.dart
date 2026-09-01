@@ -2,6 +2,8 @@ import 'package:bdo_event/core/common/app_keyboard_tracker/app_keyboard_tracker.
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(AppKeyboardTracker.dispose);
   tearDown(AppKeyboardTracker.dispose);
 

@@ -45,6 +45,9 @@ void main() {
         calls.add('preferences');
         return SharedPreferences.getInstance();
       },
+      configureDependenciesIN: ({preferences}) {
+        calls.add('dependencies:${preferences != null}');
+      },
 
       initializeNotifications: () async => calls.add('notifications'),
       restoreSession: () async => calls.add('session'),

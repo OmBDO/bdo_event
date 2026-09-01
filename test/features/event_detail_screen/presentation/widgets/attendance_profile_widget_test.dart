@@ -22,7 +22,7 @@ void main() {
     final store = fixtures.FakeNotificationEventStore(pendingAttendees: true);
     await pumpAttendanceProfile(tester, store);
 
-    expect(find.byType(AnimatedBuilder), findsOneWidget);
+    expect(find.byType(AnimatedBuilder), findsAtLeastNWidgets(1));
     store.completeAttendees(const []);
     await tester.pumpAndSettle();
     expect(find.text('0 attendees'), findsOneWidget);

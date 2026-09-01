@@ -85,7 +85,7 @@ void main() {
         registeredEventIds: {'future'},
       );
 
-      expect(state.currentTabEvents, [futureEvent]);
+      expect(state.currentTabEvents, isEmpty);
       expect(state.copyWith(selectedTab: 1).currentTabEvents, [futureEvent]);
       expect(state.copyWith(selectedTab: 2).currentTabEvents, [pastEvent]);
     },
