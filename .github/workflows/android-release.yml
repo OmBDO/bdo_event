@@ -1,0 +1,83 @@
+name: Android Release Artifacts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MAX_APK_SIZE_MB: 35
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Create environment asset
+        run: cp .env.example .env
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      - name: Build ABI-specific APKs
+        run: flutter build apk --release --split-per-abi
+
+      - name: Check APK sizes
+        shell: bash
+        run: |
+          set -euo pipefail
+          max_bytes=$((MAX_APK_SIZE_MB * 1024 * 1024))
+          shopt -s nullglob
+          apks=(build/app/outputs/flutter-apk/*-release.apk)
+          test "${#apks[@]}" -gt 0
+          for apk in "${apks[@]}"; do
+            size_bytes=$(stat -c '%s' "$apk")
+            size_mb=$(awk "BEGIN {printf \"%.2f\", $size_bytes / 1048576}")
+            printf '%s: %s MB\n' "$apk" "$size_mb"
+            if (( size_bytes > max_bytes )); then
+              printf 'APK exceeds MAX_APK_SIZE_MB=%s: %s\n' "$MAX_APK_SIZE_MB" "$apk" >&2
+              exit 1
+            fi
+          done
+
+      - name: Report largest native libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=$(find build/app/outputs/flutter-apk -name '*-arm64-v8a-release.apk' -print -quit)
+          test -n "$apk"
+          mkdir -p build/reports
+          apkanalyzer=$(find "$ANDROID_HOME" -type f -name apkanalyzer -print -quit)
+          test -n "$apkanalyzer"
+          "$apkanalyzer" apk file-size "$apk" | tee build/reports/arm64-apk-size.txt
+          unzip -l "$apk" | awk '/\.so$/ {print}' | sort -k1,1nr \
+            > build/reports/arm64-native-libraries.txt
+          cat build/reports/arm64-native-libraries.txt
+
+      - name: Upload Android release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-artifacts
+          path: |
+            build/app/outputs/bundle/release/*.aab
+            build/app/outputs/flutter-apk/*-release.apk
+            build/reports/arm64-apk-size.txt
+            build/reports/arm64-native-libraries.txt

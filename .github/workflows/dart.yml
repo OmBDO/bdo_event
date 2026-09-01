@@ -6,10 +6,18 @@
 name: Flutter
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -17,6 +25,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Create environment asset
+        run: cp .env.example .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -41,6 +52,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Create environment asset
+        run: cp .env.example .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -107,6 +121,9 @@ jobs:
             printf 'SUPABASE_MIGRATION_VERSION=%s\n' "$latest_version"
           } >> "$GITHUB_ENV"
 
+      - name: Create environment asset
+        run: cp .env.example .env
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -114,6 +131,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Verify environment asset
+        run: test -f .env
 
       - name: Run P0 data and UI contracts
         run: >-

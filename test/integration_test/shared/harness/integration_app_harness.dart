@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/single_child_widget.dart';
 
 class IntegrationAppHarness {
   const IntegrationAppHarness({
@@ -10,7 +11,7 @@ class IntegrationAppHarness {
   });
 
   final Widget home;
-  final List<BlocProvider<dynamic>> providers;
+  final List<SingleChildWidget> providers;
   final ThemeData? theme;
   final ThemeData? darkTheme;
 
