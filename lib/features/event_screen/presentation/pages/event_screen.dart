@@ -15,6 +15,7 @@ import 'package:bdo_event/features/event_screen/presentation/widgets/event_tab.d
 import 'package:bdo_event/features/event_screen/presentation/widgets/recent_event_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bdo_event/core/util/event_schedule.dart';
 import 'package:gap/gap.dart';
 
 class EventPage extends StatelessWidget {
@@ -82,6 +83,7 @@ class _EventPageViewState extends State<_EventPageView> {
               (id) => state.events.where((event) => event.id == id).firstOrNull,
             )
             .whereType<Event>()
+            .where((event) => EventSchedule.isUpcoming(event))
             .toList();
 
         return CustomScrollView(

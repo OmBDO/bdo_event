@@ -23,9 +23,12 @@ void main() {
       'Register',
       'Profile',
     ]);
-    expect(destinations[0].page, isA<EventPage>());
-    expect(destinations[1].page, isA<CalendarScreen>());
-    expect(destinations[2].page, isA<ProfileScreen>());
+    expect(destinations[0].page, isNull);
+    expect(destinations[1].page, isNull);
+    expect(destinations[2].page, isNull);
+    expect(destinations[0].createPage(), isA<EventPage>());
+    expect(destinations[1].createPage(), isA<CalendarScreen>());
+    expect(destinations[2].createPage(), isA<ProfileScreen>());
   });
 
   test('adds the organizer destination when event creation is allowed', () {
@@ -41,6 +44,7 @@ void main() {
       MainTab.profile,
     ]);
     expect(destinations[2].label, 'Create');
-    expect(destinations[2].page, isA<MyEventScreen>());
+    expect(destinations[2].page, isNull);
+    expect(destinations[2].createPage(), isA<MyEventScreen>());
   });
 }

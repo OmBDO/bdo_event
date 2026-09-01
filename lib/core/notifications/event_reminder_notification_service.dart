@@ -3,76 +3,87 @@ import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
-import 'package:bdo_event/core/notifications/event_reminder_permission_service.dart';
+
+import 'event_reminder_permission_service.dart';
+
+import 'package:bdo_event/core/notifications/local_notification_adapter.dart';
 import 'package:bdo_event/core/notifications/event_reminder_policy.dart';
-import 'package:flutter/foundation.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class EventReminderNotificationService {
   factory EventReminderNotificationService({
     FlutterLocalNotificationsPlugin? plugin,
     EventReminderPermissionService? permissionService,
+    LocalNotificationAdapter? adapter,
   }) {
+    if (adapter != null) {
+      return EventReminderNotificationService._(adapter);
+    }
     final resolvedPlugin = plugin ?? FlutterLocalNotificationsPlugin();
     return EventReminderNotificationService._(
-      resolvedPlugin,
-      permissionService ??
-          EventReminderPermissionService(plugin: resolvedPlugin),
+      FlutterLocalNotificationAdapter(
+        plugin: resolvedPlugin,
+        permissionService:
+            permissionService ??
+            EventReminderPermissionService(plugin: resolvedPlugin),
+      ),
     );
   }
 
-  EventReminderNotificationService._(this._plugin, this._permissionService);
+  EventReminderNotificationService._(this._adapter);
 
-  final FlutterLocalNotificationsPlugin _plugin;
-  final EventReminderPermissionService _permissionService;
+  final LocalNotificationAdapter _adapter;
   List<Event> _lastRegisteredEvents = const [];
 
   static const reminderLeadTimeOptions = EventReminderPolicy.leadTimeOptions;
   static const _eventReminderPayload = AppNotificationConfig.reminderPayload;
 
   Future<void> initialize() async {
-    if (!_isSupportedPlatform) return;
-    tz.initializeTimeZones();
-    const settings = InitializationSettings(
-      android: AndroidInitializationSettings(AppNotificationConfig.androidIcon),
-      iOS: DarwinInitializationSettings(),
-    );
-    await _plugin.initialize(settings);
+    try {
+      await _adapter.initialize();
+      // ignore: empty_catches
+    } on Object {}
   }
 
   Future<bool> requestPermission() async {
-    return _permissionService.request();
+    try {
+      return await _adapter.requestPermission();
+    } on Object {
+      return false;
+    }
   }
 
   Future<void> scheduleTestNotification({
     Duration delay = const Duration(seconds: 5),
-  }) {
+  }) async {
     final scheduledDate = tz.TZDateTime.now(tz.local).add(delay);
-    return _plugin.zonedSchedule(
-      0,
-      'Event reminder test',
-      'Your notification setup is working.',
-      scheduledDate,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          AppNotificationConfig.reminderChannelId,
-          AppNotificationConfig.reminderChannelName,
-          channelDescription: AppNotificationConfig.reminderChannelDescription,
-          importance: Importance.high,
-          priority: Priority.high,
+    try {
+      await _adapter.schedule(
+        id: 0,
+        title: 'Event reminder test',
+        body: 'Your notification setup is working.',
+        scheduledDate: scheduledDate,
+        details: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            AppNotificationConfig.reminderChannelId,
+            AppNotificationConfig.reminderChannelName,
+            channelDescription:
+                AppNotificationConfig.reminderChannelDescription,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    );
+      );
+      // ignore: empty_catches
+    } on Object {}
   }
 
   Future<bool> scheduleEventReminder(
     Event event, {
     Duration leadTime = const Duration(days: 1),
   }) async {
-    if (!_isSupportedPlatform) return false;
+    if (!_adapter.isSupportedPlatform) return false;
     final reminderTime = EventReminderPolicy.reminderTime(
       event,
       leadTime: leadTime,
@@ -81,24 +92,32 @@ class EventReminderNotificationService {
     if (!reminderTime.isAfter(DateTime.now())) return false;
     if (!await requestPermission()) return false;
 
-    await _plugin.zonedSchedule(
-      EventReminderPolicy.notificationIdFor(event.id),
-      event.title,
-      'Your event is scheduled for ${formatEventDate(event.date, AppDateFormats.dayMonthYear)} at ${formatEventTime(event.startTime)}.',
-      tz.TZDateTime.from(reminderTime, tz.local),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          AppNotificationConfig.reminderChannelId,
-          AppNotificationConfig.reminderChannelName,
-          channelDescription: AppNotificationConfig.reminderChannelDescription,
-          importance: Importance.high,
-          priority: Priority.high,
+    final body =
+        'Your event is scheduled for '
+        '${formatEventDate(event.date, AppDateFormats.dayMonthYear)} '
+        'at ${formatEventTime(event.startTime)}.';
+    try {
+      await _adapter.schedule(
+        id: EventReminderPolicy.notificationIdFor(event.id),
+        title: event.title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(reminderTime, tz.local),
+        details: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            AppNotificationConfig.reminderChannelId,
+            AppNotificationConfig.reminderChannelName,
+            channelDescription:
+                AppNotificationConfig.reminderChannelDescription,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      payload: _eventReminderPayload,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    );
+        payload: _eventReminderPayload,
+      );
+    } on Object {
+      return false;
+    }
     return true;
   }
 
@@ -123,10 +142,10 @@ class EventReminderNotificationService {
   }) async {
     final scheduledIds = <int>{};
     if (!enabled) {
-      final pending = await _plugin.pendingNotificationRequests();
-      for (final notification in pending) {
+      final pending = await _pendingRequests();
+      for (final notification in List.of(pending)) {
         if (notification.payload == _eventReminderPayload) {
-          await _plugin.cancel(notification.id);
+          await _cancel(notification.id);
         }
       }
       return;
@@ -145,17 +164,17 @@ class EventReminderNotificationService {
       }
     }
 
-    final pending = await _plugin.pendingNotificationRequests();
-    for (final notification in pending) {
+    final pending = await _pendingRequests();
+    for (final notification in List.of(pending)) {
       if (notification.payload == _eventReminderPayload &&
           !scheduledIds.contains(notification.id)) {
-        await _plugin.cancel(notification.id);
+        await _cancel(notification.id);
       }
     }
   }
 
   Future<void> cancelEventReminder(String eventId) =>
-      _plugin.cancel(EventReminderPolicy.notificationIdFor(eventId));
+      _cancel(EventReminderPolicy.notificationIdFor(eventId));
 
   static DateTime? eventStartTime(Event event) =>
       EventReminderPolicy.eventStartTime(event);
@@ -163,9 +182,20 @@ class EventReminderNotificationService {
   static int notificationIdFor(String eventId) =>
       EventReminderPolicy.notificationIdFor(eventId);
 
-  Future<void> cancelTestNotification() => _plugin.cancel(0);
+  Future<void> cancelTestNotification() => _cancel(0);
 
-  bool get _isSupportedPlatform =>
-      defaultTargetPlatform == TargetPlatform.android ||
-      defaultTargetPlatform == TargetPlatform.iOS;
+  Future<List<PendingNotificationRequest>> _pendingRequests() async {
+    try {
+      return await _adapter.pendingRequests();
+    } on Object {
+      return const [];
+    }
+  }
+
+  Future<void> _cancel(int id) async {
+    try {
+      await _adapter.cancel(id);
+      // ignore: empty_catches
+    } on Object {}
+  }
 }

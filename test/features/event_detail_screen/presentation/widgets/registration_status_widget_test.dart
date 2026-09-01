@@ -1,5 +1,4 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';
@@ -59,6 +58,18 @@ void main() {
     await cubit.close();
   });
 
+  testWidgets('shows closed state for a finished event', (tester) async {
+    final cubit = fixtures.createCubit();
+    await pumpSection(tester, cubit, event(date: '01/01/2020'));
+
+    expect(find.text(AppText.registrationClosed), findsNWidgets(2));
+    expect(
+      tester.widget<ElevatedButton>(find.byType(ElevatedButton)).onPressed,
+      isNull,
+    );
+    await cubit.close();
+  });
+
   testWidgets('shows ticket action for registered attendees', (tester) async {
     final cubit = fixtures.createCubit();
     cubit.emit(const EventDetailState(isRegistered: true));
@@ -71,6 +82,8 @@ void main() {
 }
 
 Event event({
+  String date = '01/09/2026',
+  String? endTime,
   bool isAvailable = true,
   int attendeeCount = 0,
   int? capacity,
@@ -78,7 +91,8 @@ Event event({
 }) => Event(
   id: 'event-1',
   title: 'Town Hall',
-  date: '01/09/2026',
+  date: date,
+  endTime: endTime,
   location: 'Pune',
   imageUrl: '',
   isAvailable: isAvailable,

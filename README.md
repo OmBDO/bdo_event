@@ -40,10 +40,31 @@ supabase db push
 ```
 
 For local database development, use `supabase start` and `supabase db reset` to
-apply the migrations to the local Postgres instance. If the CLI is not
-available, run the migration file in the Supabase SQL editor before using event
-creation or registration. Row-level security policies restrict event mutations
-to their creator and registrations to their owner.
+apply the migrations to the local Postgres instance. The committed
+[Supabase CLI configuration](supabase/config.toml) uses the conventional local
+API, database, Studio, and Inbucket ports. If the CLI is not available, run the
+migration files in the Supabase SQL editor before using event creation or
+registration. Row-level security policies restrict event mutations to their
+creator and registrations to their owner.
+
+## Integration test environment
+
+Integration tests use a disposable Supabase project whenever possible. Start
+the local project and apply every migration before running them:
+
+```text
+supabase start
+supabase db reset
+```
+
+Provide `SUPABASE_URL` and `SUPABASE_ANON_KEY` to the app/test process. The
+host-side actor registrar and cleanup code may also receive
+`SUPABASE_SERVICE_ROLE_KEY`, but that value must stay in CI or the host shell;
+do not place it in `.env`, compile it into the Flutter application, or send it
+to a device. Integration actors and event records are created with a unique
+run namespace, so a fixed shared seed user is intentionally not required.
+The expected variables are listed in
+[`test/integration_test/.env.example`](test/integration_test/.env.example).
 
 Registration cancellation is persisted as a server-side `revoked` status.
 Revoked registrations are excluded from active registration queries, direct

@@ -9,10 +9,39 @@ import 'package:bdo_event/features/event_detail_screen/presentation/widgets/over
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-class AttendanceProfileWidget extends StatelessWidget {
-  const new({super.key, required this.widget});
+class AttendanceProfileWidget extends StatefulWidget {
+  const AttendanceProfileWidget({super.key, required this.section});
 
-  final OverlayCurveSection widget;
+  final OverlayCurveSection section;
+
+  @override
+  State<AttendanceProfileWidget> createState() =>
+      _AttendanceProfileWidgetState();
+}
+
+class _AttendanceProfileWidgetState extends State<AttendanceProfileWidget> {
+  late Future<List<EventAttendee>> _attendeesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _attendeesFuture = _loadAttendees();
+  }
+
+  @override
+  void didUpdateWidget(covariant AttendanceProfileWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.section.event.id != widget.section.event.id) {
+      _attendeesFuture = _loadAttendees();
+    }
+  }
+
+  Future<List<EventAttendee>> _loadAttendees() =>
+      getIt<EventStore>().loadEventAttendees(widget.section.event.id);
+
+  void _retry() {
+    setState(() => _attendeesFuture = _loadAttendees());
+  }
 
   String _roundedCount(int count) {
     if (count < 10) return '$count';
@@ -63,9 +92,8 @@ class AttendanceProfileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         border: Border.all(
           color: Theme.of(context).colorScheme.secondary.withAlpha(66),
@@ -75,14 +103,35 @@ class AttendanceProfileWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => EventAttendeesPage(event: widget.event),
+            builder: (_) => EventAttendeesPage(event: widget.section.event),
           ),
         ),
         child: FutureBuilder<List<EventAttendee>>(
-          future: getIt<EventStore>().loadEventAttendees(widget.event.id),
+          future: _attendeesFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const AttendeeSummaryShimmer();
+            }
+            if (snapshot.hasError) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      AppText.unableToLoadAttendees,
+                      style: TextStyle(
+                        color: widget.section.primaryDark,
+                        fontSize: AppSize.text14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: AppText.retry,
+                    onPressed: _retry,
+                    icon: const Icon(Icons.refresh_rounded),
+                  ),
+                ],
+              );
             }
             final attendees = snapshot.data ?? const <EventAttendee>[];
             return Row(
@@ -94,8 +143,7 @@ class AttendanceProfileWidget extends StatelessWidget {
                       ? '${attendees.length} ${AppText.attendees}'
                       : AppText.attend100Plus,
                   style: TextStyle(
-                    color: widget
-                        .primaryDark, // Used widget.primaryDark consistently
+                    color: widget.section.primaryDark,
                     fontSize: AppSize.text14,
                     fontWeight: FontWeight.w700,
                   ),
@@ -107,7 +155,7 @@ class AttendanceProfileWidget extends StatelessWidget {
                   child: Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 10,
-                    color: widget.primaryDark,
+                    color: widget.section.primaryDark,
                   ),
                 ),
               ],

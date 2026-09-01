@@ -2,6 +2,7 @@ import 'package:bdo_event/core/util/resource/app_assets.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:bdo_event/core/common/event_image/event_image_platform.dart';
+import 'package:bdo_event/core/common/event_image/event_image_url_cache.dart';
 
 class EventImage extends StatefulWidget {
   final String path;
@@ -23,15 +24,8 @@ class EventImage extends StatefulWidget {
   State<EventImage> createState() => _EventImageState();
 }
 
-class _CachedImageUrl {
-  const _CachedImageUrl(this.url, this.expiresAt);
-
-  final String url;
-  final DateTime expiresAt;
-}
-
 class _EventImageState extends State<EventImage> {
-  static final Map<String, _CachedImageUrl> _urlCache = {};
+  static final _urlCache = ExpiringImageUrlCache();
   late Future<String> _storedImageUrl;
 
   @override
@@ -53,16 +47,13 @@ class _EventImageState extends State<EventImage> {
       return Future.value(path);
     }
 
-    final cached = _urlCache[path];
-    if (cached != null && cached.expiresAt.isAfter(DateTime.now())) {
-      return Future.value(cached.url);
+    final cached = _urlCache.get(path);
+    if (cached != null) {
+      return Future.value(cached);
     }
 
     return resolveStoredImageUrl(path).then((url) {
-      _urlCache[path] = _CachedImageUrl(
-        url,
-        DateTime.now().add(const Duration(minutes: 50)),
-      );
+      _urlCache.put(path, url);
       return url;
     });
   }

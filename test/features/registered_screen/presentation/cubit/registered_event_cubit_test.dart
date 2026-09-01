@@ -5,7 +5,6 @@ import 'package:bdo_event/core/model/notification_model/notification_model.dart'
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/model/user_model/user_model.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/registered_screen/domain/repositories/registered_event_repository.dart';
@@ -13,13 +12,14 @@ import 'package:bdo_event/features/registered_screen/domain/usecases/cancel_regi
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+final testUser = User(
+  id: 'user-1',
+  displayName: 'Asha',
+  email: 'asha@example.com',
+  createdAt: DateTime.utc(2026, 8, 1),
+);
+
 void main() {
-  final user = User(
-    id: 'user-1',
-    displayName: 'Asha',
-    email: 'asha@example.com',
-    createdAt: DateTime.utc(2026, 8, 1),
-  );
   final event = Event(
     id: 'event-1',
     title: 'Town Hall',
@@ -53,7 +53,7 @@ void main() {
 
     expect(cubit.state.isLoadingToken, isFalse);
     expect(cubit.state.registrationToken, 'token-1');
-    expect(store.tokenUserId, user.id);
+    expect(store.tokenUserId, testUser.id);
     expect(store.tokenEventId, event.id);
     await cubit.close();
   });
@@ -125,12 +125,12 @@ void main() {
 RegisteredEventCubit createCubit({
   FakeEventStore? store,
   FakeRegistrationRepository? repository,
-  User? user,
+  User? authenticatedUser,
 }) => RegisteredEventCubit(
   cancelRegisteredEvent: CancelRegisteredEvent(
     repository ?? FakeRegistrationRepository(),
   ),
-  authRepository: FakeAuthRepository(user),
+  authRepository: FakeAuthRepository(authenticatedUser ?? testUser),
   eventStore: store ?? FakeEventStore(),
   reminderNotifications: null,
 );

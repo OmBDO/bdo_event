@@ -21,8 +21,9 @@ class RegistrationCodeCodec {
   }
 
   static Map<String, String>? decode(String value) {
-    if (!value.startsWith('BDO2')) return null;
-    final encoded = value.substring(4).toUpperCase();
+    final normalized = value.toUpperCase();
+    if (!normalized.startsWith('BDO2')) return null;
+    final encoded = normalized.substring(4);
     if (encoded.isEmpty) return null;
     var buffer = 0;
     var bits = 0;

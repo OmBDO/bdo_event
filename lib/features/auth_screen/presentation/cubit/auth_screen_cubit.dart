@@ -3,9 +3,8 @@ import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_st
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthScreenCubit extends Cubit<AuthScreenState> {
-  AuthScreenCubit({required AuthRepositoryContract authRepository})
-    : _authRepository = authRepository,
-      super(const AuthScreenState());
+  AuthScreenCubit({required this._authRepository})
+    : super(const AuthScreenState());
 
   final AuthRepositoryContract _authRepository;
 

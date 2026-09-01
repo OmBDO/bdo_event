@@ -9,7 +9,7 @@ import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class MainScreenShell extends StatelessWidget {
+class MainScreenShell extends StatefulWidget {
   const MainScreenShell({
     super.key,
     required this.destinations,
@@ -22,12 +22,44 @@ class MainScreenShell extends StatelessWidget {
   final VoidCallback onLogoutSelected;
 
   @override
+  State<MainScreenShell> createState() => _MainScreenShellState();
+}
+
+class _MainScreenShellState extends State<MainScreenShell> {
+  final _pages = <MainTab, Widget>{};
+
+  @override
+  void initState() {
+    super.initState();
+    AppKeyboardTracker.initialize();
+  }
+
+  @override
+  void dispose() {
+    AppKeyboardTracker.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant MainScreenShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final availableTabs = widget.destinations.map((destination) => destination.tab).toSet();
+    _pages.removeWhere((tab, page) => !availableTabs.contains(tab));
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final destinations = widget.destinations;
+    final currentTab = widget.currentTab;
     final cubit = context.read<MainScreenCubit>();
     final selectedIndex = destinations.indexWhere(
       (destination) => destination.tab == currentTab,
     );
     final currentIndex = selectedIndex < 0 ? 0 : selectedIndex;
+    if (destinations.isNotEmpty) {
+      final destination = destinations[currentIndex];
+      _pages.putIfAbsent(destination.tab, destination.createPage);
+    }
 
     return Scaffold(
       body: Container(
@@ -61,7 +93,8 @@ class MainScreenShell extends StatelessWidget {
                 child: IndexedStack(
                   index: currentIndex,
                   children: [
-                    for (final destination in destinations) destination.page,
+                    for (final destination in destinations)
+                      _pages[destination.tab] ?? const SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -73,7 +106,7 @@ class MainScreenShell extends StatelessWidget {
               child: HeaderElement(
                 currentScreenIndex: currentIndex,
                 onProfileSelected: () => cubit.selectTab(MainTab.profile),
-                onLogoutSelected: onLogoutSelected,
+                onLogoutSelected: widget.onLogoutSelected,
               ),
             ),
             Positioned(

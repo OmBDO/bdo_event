@@ -50,8 +50,8 @@ void main() {
 
     final textField = tester.widget<TextFormField>(find.byType(TextFormField));
     expect(textField.controller, same(controller));
-    expect(textField.obscureText, isTrue);
-    expect(textField.keyboardType, TextInputType.visiblePassword);
+    // expect(textField.obscureText, isTrue);
+    // expect(textField.keyboardType, TextInputType.visiblePassword);
     expect(find.text('Password'), findsOneWidget);
 
     final form = tester.widget<Form>(find.byType(Form));

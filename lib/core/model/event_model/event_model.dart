@@ -1,5 +1,11 @@
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
 
+class _UnsetValue {
+  const _UnsetValue();
+}
+
+const _unsetValue = _UnsetValue();
+
 class Event {
   final String id;
   final String title;
@@ -49,45 +55,65 @@ class Event {
     String? id,
     String? title,
     String? date,
-    String? startTime,
-    String? endTime,
+    Object? startTime = _unsetValue,
+    Object? endTime = _unsetValue,
     String? location,
-    String? locationId,
-    String? locationAddress,
-    double? latitude,
-    double? longitude,
+    Object? locationId = _unsetValue,
+    Object? locationAddress = _unsetValue,
+    Object? latitude = _unsetValue,
+    Object? longitude = _unsetValue,
     String? imageUrl,
     String? description,
     bool? isAvailable,
     int? attendeeCount,
-    int? capacity,
-    DateTime? registrationDeadline,
-    String? organizerName,
-    String? creatorId,
-    DateTime? createdAt,
-    EventCategory? catagory,
+    Object? capacity = _unsetValue,
+    Object? registrationDeadline = _unsetValue,
+    Object? organizerName = _unsetValue,
+    Object? creatorId = _unsetValue,
+    Object? createdAt = _unsetValue,
+    Object? catagory = _unsetValue,
   }) {
     return Event(
       id: id ?? this.id,
       title: title ?? this.title,
       date: date ?? this.date,
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
+        startTime: identical(startTime, _unsetValue) ? this.startTime : startTime as String?,
+        endTime: identical(endTime, _unsetValue) ? this.endTime : endTime as String?,
       location: location ?? this.location,
-      locationId: locationId ?? this.locationId,
-      locationAddress: locationAddress ?? this.locationAddress,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
+        locationId: identical(locationId, _unsetValue)
+          ? this.locationId
+          : locationId as String?,
+        locationAddress: identical(locationAddress, _unsetValue)
+          ? this.locationAddress
+          : locationAddress as String?,
+        latitude: identical(latitude, _unsetValue)
+          ? this.latitude
+          : latitude as double?,
+        longitude: identical(longitude, _unsetValue)
+          ? this.longitude
+          : longitude as double?,
       imageUrl: imageUrl ?? this.imageUrl,
       description: description ?? this.description,
       isAvailable: isAvailable ?? this.isAvailable,
       attendeeCount: attendeeCount ?? this.attendeeCount,
-      capacity: capacity ?? this.capacity,
-      registrationDeadline: registrationDeadline ?? this.registrationDeadline,
-      organizerName: organizerName ?? this.organizerName,
-      creatorId: creatorId ?? this.creatorId,
-      createdAt: createdAt ?? this.createdAt,
-      catagory: catagory ?? this.catagory,
+        capacity: identical(capacity, _unsetValue)
+          ? this.capacity
+          : capacity as int?,
+        registrationDeadline: identical(registrationDeadline, _unsetValue)
+          ? this.registrationDeadline
+          : registrationDeadline as DateTime?,
+        organizerName: identical(organizerName, _unsetValue)
+          ? this.organizerName
+          : organizerName as String?,
+        creatorId: identical(creatorId, _unsetValue)
+          ? this.creatorId
+          : creatorId as String?,
+        createdAt: identical(createdAt, _unsetValue)
+          ? this.createdAt
+          : createdAt as DateTime?,
+        catagory: identical(catagory, _unsetValue)
+          ? this.catagory
+          : catagory as EventCategory?,
     );
   }
 

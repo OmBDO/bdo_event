@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 class RegisteredEventState extends Equatable {
+  static const _unchanged = Object();
+
   const RegisteredEventState({
     this.isCancelling = false,
     this.isLoadingToken = false,
@@ -16,14 +18,16 @@ class RegisteredEventState extends Equatable {
   RegisteredEventState copyWith({
     bool? isCancelling,
     bool? isLoadingToken,
-    String? registrationToken,
+    Object? registrationToken = _unchanged,
     String? error,
     bool clearError = false,
   }) {
     return RegisteredEventState(
       isCancelling: isCancelling ?? this.isCancelling,
       isLoadingToken: isLoadingToken ?? this.isLoadingToken,
-      registrationToken: registrationToken ?? this.registrationToken,
+      registrationToken: identical(registrationToken, _unchanged)
+          ? this.registrationToken
+          : registrationToken as String?,
       error: clearError ? null : error ?? this.error,
     );
   }

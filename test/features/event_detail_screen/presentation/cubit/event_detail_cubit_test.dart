@@ -161,8 +161,8 @@ class FakeRegistrationRepository implements RegistrationRepositoryContract {
   });
 
   bool registered;
-  final String? error;
-  final Future<String?>? pendingResult;
+  Future<String?>? pendingResult;
+  String? error;
   int registerCalls = 0;
   int cancelCalls = 0;
 
@@ -172,8 +172,13 @@ class FakeRegistrationRepository implements RegistrationRepositoryContract {
   @override
   Future<String?> registerEvent(Event event) async {
     registerCalls++;
-    final result = pendingResult ?? error;
-    if (result == null) registered = true;
+
+    final result = await pendingResult ?? error;
+
+    if (result == null) {
+      registered = true;
+    }
+
     return result;
   }
 

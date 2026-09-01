@@ -9,8 +9,11 @@ import 'package:bdo_event/features/event_screen/domain/repositories/event_reposi
 import 'package:bdo_event/features/event_screen/domain/usecases/event_use_cases.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_state.dart';
+import 'package:bdo_event/core/prefs/recent_event_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'dart:async';
 
 void main() {
   final pastEvent = event('past', '01/01/2020');
@@ -49,6 +52,32 @@ void main() {
   });
 
   test(
+    'forced loads keep the latest response when they finish out of order',
+    () async {
+      final firstResult = Completer<List<Event>>();
+      final secondResult = Completer<List<Event>>();
+      var loadNumber = 0;
+      final repository = FakeEventRepository(
+        loadEventsOverride: () {
+          loadNumber++;
+          return loadNumber == 1 ? firstResult.future : secondResult.future;
+        },
+      );
+      final cubit = createCubit(repository: repository);
+
+      final firstLoad = cubit.load(force: true);
+      final secondLoad = cubit.load(force: true);
+      secondResult.complete([pastEvent]);
+      await secondLoad;
+      firstResult.complete([futureEvent]);
+      await firstLoad;
+
+      expect(cubit.state.events, [pastEvent]);
+      await cubit.close();
+    },
+  );
+
+  test(
     'currentTabEvents separates upcoming, registered, and past events',
     () async {
       final state = EventScreenState(
@@ -56,11 +85,31 @@ void main() {
         registeredEventIds: {'future'},
       );
 
-      expect(state.currentTabEvents, [futureEvent]);
+      expect(state.currentTabEvents, isEmpty);
       expect(state.copyWith(selectedTab: 1).currentTabEvents, [futureEvent]);
       expect(state.copyWith(selectedTab: 2).currentTabEvents, [pastEvent]);
     },
   );
+
+  test('currentTabEvents moves an event to past after its end time', () {
+    final now = DateTime.now();
+    final today = '${now.day}/${now.month}/${now.year}';
+    final state = EventScreenState(
+      events: [
+        Event(
+          id: 'ended-today',
+          title: 'Ended today',
+          date: today,
+          endTime: '00:00',
+          location: 'Pune',
+          imageUrl: '',
+        ),
+      ],
+    );
+
+    expect(state.currentTabEvents, isEmpty);
+    expect(state.copyWith(selectedTab: 2).currentTabEvents, hasLength(1));
+  });
 
   test('delete rolls back the event when the repository fails', () async {
     final repository = FakeEventRepository(
@@ -126,7 +175,10 @@ void main() {
   test('toggleSavedEvent persists add and remove operations', () async {
     SharedPreferences.setMockInitialValues({});
     final preferences = await SharedPreferences.getInstance();
-    final cubit = createCubit(preferences: preferences, repository: null);
+    final cubit = createCubit(
+      preferences: preferences,
+      repository: FakeEventRepository(),
+    );
 
     cubit.toggleSavedEvent(futureEvent);
     expect(cubit.state.savedEventIds, {'future'});
@@ -147,6 +199,7 @@ EventScreenCubit createCubit({
   List<Event> registeredEvents = const [],
   SharedPreferences? preferences,
   AuthRepositoryContract? authRepository,
+  RecentEventStore? recentEventStore,
 }) => EventScreenCubit(
   loadEvents: LoadEvents(repository),
   loadRegisteredEvents: LoadRegisteredEvents(
@@ -157,6 +210,7 @@ EventScreenCubit createCubit({
   deleteEvent: DeleteEvent(repository),
   authRepository: authRepository ?? FakeAuthRepository(testUser),
   preferences: preferences,
+  recentEventStore: recentEventStore,
 );
 
 class FakeEventRepository implements EventRepositoryContract {
@@ -164,11 +218,13 @@ class FakeEventRepository implements EventRepositoryContract {
     this.events = const [],
     this.deleteResult,
     this.saveResult,
+    this.loadEventsOverride,
   });
 
   final List<Event> events;
   final EventOperationResult? deleteResult;
   final EventOperationResult? saveResult;
+  final Future<List<Event>> Function()? loadEventsOverride;
   int loadCalls = 0;
   int createCalls = 0;
   int updateCalls = 0;
@@ -176,6 +232,7 @@ class FakeEventRepository implements EventRepositoryContract {
   @override
   Future<List<Event>> loadEvents() async {
     loadCalls++;
+    if (loadEventsOverride != null) return loadEventsOverride!();
     return events;
   }
 

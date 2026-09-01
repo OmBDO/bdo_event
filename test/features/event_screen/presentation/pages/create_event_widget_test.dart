@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
+import 'package:bdo_event/core/model/event_model/event_catagory.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../cubit/event_screen_cubit_test.dart' as fixtures;
+import '../../../../shared/fixtures/location_search_adapter.dart';
 
 void main() {
   testWidgets('shows required validation errors for an empty event form', (
@@ -19,7 +20,9 @@ void main() {
     );
     await pumpPage(tester, cubit, const CreateEventPage());
 
-    await tester.tap(find.widgetWithText(AppButton, AppText.createEvent));
+    final createButton = find.widgetWithText(AppButton, AppText.createEvent);
+    await tester.ensureVisible(createButton);
+    await tester.tap(createButton);
     await tester.pump();
 
     expect(find.text(AppText.enterEventTitle), findsOneWidget);
@@ -76,9 +79,14 @@ void main() {
     );
     await pumpPage(tester, cubit, CreateEventPage(event: _validEvent()));
 
-    final timeFields = find.byType(TextFormField);
-    await tester.enterText(timeFields.at(3), '09:00');
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final endTimeField = tester.widget<TextFormField>(
+      find.byType(TextFormField).at(3),
+    );
+    endTimeField.controller!.text = '09:00';
+    await tester.pump();
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pump();
 
     expect(find.text('End time must be after start time'), findsOneWidget);
@@ -94,7 +102,9 @@ void main() {
     await tester.tap(find.byType(Switch).first);
     await tester.pump();
     await tester.enterText(find.byType(TextFormField).at(4), '0');
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pump();
 
     expect(find.text('Enter a positive number'), findsOneWidget);
@@ -119,7 +129,9 @@ void main() {
       ),
     );
 
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pump();
 
     expect(find.text('Deadline must be in the future'), findsOneWidget);
@@ -131,11 +143,48 @@ void main() {
     final cubit = fixtures.createCubit(repository: repository);
     await pumpPage(tester, cubit, CreateEventPage(event: _validEvent()));
 
-    await tester.tap(find.widgetWithText(AppButton, AppText.updateEvent));
+    final updateButton = find.widgetWithText(AppButton, AppText.updateEvent);
+    await tester.ensureVisible(updateButton);
+    await tester.tap(updateButton);
     await tester.pumpAndSettle();
 
     expect(repository.updateCalls, 1);
     expect(find.byType(CreateEventPage), findsNothing);
+    await cubit.close();
+  });
+
+  testWidgets('searches location through the injected adapter', (tester) async {
+    final cubit = fixtures.createCubit(
+      repository: fixtures.FakeEventRepository(),
+    );
+    final locationSearch = RecordingLocationSearchAdapter();
+    await pumpPage(
+      tester,
+      cubit,
+      CreateEventPage(
+        event: _validEvent(),
+        locationSearchAdapter: locationSearch,
+      ),
+    );
+
+    final searchField = find.byWidgetPredicate(
+      (widget) =>
+          widget is TextField &&
+          widget.decoration?.hintText == AppText.searchAddressOrPlace,
+    );
+    await tester.enterText(searchField, 'Pune station');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await tester.pump();
+
+    expect(locationSearch.query, 'Pune station');
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is DropdownButtonFormField &&
+            widget.initialValue == null,
+      ),
+      findsAtLeastNWidgets(1),
+    );
     await cubit.close();
   });
 }

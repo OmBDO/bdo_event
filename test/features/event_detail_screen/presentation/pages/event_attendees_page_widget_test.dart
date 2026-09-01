@@ -1,13 +1,16 @@
 import 'package:bdo_event/core/di/app_dependencies.dart';
+import 'package:bdo_event/core/common/clipboard_share.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../notification_screen/presentation/pages/notification_screen_widget_test.dart'
+import '../../../../shared/fixtures/fake_notification_event_store.dart'
     as fixtures;
+import '../../../../shared/fixtures/clipboard_share_adapters.dart';
 
 void main() {
   tearDown(() async {
@@ -40,6 +43,7 @@ void main() {
   });
 
   testWidgets('renders attendees and confirms CSV copy', (tester) async {
+    final clipboard = RecordingClipboardAdapter();
     final attendees = [
       const EventAttendee(userId: 'user-1', displayName: 'Asha'),
       const EventAttendee(userId: 'user-2', displayName: ''),
@@ -47,6 +51,7 @@ void main() {
     await pumpAttendeesPage(
       tester,
       fixtures.FakeNotificationEventStore(attendees: attendees),
+      clipboard: clipboard,
     );
 
     expect(find.text('Asha'), findsOneWidget);
@@ -58,13 +63,74 @@ void main() {
     await tester.pump();
 
     expect(find.text('Attendee CSV copied'), findsOneWidget);
+    expect(clipboard.text, contains('Asha'));
+    expect(clipboard.text, contains('Town Hall'));
+  });
+
+  testWidgets('shares attendee CSV through the share adapter', (tester) async {
+    final sharing = RecordingShareAdapter();
+    final attendees = [
+      const EventAttendee(userId: 'user-1', displayName: 'Asha'),
+    ];
+    await pumpAttendeesPage(
+      tester,
+      fixtures.FakeNotificationEventStore(attendees: attendees),
+      share: sharing,
+    );
+
+    await tester.tap(find.text(AppText.shareCsv));
+    await tester.pump();
+
+    expect(sharing.params?.text, AppText.attendeeListFor('Town Hall'));
+  });
+
+  testWidgets('contains attendee clipboard failures without confirmation', (
+    tester,
+  ) async {
+    final clipboard = RecordingClipboardAdapter(
+      error: StateError('clipboard unavailable'),
+    );
+    await pumpAttendeesPage(
+      tester,
+      fixtures.FakeNotificationEventStore(
+        attendees: const [EventAttendee(userId: 'user-1', displayName: 'Asha')],
+      ),
+      clipboard: clipboard,
+    );
+
+    await tester.tap(find.byTooltip(AppText.copyAttendeeListAsCsv));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppText.attendeeCsvCopied), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains attendee share failures', (tester) async {
+    final sharing = RecordingShareAdapter(
+      error: StateError('sharing unavailable'),
+    );
+    await pumpAttendeesPage(
+      tester,
+      fixtures.FakeNotificationEventStore(
+        attendees: const [EventAttendee(userId: 'user-1', displayName: 'Asha')],
+      ),
+      share: sharing,
+    );
+
+    await tester.tap(find.text(AppText.shareCsv));
+    await tester.pumpAndSettle();
+
+    expect(sharing.params, isNull);
+    expect(tester.takeException(), isNull);
   });
 }
 
 Future<void> pumpAttendeesPage(
   WidgetTester tester,
-  fixtures.FakeNotificationEventStore store,
-) async {
+  fixtures.FakeNotificationEventStore store, {
+  ClipboardAdapter? clipboard,
+  ShareAdapter? share,
+}) async {
   getIt.registerSingleton<EventStore>(store);
   await tester.pumpWidget(
     MaterialApp(
@@ -76,6 +142,8 @@ Future<void> pumpAttendeesPage(
           location: 'Pune',
           imageUrl: '',
         ),
+        clipboardAdapter: clipboard,
+        shareAdapter: share,
       ),
     ),
   );

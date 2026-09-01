@@ -16,6 +16,11 @@ void main() {
     await pumpCategories(tester, cubit);
 
     for (final category in EventCategory.defaults) {
+      await tester.scrollUntilVisible(
+        find.text(category.name),
+        200,
+        scrollable: find.byType(Scrollable),
+      );
       expect(find.text(category.name), findsOneWidget);
     }
     await cubit.close();
@@ -32,7 +37,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(CreateEventPage), findsOneWidget);
-    expect(find.text('Create your event'), findsOneWidget);
+    expect(find.text('Bring people together'), findsOneWidget);
     await cubit.close();
   });
 }

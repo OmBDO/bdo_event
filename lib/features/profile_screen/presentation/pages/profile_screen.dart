@@ -15,12 +15,22 @@ import 'package:bdo_event/features/profile_screen/presentation/sections/support_
 import 'package:bdo_event/features/profile_screen/presentation/sections/watcher_settings_section.dart';
 import 'package:bdo_event/features/profile_screen/presentation/pages/profile_details_page.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
+import 'package:bdo_event/core/common/profile_image/profile_image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({
+    super.key,
+    this.imagePicker,
+    this.storeImage,
+    this.deleteImage,
+  });
+
+  final ProfileImagePicker? imagePicker;
+  final StoreProfileImage? storeImage;
+  final DeleteProfileImage? deleteImage;
 
   @override
   Widget build(BuildContext context) =>
@@ -46,7 +56,12 @@ class ProfileScreen extends StatelessWidget {
                   ProfileAccountSection(
                     onEditProfile: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => ProfileDetailsPage(user: user),
+                        builder: (_) => ProfileDetailsPage(
+                          user: user,
+                          imagePicker: imagePicker,
+                          storeImage: storeImage,
+                          deleteImage: deleteImage,
+                        ),
                       ),
                     ),
                     onChangePassword: () => _showChangePasswordDialog(context),

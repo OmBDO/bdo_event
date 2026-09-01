@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../notification_screen/presentation/pages/notification_screen_widget_test.dart'
+import '../../../../shared/fixtures/fake_notification_event_store.dart'
     as notification_fixtures;
 import '../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dart'
     as profile_fixtures;
@@ -24,7 +24,17 @@ void main() {
     );
 
     expect(find.text('Event analysis'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Capacity trajectory'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Capacity trajectory'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Attendance mix'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Attendance mix'), findsOneWidget);
     expect(find.text('6'), findsAtLeastNWidgets(1));
   });

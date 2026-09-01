@@ -30,18 +30,20 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   final SharedPreferences? _preferences;
   final RecentEventStore? _recentEventStore;
   static const _savedEventIdsKey = 'saved_event_ids';
+  int _loadGeneration = 0;
 
   Future<void> load({bool force = false}) async {
     if (isClosed) return;
     if (!force && (state.hasLoaded || state.isLoading)) return;
+    final loadGeneration = ++_loadGeneration;
+    final userId = _authRepository.currentUser?.id;
     emit(state.copyWith(isLoading: true, clearError: true));
     try {
       final events = await _loadEvents();
-      final userId = _authRepository.currentUser?.id;
       final registeredEvents = userId == null || _loadRegisteredEvents == null
           ? const <Event>[]
           : await _loadRegisteredEvents(userId);
-      if (!isClosed) {
+      if (!isClosed && loadGeneration == _loadGeneration) {
         emit(
           state.copyWith(
             events: events,
@@ -59,7 +61,7 @@ class EventScreenCubit extends Cubit<EventScreenState> {
         );
       }
     } on Object {
-      if (!isClosed) {
+      if (!isClosed && loadGeneration == _loadGeneration) {
         emit(
           state.copyWith(isLoading: false, error: AppText.unableToLoadEvents),
         );
@@ -165,6 +167,7 @@ class EventScreenCubit extends Cubit<EventScreenState> {
   }
 
   void clearState() {
+    _loadGeneration++;
     emit(const EventScreenState());
   }
 }

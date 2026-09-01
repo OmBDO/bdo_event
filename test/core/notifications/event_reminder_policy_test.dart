@@ -27,13 +27,22 @@ void main() {
       );
     });
 
+    test('accepts a slash-formatted date produced by event creation', () {
+      expect(
+        EventReminderPolicy.eventStartTime(
+          baseEvent.copyWith(date: '01/09/2026'),
+        ),
+        DateTime(2026, 9, 1, 9, 30),
+      );
+    });
+
     test('returns null for incomplete or invalid scheduling data', () {
       expect(EventReminderPolicy.eventStartTime(baseEvent.copyWith(startTime: '')), isNull);
       expect(EventReminderPolicy.eventStartTime(baseEvent.copyWith(startTime: '9')), isNull);
       expect(EventReminderPolicy.eventStartTime(baseEvent.copyWith(startTime: '24:00')), isNull);
       expect(EventReminderPolicy.eventStartTime(baseEvent.copyWith(startTime: '09:60')), isNull);
       expect(
-        EventReminderPolicy.eventStartTime(baseEvent.copyWith(date: '01/09/2026')),
+        EventReminderPolicy.eventStartTime(baseEvent.copyWith(date: '31/02/2026')),
         isNull,
       );
     });

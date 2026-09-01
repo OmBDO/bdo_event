@@ -1,0 +1,103 @@
+name: Flutter P1 Integration
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  integration-p1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start disposable Supabase
+        run: supabase start > "$RUNNER_TEMP/supabase-start.log" 2>&1
+
+      - name: Apply migrations
+        run: supabase db reset --local > "$RUNNER_TEMP/supabase-reset.log" 2>&1
+
+      - name: Lint local database
+        run: supabase db lint --local --fail-on error
+
+      - name: Verify latest migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest_file="$(
+            find supabase/migrations -maxdepth 1 -type f -name '*.sql' \
+              -printf '%f\n' | sort | tail -n 1
+          )"
+          latest_version="${latest_file%%_*}"
+          test -n "$latest_version"
+          db_container="$(
+            docker ps --filter 'name=supabase_db_' \
+              --format '{{.Names}}' | head -n 1
+          )"
+          test -n "$db_container"
+          applied_version="$(
+            docker exec "$db_container" psql -U postgres -d postgres -Atc \
+              "select version from supabase_migrations.schema_migrations \
+               where version = '$latest_version';"
+          )"
+          test "$applied_version" = "$latest_version"
+
+      - name: Export local test environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          status_env="$RUNNER_TEMP/supabase-env"
+          supabase status -o env > "$status_env"
+          source "$status_env"
+          {
+            printf 'SUPABASE_URL=%s\n' "$API_URL"
+            printf 'SUPABASE_ANON_KEY=%s\n' "$ANON_KEY"
+            printf 'SUPABASE_SERVICE_ROLE_KEY=%s\n' "$SERVICE_ROLE_KEY"
+            printf 'SUPABASE_TEST_PROJECT=local\n'
+          } >> "$GITHUB_ENV"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run P1 integration journeys
+        run: |
+          root=test/integration_test
+          event_pages=$root/features/event_screen/presentation/pages
+          notification_pages=$root/features/notification_screen/presentation
+          profile_pages=$root/features/profile_screen/presentation/pages
+          auth_pages=$root/features/auth_screen/presentation/pages
+          main_pages=$root/features/main_screen/presentation/pages
+          flutter test \
+            "$root/shared" \
+            "$root/core/deep_link/event_deep_link_journey_test.dart" \
+            "$notification_pages/pages/notification_arrival_journey_test.dart" \
+            "$event_pages/event_analytics_journey_test.dart" \
+            "$event_pages/event_lifecycle_journey_test.dart" \
+            "$event_pages/event_creation_journey_test.dart" \
+            "$profile_pages/profile_persistence_journey_test.dart" \
+            "$profile_pages/profile_image_journey_test.dart" \
+            "$auth_pages/role_navigation_journey_test.dart" \
+            "$main_pages/logout_everywhere_journey_test.dart"
+
+      - name: Stop disposable Supabase
+        if: always()
+        run: supabase stop
+
+      - name: Upload Supabase logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-p1-integration-logs
+          path: ${{ runner.temp }}/supabase-*.log

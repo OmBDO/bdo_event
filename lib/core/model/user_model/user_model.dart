@@ -1,5 +1,11 @@
 import 'package:bdo_event/core/util/resource/app_locals.dart';
 
+class _UnsetValue {
+  const _UnsetValue();
+}
+
+const _unsetValue = _UnsetValue();
+
 /// A stable application identity, independent of the authentication provider.
 ///
 /// Authentication secrets deliberately do not belong in this model. A future
@@ -89,26 +95,32 @@ class User {
     String? displayName,
     String? email,
     Set<UserRole>? roles,
-    String? photoUrl,
-    String? phoneNumber,
-    String? bio,
+    Object? photoUrl = _unsetValue,
+    Object? phoneNumber = _unsetValue,
+    Object? bio = _unsetValue,
     String? locale,
     bool? notificationsEnabled,
-    DateTime? updatedAt,
-    DateTime? lastSignedInAt,
+    Object? updatedAt = _unsetValue,
+    Object? lastSignedInAt = _unsetValue,
   }) => User(
     id: id,
     displayName: displayName ?? this.displayName,
     email: email ?? this.email,
     roles: roles ?? this.roles,
-    photoUrl: photoUrl ?? this.photoUrl,
-    phoneNumber: phoneNumber ?? this.phoneNumber,
-    bio: bio ?? this.bio,
+    photoUrl: identical(photoUrl, _unsetValue) ? this.photoUrl : photoUrl as String?,
+    phoneNumber: identical(phoneNumber, _unsetValue)
+      ? this.phoneNumber
+      : phoneNumber as String?,
+    bio: identical(bio, _unsetValue) ? this.bio : bio as String?,
     locale: locale ?? this.locale,
     notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     createdAt: createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-    lastSignedInAt: lastSignedInAt ?? this.lastSignedInAt,
+    updatedAt: identical(updatedAt, _unsetValue)
+      ? this.updatedAt
+      : updatedAt as DateTime?,
+    lastSignedInAt: identical(lastSignedInAt, _unsetValue)
+      ? this.lastSignedInAt
+      : lastSignedInAt as DateTime?,
   );
 
   factory User.fromJson(Map<String, dynamic> json) => User(

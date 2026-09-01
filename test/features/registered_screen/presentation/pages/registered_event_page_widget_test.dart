@@ -1,12 +1,9 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/common/clipboard_share.dart';
 import 'package:bdo_event/core/util/registration_code_codec.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
-import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/cubit/registered_event_cubit.dart';
 import 'package:bdo_event/features/registered_screen/presentation/pages/registered_event_page.dart';
-import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_cubit.dart';
-import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,6 +16,7 @@ import '../../../event_screen/presentation/cubit/event_screen_cubit_test.dart'
 import '../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dart'
     as profile_fixtures;
 import '../cubit/registered_event_cubit_test.dart' as registered_fixtures;
+import '../../../../shared/fixtures/clipboard_share_adapters.dart';
 
 void main() {
   testWidgets('shows the preparing ticket while token is unavailable', (
@@ -67,15 +65,39 @@ void main() {
   testWidgets('copies the manual registration code and shows confirmation', (
     tester,
   ) async {
+    final clipboard = RecordingClipboardAdapter();
     final cubit = registered_fixtures.createCubit(
       store: registered_fixtures.FakeEventStore(token: 'token-1'),
     );
-    await pumpPage(tester, cubit);
+    await pumpPage(tester, cubit, clipboard: clipboard);
 
     await tester.tap(find.byTooltip(AppText.copyRegistrationCode));
     await tester.pump();
 
     expect(find.text(AppText.registrationCodeCopied), findsOneWidget);
+    expect(
+      clipboard.text,
+      RegistrationCodeCodec.encode(eventId: 'event-1', token: 'token-1'),
+    );
+    await cubit.close();
+  });
+
+  testWidgets('contains ticket clipboard failures without confirmation', (
+    tester,
+  ) async {
+    final clipboard = RecordingClipboardAdapter(
+      error: StateError('clipboard unavailable'),
+    );
+    final cubit = registered_fixtures.createCubit(
+      store: registered_fixtures.FakeEventStore(token: 'token-1'),
+    );
+    await pumpPage(tester, cubit, clipboard: clipboard);
+
+    await tester.tap(find.byTooltip(AppText.copyRegistrationCode));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppText.registrationCodeCopied), findsNothing);
+    expect(tester.takeException(), isNull);
     await cubit.close();
   });
 
@@ -153,8 +175,9 @@ final ticketEvent = Event(
 
 Future<void> pumpPage(
   WidgetTester tester,
-  RegisteredEventCubit registeredCubit,
-) async {
+  RegisteredEventCubit registeredCubit, {
+  ClipboardAdapter? clipboard,
+}) async {
   final profileCubit = profile_fixtures.createCubit();
   await tester.pumpWidget(
     MaterialApp(
@@ -163,7 +186,10 @@ Future<void> pumpPage(
           BlocProvider.value(value: registeredCubit),
           BlocProvider.value(value: profileCubit),
         ],
-        child: RegisteredEventPage(event: ticketEvent),
+        child: RegisteredEventPage(
+          event: ticketEvent,
+          clipboardAdapter: clipboard,
+        ),
       ),
     ),
   );

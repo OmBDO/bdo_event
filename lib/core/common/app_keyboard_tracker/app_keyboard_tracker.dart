@@ -8,17 +8,26 @@ class AppKeyboardTracker with WidgetsBindingObserver {
   );
 
   static final AppKeyboardTracker _instance = AppKeyboardTracker._internal();
+  static bool _isInitialized = false;
   factory AppKeyboardTracker() => _instance;
   AppKeyboardTracker._internal();
 
+  @visibleForTesting
+  static bool get isInitialized => _isInitialized;
+
   /// Starts listening to global system viewport modifications
   static void initialize() {
+    if (_isInitialized) return;
     WidgetsBinding.instance.addObserver(_instance);
+    _isInitialized = true;
   }
 
   /// Clears observer linkage channels safely
   static void dispose() {
+    if (!_isInitialized) return;
     WidgetsBinding.instance.removeObserver(_instance);
+    _isInitialized = false;
+    isKeyboardVisible.value = false;
   }
 
   @override

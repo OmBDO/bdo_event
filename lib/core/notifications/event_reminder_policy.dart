@@ -1,10 +1,11 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/event_schedule.dart';
 
 class EventReminderPolicy {
   static const leadTimeOptions = <int>[60, 1440, 10080];
 
   static DateTime? eventStartTime(Event event) {
-    final date = DateTime.tryParse(event.date);
+    final date = EventSchedule.eventDate(event);
     final time = event.startTime;
     if (date == null || time == null) return null;
 

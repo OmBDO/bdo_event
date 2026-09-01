@@ -10,11 +10,19 @@ import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/prefs/recent_event_store.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
+import 'package:bdo_event/core/common/clipboard_share.dart';
 
 class EventDetailPage extends StatefulWidget {
   final Event event;
+  final ClipboardAdapter? clipboardAdapter;
+  final ShareAdapter? shareAdapter;
 
-  const EventDetailPage({super.key, required this.event});
+  const EventDetailPage({
+    super.key,
+    required this.event,
+    this.clipboardAdapter,
+    this.shareAdapter,
+  });
 
   @override
   State<EventDetailPage> createState() => _EventDetailPageState();
@@ -52,7 +60,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
             child: BackgroundDecoration(widget: widget),
           ),
 
-          EventDetailHeader(event: widget.event),
+          EventDetailHeader(
+            event: widget.event,
+            clipboardAdapter: widget.clipboardAdapter,
+            shareAdapter: widget.shareAdapter,
+          ),
 
           // 2. Main Overlapping Rounded Bottom Content Sheet
           Positioned(

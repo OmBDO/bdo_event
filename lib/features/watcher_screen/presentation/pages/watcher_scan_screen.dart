@@ -6,10 +6,7 @@ import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:gap/gap.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:flutter/services.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_state.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scan_history_sheet.dart';
@@ -19,17 +16,26 @@ import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_ta
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
 
+import '../adapters.dart';
+
 class WatcherScanScreen extends StatefulWidget {
-  const WatcherScanScreen({super.key});
+  const WatcherScanScreen({super.key, this.scanner, this.voice, this.feedback});
+
+  final WatcherScannerAdapter? scanner;
+  final WatcherVoiceAdapter? voice;
+  final WatcherFeedbackAdapter? feedback;
 
   @override
   State<WatcherScanScreen> createState() => _WatcherScanScreenState();
 }
 
 class _WatcherScanScreenState extends State<WatcherScanScreen> {
-  final _controller = MobileScannerController();
+  late final WatcherScannerAdapter _scanner =
+      widget.scanner ?? MobileScannerAdapter();
+  late final WatcherVoiceAdapter _voice = widget.voice ?? FlutterTtsAdapter();
+  late final WatcherFeedbackAdapter _feedback =
+      widget.feedback ?? const SystemWatcherFeedbackAdapter();
   final _manualEntryController = TextEditingController();
-  final _speech = FlutterTts();
   Timer? _scanCooldown;
   bool _torchEnabled = false;
 
@@ -40,28 +46,44 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
   }
 
   Future<void> _configureSpeech() async {
-    await _speech.setLanguage(AppLocales.englishIndia);
-    await _speech.setSpeechRate(0.5);
-    await _speech.setVolume(
-      // ignore: use_build_context_synchronously
-      context.read<ProfileScreenCubit>().state.watcherSoundVolume,
-    );
-    await _speech.setPitch(1.0);
+    try {
+      await _voice.configure(
+        language: AppLocales.englishIndia,
+        volume: context.read<ProfileScreenCubit>().state.watcherSoundVolume,
+      );
+    } on Object {
+      return;
+    }
   }
 
   Future<void> _announce(String message) async {
     if (context.read<ProfileScreenCubit>().state.isWatcherVoiceMuted) return;
-    await _speech.stop();
-    await _speech.speak(message);
+    try {
+      await _voice.stop();
+      await _voice.speak(message);
+    } on Object {
+      return;
+    }
   }
 
   @override
   void dispose() {
     _scanCooldown?.cancel();
-    _controller.dispose();
     _manualEntryController.dispose();
-    _speech.stop();
+    try {
+      _scanner.dispose();
+      // ignore: empty_catches
+    } on Object {}
+    unawaited(_disposeVoice());
     super.dispose();
+  }
+
+  Future<void> _disposeVoice() async {
+    try {
+      await _voice.dispose();
+    } on Object {
+      return;
+    }
   }
 
   @override
@@ -70,7 +92,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
       listenWhen: (previous, current) =>
           previous.watcherSoundVolume != current.watcherSoundVolume,
       listener: (context, state) {
-        _speech.setVolume(state.watcherSoundVolume);
+        unawaited(_setVoiceVolume(state.watcherSoundVolume));
       },
       child: BlocListener<WatcherScanCubit, WatcherScanState>(
         listenWhen: (previous, current) =>
@@ -84,7 +106,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                 .read<ProfileScreenCubit>()
                 .state
                 .isWatcherVibrationEnabled) {
-              HapticFeedback.mediumImpact();
+              unawaited(_provideFeedback());
             }
           }
           if (state.message != null) {
@@ -144,11 +166,8 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        MobileScanner(
-                          controller: _controller,
-                          onDetect: (capture) {
-                            final value =
-                                capture.barcodes.firstOrNull?.rawValue;
+                        _scanner.buildView(
+                          onDetected: (value) {
                             if (value != null &&
                                 state.status == WatcherScanStatus.idle &&
                                 _scanCooldown == null) {
@@ -171,20 +190,13 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
                                 icon: _torchEnabled
                                     ? Icons.flash_on
                                     : Icons.flash_off,
-                                onPressed: () async {
-                                  await _controller.toggleTorch();
-                                  if (mounted) {
-                                    setState(
-                                      () => _torchEnabled = !_torchEnabled,
-                                    );
-                                  }
-                                },
+                                onPressed: _toggleTorch,
                               ),
                               const Gap(AppSpace.space12),
                               ScannerIconButton(
                                 tooltip: AppText.switchCamera,
                                 icon: Icons.cameraswitch_outlined,
-                                onPressed: _controller.switchCamera,
+                                onPressed: _switchCamera,
                               ),
                             ],
                           ),
@@ -321,5 +333,40 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
     if (value.isEmpty) return;
     FocusManager.instance.primaryFocus?.unfocus();
     context.read<WatcherScanCubit>().validate(value);
+  }
+
+  Future<void> _setVoiceVolume(double volume) async {
+    try {
+      await _voice.setVolume(volume);
+    } on Object {
+      return;
+    }
+  }
+
+  Future<void> _provideFeedback() async {
+    try {
+      await _feedback.mediumImpact();
+    } on Object {
+      return;
+    }
+  }
+
+  Future<void> _toggleTorch() async {
+    try {
+      await _scanner.toggleTorch();
+      if (mounted) {
+        setState(() => _torchEnabled = !_torchEnabled);
+      }
+    } on Object {
+      return;
+    }
+  }
+
+  void _switchCamera() {
+    try {
+      _scanner.switchCamera();
+    } on Object {
+      return;
+    }
   }
 }

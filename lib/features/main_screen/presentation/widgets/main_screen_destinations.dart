@@ -15,20 +15,20 @@ List<MainScreenDestination> mainScreenDestinations({
     tab: MainTab.events,
     label: AppText.event,
     icon: Icons.calendar_month,
-    page: EventPage(),
+    pageBuilder: () => const EventPage(),
   ),
   MainScreenDestination(
     tab: MainTab.registrations,
     label: AppText.register,
     icon: Icons.app_registration_rounded,
-    page: CalendarScreen(),
+    pageBuilder: () => const CalendarScreen(),
   ),
   if (canCreateEvents)
     MainScreenDestination(
       tab: MainTab.createEvent,
       label: AppText.create,
       icon: Icons.add_circle_outline_rounded,
-      page: MyEventScreen(),
+      pageBuilder: () => const MyEventScreen(),
     ),
   // if (canScan)
   //   const MainScreenDestination(
@@ -41,6 +41,6 @@ List<MainScreenDestination> mainScreenDestinations({
     tab: MainTab.profile,
     label: AppText.profile,
     icon: Icons.account_box,
-    page: ProfileScreen(),
+    pageBuilder: () => const ProfileScreen(),
   ),
 ];

@@ -1,15 +1,19 @@
-import 'package:local_auth/local_auth.dart';
+import 'biometric_adapter.dart';
 
 class BiometricLockService {
-  BiometricLockService([LocalAuthentication? authentication])
-    : _authentication = authentication ?? LocalAuthentication();
+  factory BiometricLockService({BiometricAdapter? adapter}) {
+    return BiometricLockService._(
+      adapter ?? LocalAuthBiometricAdapter(),
+    );
+  }
 
-  final LocalAuthentication _authentication;
+  BiometricLockService._(this._adapter);
+
+  final BiometricAdapter _adapter;
 
   Future<bool> isAvailable() async {
     try {
-      return await _authentication.isDeviceSupported() &&
-          await _authentication.canCheckBiometrics;
+      return await _adapter.isAvailable();
     } on Object {
       return false;
     }
@@ -18,13 +22,8 @@ class BiometricLockService {
   Future<bool> unlock() async {
     if (!await isAvailable()) return false;
     try {
-      return await _authentication.authenticate(
+      return await _adapter.authenticate(
         localizedReason: 'Authenticate to open your event account',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-          useErrorDialogs: true,
-        ),
       );
     } on Object {
       return false;
