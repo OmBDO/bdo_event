@@ -10,15 +10,17 @@ class IntegrationAppHarness {
   });
 
   final Widget home;
-  final List<BlocProvider> providers;
+  final List<BlocProvider<dynamic>> providers;
   final ThemeData? theme;
   final ThemeData? darkTheme;
 
   Widget build() {
-    return MaterialApp(
-      home: MultiBlocProvider(providers: providers, child: home),
-      theme: theme,
-      darkTheme: darkTheme,
-    );
+    final app = MaterialApp(home: home, theme: theme, darkTheme: darkTheme);
+
+    if (providers.isEmpty) {
+      return app;
+    }
+
+    return MultiBlocProvider(providers: providers, child: app);
   }
 }
