@@ -1,0 +1,13 @@
+.git
+.github
+.dart_tool
+.pub-cache
+build
+coverage
+.env
+*.iml
+.idea
+.vscode
+ios/Pods
+android/.gradle
+android/local.properties
