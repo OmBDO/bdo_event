@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create environment asset
+        run: cp .env.example .env
+
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:

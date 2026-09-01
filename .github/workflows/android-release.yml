@@ -22,6 +22,9 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
+      - name: Create environment asset
+        run: cp .env.example .env
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
