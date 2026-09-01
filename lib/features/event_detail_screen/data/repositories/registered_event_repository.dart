@@ -8,12 +8,10 @@ import 'package:bdo_event/core/util/event_schedule.dart';
 
 class RegisteredEventRepository implements RegistrationRepositoryContract {
   RegisteredEventRepository({
-    required RegistrationDataSource dataSource,
-    required AuthRepositoryContract authRepository,
+    required this._dataSource,
+    required this._authRepository,
     DateTime Function()? now,
-  }) : _dataSource = dataSource,
-       _authRepository = authRepository,
-       _now = now ?? DateTime.now;
+  }) : _now = now ?? DateTime.now;
 
   final RegistrationDataSource _dataSource;
   final AuthRepositoryContract _authRepository;
@@ -45,7 +43,7 @@ class RegisteredEventRepository implements RegistrationRepositoryContract {
     }
 
     if (event.registrationDeadline != null &&
-      !now.isBefore(event.registrationDeadline!)) {
+        !now.isBefore(event.registrationDeadline!)) {
       return AppText.registrationDeadlinePassed;
     }
 

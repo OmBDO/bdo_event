@@ -6,6 +6,7 @@ import 'package:bdo_event/core/util/event_date_formatter.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
+import 'package:share_plus/share_plus.dart';
 
 class EventDetailHeader extends StatelessWidget {
   const EventDetailHeader({

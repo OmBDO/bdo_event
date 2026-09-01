@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:bdo_event/core/util/event_resource.dart' show AppStorageBuckets;
+import 'package:bdo_event/core/util/resource/app_buckets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -82,67 +82,75 @@ void main() {
     cleanupScope = null;
   });
 
-  test('enforces private event-image ownership and authenticated reads',
-      () async {
-    final bucket = AppStorageBuckets.eventImages;
-    final path = '${owner.userId}/${context.namespace('event-image')}.jpg';
-    final bytes = Uint8List.fromList([0, 1, 2, 3]);
-    final replacement = Uint8List.fromList([4, 5, 6, 7]);
-    final trackedObject = storageCleanup!.track(bucket: bucket, path: path);
+  test(
+    'enforces private event-image ownership and authenticated reads',
+    () async {
+      final bucket = AppStorageBuckets.eventImages;
+      final path = '${owner.userId}/${context.namespace('event-image')}.jpg';
+      final bytes = Uint8List.fromList([0, 1, 2, 3]);
+      final replacement = Uint8List.fromList([4, 5, 6, 7]);
+      final trackedObject = storageCleanup!.track(bucket: bucket, path: path);
 
-    await ownerClient.storage.from(bucket).uploadBinary(
-      path,
-      bytes,
-      fileOptions: const supabase.FileOptions(
-        contentType: 'image/jpeg',
-        upsert: false,
-      ),
-    );
-    final signedUrl = await otherClient.storage
-        .from(bucket)
-        .createSignedUrl(path, 60);
-    expect(signedUrl, startsWith('http'));
+      await ownerClient.storage
+          .from(bucket)
+          .uploadBinary(
+            path,
+            bytes,
+            fileOptions: const supabase.FileOptions(
+              contentType: 'image/jpeg',
+              upsert: false,
+            ),
+          );
+      final signedUrl = await otherClient.storage
+          .from(bucket)
+          .createSignedUrl(path, 60);
+      expect(signedUrl, startsWith('http'));
 
-    await expectLater(
-      anonymousClient.storage.from(bucket).createSignedUrl(path, 60),
-      throwsA(isA<Exception>()),
-    );
-    final otherPath =
-        '${owner.userId}/${context.namespace('unauthorized-upload')}.jpg';
-    storageCleanup!.track(bucket: bucket, path: otherPath);
-    await expectLater(
-      otherClient.storage.from(bucket).uploadBinary(
-        otherPath,
-        bytes,
-        fileOptions: const supabase.FileOptions(
-          contentType: 'image/jpeg',
-          upsert: false,
-        ),
-      ),
-      throwsA(isA<Exception>()),
-    );
-    await expectLater(
-      otherClient.storage.from(bucket).remove([path]),
-      throwsA(isA<Exception>()),
-    );
+      await expectLater(
+        anonymousClient.storage.from(bucket).createSignedUrl(path, 60),
+        throwsA(isA<Exception>()),
+      );
+      final otherPath =
+          '${owner.userId}/${context.namespace('unauthorized-upload')}.jpg';
+      storageCleanup!.track(bucket: bucket, path: otherPath);
+      await expectLater(
+        otherClient.storage
+            .from(bucket)
+            .uploadBinary(
+              otherPath,
+              bytes,
+              fileOptions: const supabase.FileOptions(
+                contentType: 'image/jpeg',
+                upsert: false,
+              ),
+            ),
+        throwsA(isA<Exception>()),
+      );
+      await expectLater(
+        otherClient.storage.from(bucket).remove([path]),
+        throwsA(isA<Exception>()),
+      );
 
-    await ownerClient.storage.from(bucket).uploadBinary(
-      path,
-      replacement,
-      fileOptions: const supabase.FileOptions(
-        contentType: 'image/jpeg',
-        upsert: true,
-      ),
-    );
-    final downloaded = await ownerClient.storage.from(bucket).download(path);
-    expect(downloaded, orderedEquals(replacement));
+      await ownerClient.storage
+          .from(bucket)
+          .uploadBinary(
+            path,
+            replacement,
+            fileOptions: const supabase.FileOptions(
+              contentType: 'image/jpeg',
+              upsert: true,
+            ),
+          );
+      final downloaded = await ownerClient.storage.from(bucket).download(path);
+      expect(downloaded, orderedEquals(replacement));
 
-    await trackedObject.delete();
-    await expectLater(
-      ownerClient.storage.from(bucket).download(path),
-      throwsA(isA<Exception>()),
-    );
-  });
+      await trackedObject.delete();
+      await expectLater(
+        ownerClient.storage.from(bucket).download(path),
+        throwsA(isA<Exception>()),
+      );
+    },
+  );
 }
 
 Future<supabase.SupabaseClient> _signIn(

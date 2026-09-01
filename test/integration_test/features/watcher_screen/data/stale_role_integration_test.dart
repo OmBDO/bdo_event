@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -33,6 +33,52 @@ void main() {
   CleanupScope? cleanupScope;
   EventCleanup? eventCleanup;
   RegistrationCleanup? registrationCleanup;
+
+  Future<void> expectWatcherAccessDenied(String token, String eventId) async {
+    await expectLater(
+      watcherClient.rpc(
+        'validate_event_registration',
+        params: {'requested_token': token, 'requested_event_id': eventId},
+      ),
+      throwsA(isA<supabase.PostgrestException>()),
+    );
+    await expectLater(
+      watcherClient.rpc(
+        'check_in_event_registration',
+        params: {'requested_token': token, 'requested_event_id': eventId},
+      ),
+      throwsA(isA<supabase.PostgrestException>()),
+    );
+    await expectLater(
+      watcherClient.rpc(
+        'load_event_attendance_count',
+        params: {'requested_event_id': eventId},
+      ),
+      throwsA(isA<supabase.PostgrestException>()),
+    );
+    await expectLater(
+      watcherClient.rpc(
+        'load_event_check_in_count',
+        params: {'requested_event_id': eventId},
+      ),
+      throwsA(isA<supabase.PostgrestException>()),
+    );
+  }
+
+  Future<EventFixtureData> createEvent() async {
+    final event = EventFixture(context).draft(
+      testId: 'stale-role-event',
+      title: '${context.runId} Stale Role Event',
+      creatorId: eventOwner.userId,
+    );
+    eventCleanup!.track(event);
+    await cleanupClient.from(AppDatabase.eventsTable).insert({
+      AppDatabase.id: event.eventId,
+      AppDatabase.creatorId: eventOwner.userId,
+      AppDatabase.payload: event.event.toJson(),
+    });
+    return event;
+  }
 
   setUp(() async {
     environment = SupabaseEnvironment.fromEnvironment();
@@ -104,7 +150,7 @@ void main() {
   });
 
   test('revoked watcher roles cannot use an already-issued session', () async {
-    final event = await _createEvent();
+    final event = await createEvent();
     final registration = RegistrationFixture(context).draft(
       testId: 'stale-role-registration',
       actor: user.definition,
@@ -128,78 +174,21 @@ void main() {
     expect(
       await watcherClient.rpc(
         'validate_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': event.eventId,
-        },
+        params: {'requested_token': token, 'requested_event_id': event.eventId},
       ),
       hasLength(1),
     );
 
-    await SupabaseActorRoleUpdater(environment: environment).setRoles(
-      watcher.userId!,
-      const ['user'],
-    );
-    await _expectWatcherAccessDenied(token, event.eventId);
+    await SupabaseActorRoleUpdater(environment: environment)
+        .setRoles(watcher.userId!, const ['user']);
+    await expectWatcherAccessDenied(token, event.eventId);
 
     final refreshed = await watcherClient.auth.refreshSession();
     final refreshedUser = refreshed.user;
     expect(refreshedUser, isNotNull);
     expect(refreshedUser!.appMetadata['roles'], isNot(contains('watcher')));
-    await _expectWatcherAccessDenied(token, event.eventId);
+    await expectWatcherAccessDenied(token, event.eventId);
   });
-
-  Future<void> _expectWatcherAccessDenied(String token, String eventId) async {
-    await expectLater(
-      watcherClient.rpc(
-        'validate_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': eventId,
-        },
-      ),
-      throwsA(isA<supabase.PostgrestException>()),
-    );
-    await expectLater(
-      watcherClient.rpc(
-        'check_in_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': eventId,
-        },
-      ),
-      throwsA(isA<supabase.PostgrestException>()),
-    );
-    await expectLater(
-      watcherClient.rpc(
-        'load_event_attendance_count',
-        params: {'requested_event_id': eventId},
-      ),
-      throwsA(isA<supabase.PostgrestException>()),
-    );
-    await expectLater(
-      watcherClient.rpc(
-        'load_event_check_in_count',
-        params: {'requested_event_id': eventId},
-      ),
-      throwsA(isA<supabase.PostgrestException>()),
-    );
-  }
-
-  Future<EventFixtureData> _createEvent() async {
-    final event = EventFixture(context).draft(
-      testId: 'stale-role-event',
-      title: '${context.runId} Stale Role Event',
-      creatorId: eventOwner.userId,
-    );
-    eventCleanup!.track(event);
-    await cleanupClient.from(AppDatabase.eventsTable).insert({
-      AppDatabase.id: event.eventId,
-      AppDatabase.creatorId: eventOwner.userId,
-      AppDatabase.payload: event.event.toJson(),
-    });
-    return event;
-  }
 }
 
 Future<supabase.SupabaseClient> _signIn(

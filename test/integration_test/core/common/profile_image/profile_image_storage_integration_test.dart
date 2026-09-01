@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:bdo_event/core/util/event_resource.dart' show AppStorageBuckets;
+import 'package:bdo_event/core/util/resource/app_buckets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:integration_test/integration_test.dart';
@@ -90,14 +90,16 @@ void main() {
     final replacement = Uint8List.fromList([11, 12, 13]);
     final trackedObject = storageCleanup!.track(bucket: bucket, path: path);
 
-    await ownerClient.storage.from(bucket).uploadBinary(
-      path,
-      bytes,
-      fileOptions: const supabase.FileOptions(
-        contentType: 'image/jpeg',
-        upsert: false,
-      ),
-    );
+    await ownerClient.storage
+        .from(bucket)
+        .uploadBinary(
+          path,
+          bytes,
+          fileOptions: const supabase.FileOptions(
+            contentType: 'image/jpeg',
+            upsert: false,
+          ),
+        );
     final publicUrl = anonymousClient.storage.from(bucket).getPublicUrl(path);
     final publicResponse = await http.get(Uri.parse(publicUrl));
     expect(publicResponse.statusCode, 200);
@@ -107,14 +109,16 @@ void main() {
         '${owner.userId}/${context.namespace('profile-unauthorized')}.jpg';
     storageCleanup!.track(bucket: bucket, path: otherPath);
     await expectLater(
-      otherClient.storage.from(bucket).uploadBinary(
-        otherPath,
-        bytes,
-        fileOptions: const supabase.FileOptions(
-          contentType: 'image/jpeg',
-          upsert: false,
-        ),
-      ),
+      otherClient.storage
+          .from(bucket)
+          .uploadBinary(
+            otherPath,
+            bytes,
+            fileOptions: const supabase.FileOptions(
+              contentType: 'image/jpeg',
+              upsert: false,
+            ),
+          ),
       throwsA(isA<Exception>()),
     );
     await expectLater(
@@ -122,14 +126,16 @@ void main() {
       throwsA(isA<Exception>()),
     );
 
-    await ownerClient.storage.from(bucket).uploadBinary(
-      path,
-      replacement,
-      fileOptions: const supabase.FileOptions(
-        contentType: 'image/jpeg',
-        upsert: true,
-      ),
-    );
+    await ownerClient.storage
+        .from(bucket)
+        .uploadBinary(
+          path,
+          replacement,
+          fileOptions: const supabase.FileOptions(
+            contentType: 'image/jpeg',
+            upsert: true,
+          ),
+        );
     final replacedResponse = await http.get(Uri.parse(publicUrl));
     expect(replacedResponse.statusCode, 200);
     expect(replacedResponse.bodyBytes, orderedEquals(replacement));

@@ -1,5 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/common/clipboard_share.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/widgets/event_detail_header.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,9 @@ import '../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dar
     as profile_fixtures;
 
 void main() {
-  testWidgets('copies event details through the clipboard adapter',
-      (tester) async {
+  testWidgets('copies event details through the clipboard adapter', (
+    tester,
+  ) async {
     final clipboard = RecordingClipboardAdapter();
     final profileCubit = profile_fixtures.createCubit(
       user: profile_fixtures.testUser,
@@ -44,8 +46,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('contains event clipboard failures without confirmation',
-      (tester) async {
+  testWidgets('contains event clipboard failures without confirmation', (
+    tester,
+  ) async {
     final clipboard = RecordingClipboardAdapter(
       error: StateError('clipboard unavailable'),
     );

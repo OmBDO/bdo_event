@@ -1,23 +1,24 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../shared/actors/actor_cleanup.dart';
-import '../../../shared/actors/actor_factory.dart';
-import '../../../shared/actors/supabase_actor_cleanup.dart';
-import '../../../shared/actors/supabase_actor_registrar.dart';
-import '../../../shared/actors/test_actor.dart';
-import '../../../shared/cleanup/cleanup_scope.dart';
-import '../../../shared/cleanup/event_cleanup.dart';
-import '../../../shared/cleanup/registration_cleanup.dart';
-import '../../../shared/fixtures/event_fixture.dart';
-import '../../../shared/fixtures/registration_fixture.dart';
-import '../../../shared/harness/authenticated_app_harness.dart';
-import '../../../shared/harness/supabase_client_factory.dart';
-import '../../../shared/harness/supabase_environment.dart';
-import '../../../shared/harness/test_run_context.dart';
+import '../../../../shared/actors/actor_cleanup.dart';
+import '../../../../shared/actors/actor_factory.dart';
+import '../../../../shared/actors/supabase_actor_cleanup.dart';
+import '../../../../shared/actors/supabase_actor_registrar.dart';
+import '../../../../shared/actors/test_actor.dart';
+import '../../../../shared/cleanup/cleanup_scope.dart';
+import '../../../../shared/cleanup/event_cleanup.dart';
+import '../../../../shared/cleanup/registration_cleanup.dart';
+import '../../../../shared/fixtures/event_fixture.dart';
+import '../../../../shared/fixtures/registration_fixture.dart';
+import '../../../../shared/harness/authenticated_app_harness.dart';
+import '../../../../shared/harness/supabase_client_factory.dart';
+import '../../../../shared/harness/supabase_environment.dart';
+import '../../../../shared/harness/test_run_context.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -81,7 +82,6 @@ void main() {
       title: '${context.runId} Analytics Event',
       date: '31/12/2029',
       location: 'Integration Hall',
-      description: 'Event analytics integration journey.',
       creatorId: ownerId,
       capacity: 10,
     );
@@ -132,8 +132,9 @@ void main() {
     cleanupScope = null;
   });
 
-  testWidgets('opens attendees and analytics for an owned event',
-      (tester) async {
+  testWidgets('opens attendees and analytics for an owned event', (
+    tester,
+  ) async {
     final client = ownerClient;
     expect(client, isNotNull);
     if (client == null) {

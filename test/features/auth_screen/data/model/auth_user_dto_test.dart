@@ -4,6 +4,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 void main() {
+  supabase.User authUser({
+    required String? email,
+    required Map<String, dynamic> appMetadata,
+    required Map<String, dynamic> userMetadata,
+  }) => supabase.User.fromJson({
+    'id': 'user-1',
+    'aud': 'authenticated',
+    'role': 'authenticated',
+    'email': email,
+    'phone': '',
+    'created_at': '2026-08-01T00:00:00Z',
+    'app_metadata': appMetadata,
+    'user_metadata': userMetadata,
+    'identities': const [],
+  })!;
+
   test('maps provider metadata, roles, and notification preference', () {
     final entity = AuthUserDto(
       user: authUser(
@@ -61,19 +77,3 @@ void main() {
     expect(entity.roles, {UserRole.user});
   });
 }
-
-supabase.User authUser({
-  required String? email,
-  required Map<String, dynamic> appMetadata,
-  required Map<String, dynamic> userMetadata,
-}) => supabase.User.fromJson({
-  'id': 'user-1',
-  'aud': 'authenticated',
-  'role': 'authenticated',
-  'email': email,
-  'phone': '',
-  'created_at': '2026-08-01T00:00:00Z',
-  'app_metadata': appMetadata,
-  'user_metadata': userMetadata,
-  'identities': const [],
-});

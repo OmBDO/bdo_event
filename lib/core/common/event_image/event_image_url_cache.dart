@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 class ExpiringImageUrlCache {
   ExpiringImageUrlCache({
     this.maxEntries = 100,
@@ -8,7 +6,7 @@ class ExpiringImageUrlCache {
 
   final int maxEntries;
   final Duration timeToLive;
-  final _entries = LinkedHashMap<String, _CacheEntry>();
+  final _entries = <String, _CacheEntry>{};
 
   String? get(String path, {DateTime? now}) {
     final currentTime = now ?? DateTime.now();
@@ -33,9 +31,7 @@ class ExpiringImageUrlCache {
   }
 
   void _removeExpired(DateTime now) {
-    _entries.removeWhere(
-      (path, entry) => !entry.expiresAt.isAfter(now),
-    );
+    _entries.removeWhere((path, entry) => !entry.expiresAt.isAfter(now));
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:bdo_event/core/common/clipboard_share.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/model/user_model/event_attendee.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/pages/event_attendees_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -83,8 +84,9 @@ void main() {
     expect(sharing.params?.text, AppText.attendeeListFor('Town Hall'));
   });
 
-  testWidgets('contains attendee clipboard failures without confirmation',
-      (tester) async {
+  testWidgets('contains attendee clipboard failures without confirmation', (
+    tester,
+  ) async {
     final clipboard = RecordingClipboardAdapter(
       error: StateError('clipboard unavailable'),
     );
@@ -125,12 +127,10 @@ void main() {
 
 Future<void> pumpAttendeesPage(
   WidgetTester tester,
-  fixtures.FakeNotificationEventStore store,
-  {
+  fixtures.FakeNotificationEventStore store, {
   ClipboardAdapter? clipboard,
   ShareAdapter? share,
-  },
-) async {
+}) async {
   getIt.registerSingleton<EventStore>(store);
   await tester.pumpWidget(
     MaterialApp(

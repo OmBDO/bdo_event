@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -97,19 +97,55 @@ void main() {
   });
 
   test('enforces future, boundary, and past registration deadlines', () async {
-    final openEvent = await _createEvent(
+    Future<EventFixtureData> createEvent(
+      String testId,
+      DateTime deadline,
+    ) async {
+      final event = EventFixture(context).draft(
+        testId: testId,
+        title: '${context.runId} $testId',
+        creatorId: owner.userId,
+        registrationDeadline: deadline,
+      );
+      eventCleanup!.track(event);
+      await ownerClient.from(AppDatabase.eventsTable).insert({
+        AppDatabase.id: event.eventId,
+        AppDatabase.creatorId: owner.userId,
+        AppDatabase.payload: event.event.toJson(),
+      });
+      return event;
+    }
+
+    void trackRegistration(EventFixtureData event, String testId) {
+      final registration = RegistrationFixture(context)
+          .draft(testId: testId, actor: user.definition, event: event);
+      registrationCleanup!.track(registration);
+    }
+
+    Future<void> activate(
+      EventFixtureData event, {
+      Map<String, dynamic>? payload,
+    }) => userClient.rpc(
+      'activate_event_registration',
+      params: {
+        'requested_event_id': event.eventId,
+        'event_payload': payload ?? event.event.toJson(),
+      },
+    );
+
+    final openEvent = await createEvent(
       'deadline-open',
       DateTime.now().toUtc().add(const Duration(minutes: 5)),
     );
-    _trackRegistration(openEvent, 'deadline-open-registration');
-    await _activate(openEvent);
+    trackRegistration(openEvent, 'deadline-open-registration');
+    await activate(openEvent);
 
-    final boundaryEvent = await _createEvent(
+    final boundaryEvent = await createEvent(
       'deadline-boundary',
       DateTime.now().toUtc(),
     );
     await expectLater(
-      _activate(boundaryEvent),
+      activate(boundaryEvent),
       throwsA(
         predicate<supabase.PostgrestException>(
           (error) => error.message.contains('closed'),
@@ -117,7 +153,7 @@ void main() {
       ),
     );
 
-    final closedEvent = await _createEvent(
+    final closedEvent = await createEvent(
       'deadline-closed',
       DateTime.now().toUtc().subtract(const Duration(minutes: 5)),
     );
@@ -129,7 +165,7 @@ void main() {
         )
         .toJson();
     await expectLater(
-      _activate(closedEvent, payload: staleFuturePayload),
+      activate(closedEvent, payload: staleFuturePayload),
       throwsA(
         predicate<supabase.PostgrestException>(
           (error) => error.message.contains('closed'),
@@ -145,45 +181,6 @@ void main() {
     expect(activeRows, hasLength(1));
     expect(activeRows.single[AppDatabase.eventId], openEvent.eventId);
   });
-
-  Future<EventFixtureData> _createEvent(
-    String testId,
-    DateTime deadline,
-  ) async {
-    final event = EventFixture(context).draft(
-      testId: testId,
-      title: '${context.runId} $testId',
-      creatorId: owner.userId,
-      registrationDeadline: deadline,
-    );
-    eventCleanup!.track(event);
-    await ownerClient.from(AppDatabase.eventsTable).insert({
-      AppDatabase.id: event.eventId,
-      AppDatabase.creatorId: owner.userId,
-      AppDatabase.payload: event.event.toJson(),
-    });
-    return event;
-  }
-
-  void _trackRegistration(EventFixtureData event, String testId) {
-    final registration = RegistrationFixture(context).draft(
-      testId: testId,
-      actor: user.definition,
-      event: event,
-    );
-    registrationCleanup!.track(registration);
-  }
-
-  Future<void> _activate(
-    EventFixtureData event, {
-    Map<String, dynamic>? payload,
-  }) => userClient.rpc(
-    'activate_event_registration',
-    params: {
-      'requested_event_id': event.eventId,
-      'event_payload': payload ?? event.event.toJson(),
-    },
-  );
 }
 
 Future<supabase.SupabaseClient> _signIn(

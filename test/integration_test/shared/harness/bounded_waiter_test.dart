@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'bounded_waiter.dart';
@@ -18,8 +20,7 @@ void main() {
     expect(attempts, 1);
   });
 
-  test('polls with the configured delay until the condition is true',
-      () async {
+  test('polls with the configured delay until the condition is true', () async {
     var attempts = 0;
     final delays = <Duration>[];
     final waiter = BoundedWaiter(

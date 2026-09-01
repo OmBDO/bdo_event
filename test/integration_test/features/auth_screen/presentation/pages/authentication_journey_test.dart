@@ -1,18 +1,19 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../shared/actors/actor_cleanup.dart';
-import '../../../shared/actors/actor_factory.dart';
-import '../../../shared/actors/supabase_actor_cleanup.dart';
-import '../../../shared/actors/supabase_actor_registrar.dart';
-import '../../../shared/actors/test_actor.dart';
-import '../../../shared/cleanup/cleanup_scope.dart';
-import '../../../shared/harness/authenticated_app_harness.dart';
-import '../../../shared/harness/supabase_client_factory.dart';
-import '../../../shared/harness/supabase_environment.dart';
-import '../../../shared/harness/test_run_context.dart';
+import '../../../../shared/actors/actor_cleanup.dart';
+import '../../../../shared/actors/actor_factory.dart';
+import '../../../../shared/actors/supabase_actor_cleanup.dart';
+import '../../../../shared/actors/supabase_actor_registrar.dart';
+import '../../../../shared/actors/test_actor.dart';
+import '../../../../shared/cleanup/cleanup_scope.dart';
+import '../../../../shared/harness/authenticated_app_harness.dart';
+import '../../../../shared/harness/supabase_client_factory.dart'
+    show SupabaseClientFactory;
+import '../../../../shared/harness/supabase_environment.dart';
+import '../../../../shared/harness/test_run_context.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -63,8 +64,9 @@ void main() {
     cleanupScope = null;
   });
 
-  testWidgets('restores a session, reaches the shell, and logs out',
-      (tester) async {
+  testWidgets('restores a session, reaches the shell, and logs out', (
+    tester,
+  ) async {
     final preAuthClient = setupClient;
     expect(preAuthClient, isNotNull);
     if (preAuthClient == null) {

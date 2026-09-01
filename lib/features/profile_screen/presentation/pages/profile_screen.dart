@@ -16,7 +16,6 @@ import 'package:bdo_event/features/profile_screen/presentation/sections/watcher_
 import 'package:bdo_event/features/profile_screen/presentation/pages/profile_details_page.dart';
 import 'package:bdo_event/features/watcher_screen/presentation/cubit/watcher_scan_cubit.dart';
 import 'package:bdo_event/core/common/profile_image/profile_image_picker.dart';
-import 'package:bdo_event/core/common/profile_image/profile_image_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -34,109 +33,112 @@ class ProfileScreen extends StatelessWidget {
   final DeleteProfileImage? deleteImage;
 
   @override
-  Widget build(
-    BuildContext context,
-  ) => BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
-    listenWhen: (previous, current) =>
-        previous.errorMessage != current.errorMessage &&
-        current.errorMessage != null,
-    listener: (context, state) =>
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(state.errorMessage!))),
-    builder: (context, state) {
-      final theme = Theme.of(context);
-      final isDarkMode = theme.brightness == Brightness.dark;
-      final user = state.user;
-      return SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Gap(AppSpace.space30),
-              ProfileHeaderSection(user: user),
-              const Gap(AppSpace.space10),
-              ProfileAccountSection(
-                onEditProfile: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProfileDetailsPage(
-                      user: user,
-                      imagePicker: imagePicker,
-                      storeImage: storeImage,
-                      deleteImage: deleteImage,
+  Widget build(BuildContext context) =>
+      BlocConsumer<ProfileScreenCubit, ProfileScreenState>(
+        listenWhen: (previous, current) =>
+            previous.errorMessage != current.errorMessage &&
+            current.errorMessage != null,
+        listener: (context, state) =>
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.errorMessage!))),
+        builder: (context, state) {
+          final theme = Theme.of(context);
+          final isDarkMode = theme.brightness == Brightness.dark;
+          final user = state.user;
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Gap(AppSpace.space30),
+                  ProfileHeaderSection(user: user),
+                  const Gap(AppSpace.space10),
+                  ProfileAccountSection(
+                    onEditProfile: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ProfileDetailsPage(
+                          user: user,
+                          imagePicker: imagePicker,
+                          storeImage: storeImage,
+                          deleteImage: deleteImage,
+                        ),
+                      ),
+                    ),
+                    onChangePassword: () => _showChangePasswordDialog(context),
+                  ),
+                  const Gap(AppSpace.space16),
+                  ProfilePreferencesSection(
+                    state: state,
+                    onReminderLeadTime: (minutes) =>
+                        _showReminderLeadTimeDialog(context, minutes),
+                    onShowLanguageInfo: () => _showInfoDialog(
+                      context,
+                      title: AppText.appLanguage,
+                      message: AppText.onlyAvailableLanguage,
                     ),
                   ),
-                ),
-                onChangePassword: () => _showChangePasswordDialog(context),
-              ),
-              const Gap(AppSpace.space16),
-              ProfilePreferencesSection(
-                state: state,
-                onReminderLeadTime: (minutes) =>
-                    _showReminderLeadTimeDialog(context, minutes),
-                onShowLanguageInfo: () => _showInfoDialog(
-                  context,
-                  title: AppText.appLanguage,
-                  message: AppText.onlyAvailableLanguage,
-                ),
-              ),
-              if (user?.hasPermission(UserPermission.scanRegistrations) ??
-                  false) ...[
-                const Gap(AppSpace.space16),
-                ProfileWatcherSettingsSection(state: state),
-              ],
-              if (user?.hasPermission(UserPermission.createEvents) ??
-                  false) ...[
-                const Gap(AppSpace.space16),
-                ProfileOrganizerToolsSection(user: user!),
-              ],
-              const Gap(AppSpace.space16),
-              ProfileSupportSection(
-                onShowInfo: ({required title, required message}) =>
-                    _showInfoDialog(context, title: title, message: message),
-                onSignOutEverywhere: () => _signOutEverywhere(context),
-              ),
-              const Gap(AppSpace.space24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextButton.icon(
-                  onPressed: () => _logout(context),
-                  style: TextButton.styleFrom(
-                    foregroundColor: isDarkMode
-                        ? theme.colorScheme.onSurface
-                        : Colors.black54,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    backgroundColor: isDarkMode
-                        ? theme.colorScheme.surfaceContainerHighest
-                        : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
-                    minimumSize: const Size(double.infinity, 50),
+                  if (user?.hasPermission(UserPermission.scanRegistrations) ??
+                      false) ...[
+                    const Gap(AppSpace.space16),
+                    ProfileWatcherSettingsSection(state: state),
+                  ],
+                  if (user?.hasPermission(UserPermission.createEvents) ??
+                      false) ...[
+                    const Gap(AppSpace.space16),
+                    ProfileOrganizerToolsSection(user: user!),
+                  ],
+                  const Gap(AppSpace.space16),
+                  ProfileSupportSection(
+                    onShowInfo: ({required title, required message}) =>
+                        _showInfoDialog(
+                          context,
+                          title: title,
+                          message: message,
+                        ),
+                    onSignOutEverywhere: () => _signOutEverywhere(context),
                   ),
-                  icon: const Icon(Icons.logout_rounded, size: 20),
-                  label: const Text(
-                    AppText.logout,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: AppSize.text15,
+                  const Gap(AppSpace.space24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextButton.icon(
+                      onPressed: () => _logout(context),
+                      style: TextButton.styleFrom(
+                        foregroundColor: isDarkMode
+                            ? theme.colorScheme.onSurface
+                            : Colors.black54,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        backgroundColor: isDarkMode
+                            ? theme.colorScheme.surfaceContainerHighest
+                            : const Color(0xFFB1D4FA).withValues(alpha: 0.6),
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      icon: const Icon(Icons.logout_rounded, size: 20),
+                      label: const Text(
+                        AppText.logout,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: AppSize.text15,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  ValueListenableBuilder<double>(
+                    valueListenable: FooterHeightTracker.heightNotifier,
+                    builder: (context, dynamicHeight, child) =>
+                        SizedBox(height: dynamicHeight + AppSpace.space24),
+                  ),
+                ],
               ),
-              ValueListenableBuilder<double>(
-                valueListenable: FooterHeightTracker.heightNotifier,
-                builder: (context, dynamicHeight, child) =>
-                    SizedBox(height: dynamicHeight + AppSpace.space24),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
-    },
-  );
 
   Future<void> _logout(BuildContext context) async {
     await context.read<AuthScreenCubit>().logout();

@@ -15,15 +15,11 @@ import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_ic
 import 'package:bdo_event/features/watcher_screen/presentation/widget/scanner_target_overlay.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_state.dart';
+
 import '../adapters.dart';
 
 class WatcherScanScreen extends StatefulWidget {
-  const WatcherScanScreen({
-    super.key,
-    this.scanner,
-    this.voice,
-    this.feedback,
-  });
+  const WatcherScanScreen({super.key, this.scanner, this.voice, this.feedback});
 
   final WatcherScannerAdapter? scanner;
   final WatcherVoiceAdapter? voice;
@@ -35,11 +31,10 @@ class WatcherScanScreen extends StatefulWidget {
 
 class _WatcherScanScreenState extends State<WatcherScanScreen> {
   late final WatcherScannerAdapter _scanner =
-    widget.scanner ?? MobileScannerAdapter();
-  late final WatcherVoiceAdapter _voice =
-    widget.voice ?? FlutterTtsAdapter();
+      widget.scanner ?? MobileScannerAdapter();
+  late final WatcherVoiceAdapter _voice = widget.voice ?? FlutterTtsAdapter();
   late final WatcherFeedbackAdapter _feedback =
-    widget.feedback ?? const SystemWatcherFeedbackAdapter();
+      widget.feedback ?? const SystemWatcherFeedbackAdapter();
   final _manualEntryController = TextEditingController();
   Timer? _scanCooldown;
   bool _torchEnabled = false;
@@ -77,6 +72,7 @@ class _WatcherScanScreenState extends State<WatcherScanScreen> {
     _manualEntryController.dispose();
     try {
       _scanner.dispose();
+      // ignore: empty_catches
     } on Object {}
     unawaited(_disposeVoice());
     super.dispose();

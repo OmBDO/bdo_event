@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:bdo_event/core/model/user_model/user_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_identifier.dart';
+import 'package:bdo_event/core/util/resource/app_locals.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/watcher_screen/data/datasource/watcher_remote_data_source.dart';
 import 'package:bdo_event/features/watcher_screen/data/repositories/watcher_repository.dart';
@@ -15,14 +17,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dart'
+import '../../../profile_screen/presentation/cubit/profile_screen_cubit_test.dart'
     as profile_fixtures;
 import '../../../../shared/fixtures/fake_notification_event_store.dart';
 import '../../../../shared/fixtures/watcher_native_adapters.dart';
 
 void main() {
-  testWidgets('routes scanner callbacks and native controls through adapters',
-      (tester) async {
+  testWidgets('routes scanner callbacks and native controls through adapters', (
+    tester,
+  ) async {
     final scanner = RecordingScannerAdapter();
     final voice = RecordingVoiceAdapter();
     final feedback = RecordingFeedbackAdapter();
@@ -45,11 +48,13 @@ void main() {
     );
 
     expect(voice.languages, [AppLocales.englishIndia]);
-    scanner.detect(jsonEncode({
-      'type': AppIdentifiers.qrRegistrationType,
-      'eventId': 'event-1',
-      'token': 'token-1',
-    }));
+    scanner.detect(
+      jsonEncode({
+        'type': AppIdentifiers.qrRegistrationType,
+        'eventId': 'event-1',
+        'token': 'token-1',
+      }),
+    );
     scanner.detect('ignored-during-cooldown');
     await tester.pump(const Duration(milliseconds: 1600));
 
@@ -79,8 +84,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('contains native adapter failures and completes teardown',
-      (tester) async {
+  testWidgets('contains native adapter failures and completes teardown', (
+    tester,
+  ) async {
     final scanner = RecordingScannerAdapter(
       toggleTorchError: StateError('torch unavailable'),
       switchCameraError: StateError('camera unavailable'),
@@ -99,15 +105,24 @@ void main() {
     );
     final watcherCubit = createWatcherCubit(store);
     final profileCubit = profile_fixtures.createCubit();
-    await pumpScreen(tester, watcherCubit, profileCubit, scanner, voice, feedback);
+    await pumpScreen(
+      tester,
+      watcherCubit,
+      profileCubit,
+      scanner,
+      voice,
+      feedback,
+    );
 
     profileCubit.updateWatcherSoundVolume(0.4);
     await tester.pump();
-    scanner.detect(jsonEncode({
-      'type': AppIdentifiers.qrRegistrationType,
-      'eventId': 'event-1',
-      'token': 'token-1',
-    }));
+    scanner.detect(
+      jsonEncode({
+        'type': AppIdentifiers.qrRegistrationType,
+        'eventId': 'event-1',
+        'token': 'token-1',
+      }),
+    );
     await tester.pump(const Duration(milliseconds: 1600));
 
     expect(find.text(AppText.registrationValid), findsOneWidget);
@@ -124,14 +139,22 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('disposes scanner and voice adapters with the screen',
-      (tester) async {
+  testWidgets('disposes scanner and voice adapters with the screen', (
+    tester,
+  ) async {
     final scanner = RecordingScannerAdapter();
     final voice = RecordingVoiceAdapter();
     final feedback = RecordingFeedbackAdapter();
     final watcherCubit = createWatcherCubit(FakeWatcherStore());
     final profileCubit = profile_fixtures.createCubit();
-    await pumpScreen(tester, watcherCubit, profileCubit, scanner, voice, feedback);
+    await pumpScreen(
+      tester,
+      watcherCubit,
+      profileCubit,
+      scanner,
+      voice,
+      feedback,
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -176,11 +199,11 @@ WatcherScanCubit createWatcherCubit(FakeWatcherStore store) {
     checkInRegistration: CheckInRegistration(repository),
     loadScanDashboard: LoadScanDashboard(repository),
     authRepository: profile_fixtures.FakeAuthRepository(
-      user: const User(
+      user: User(
         id: 'watcher-1',
         displayName: 'Watcher',
         email: 'watcher@example.com',
-        roles: {UserRole.watcher},
+        roles: const {UserRole.watcher},
         createdAt: DateTime(2026, 1, 1),
       ),
     ),
@@ -208,4 +231,3 @@ class FakeWatcherStore extends FakeNotificationEventStore {
   @override
   Future<int> loadCheckedInCount(String eventId) async => 0;
 }
-

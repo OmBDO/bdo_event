@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/util/resource/app_assets.dart';
 import 'package:bdo_event/core/util/resource/app_buckets.dart';
 import 'package:bdo_event/core/util/resource/app_file.dart';
 import 'package:bdo_event/core/util/resource/app_other.dart';

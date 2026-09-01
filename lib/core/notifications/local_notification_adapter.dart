@@ -1,5 +1,8 @@
+import 'package:bdo_event/core/util/resource/app_notification.dart';
+import 'package:timezone/data/latest_10y.dart' as tz;
+
 import 'event_reminder_permission_service.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;

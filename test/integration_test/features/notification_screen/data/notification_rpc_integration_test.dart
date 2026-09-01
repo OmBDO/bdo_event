@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;

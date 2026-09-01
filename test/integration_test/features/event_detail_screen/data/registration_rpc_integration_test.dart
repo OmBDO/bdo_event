@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -111,16 +111,46 @@ void main() {
   test(
     'revocation invalidates the old token and excludes the registration',
     () async {
-      final event = await _createEvent();
-      final registration = RegistrationFixture(context).draft(
-        testId: 'lifecycle',
-        actor: user.definition,
-        event: event,
+      Future<EventFixtureData> createEvent() async {
+        final event = EventFixture(context).draft(
+          testId: 'registration-event',
+          title: '${context.runId} Registration Event',
+          creatorId: owner.userId,
+        );
+        eventCleanup!.track(event);
+        await ownerClient.from(AppDatabase.eventsTable).insert({
+          AppDatabase.id: event.eventId,
+          AppDatabase.creatorId: owner.userId,
+          AppDatabase.payload: event.event.toJson(),
+        });
+        return event;
+      }
+
+      Future<void> activate(EventFixtureData event) => userClient.rpc(
+        'activate_event_registration',
+        params: {
+          'requested_event_id': event.eventId,
+          'event_payload': event.event.toJson(),
+        },
       );
+
+      Future<String> activeToken(EventFixtureData event) async {
+        final row = await userClient
+            .from(AppDatabase.eventRegistrationsTable)
+            .select(AppDatabase.registrationToken)
+            .eq(AppDatabase.eventId, event.eventId)
+            .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration)
+            .single();
+        return row[AppDatabase.registrationToken] as String;
+      }
+
+      final event = await createEvent();
+      final registration = RegistrationFixture(context)
+          .draft(testId: 'lifecycle', actor: user.definition, event: event);
       registrationCleanup!.track(registration);
 
-      await _activate(event);
-      final firstToken = await _activeToken(event);
+      await activate(event);
+      final firstToken = await activeToken(event);
       await userClient.rpc(
         'revoke_event_registration',
         params: {'requested_event_id': event.eventId},
@@ -138,10 +168,7 @@ void main() {
             .from(AppDatabase.eventRegistrationsTable)
             .select(AppDatabase.registrationToken)
             .eq(AppDatabase.eventId, event.eventId)
-            .eq(
-              AppDatabase.registrationStatus,
-              AppDatabase.activeRegistration,
-            ),
+            .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration),
         isEmpty,
       );
       expect(
@@ -158,31 +185,71 @@ void main() {
   );
 
   test('an active user cannot register for the same event twice', () async {
-    final event = await _createEvent();
-    final registration = RegistrationFixture(context).draft(
-      testId: 'duplicate',
-      actor: user.definition,
-      event: event,
+    Future<EventFixtureData> createEvent() async {
+      final event = EventFixture(context).draft(
+        testId: 'registration-event',
+        title: '${context.runId} Registration Event',
+        creatorId: owner.userId,
+      );
+      eventCleanup!.track(event);
+      await ownerClient.from(AppDatabase.eventsTable).insert({
+        AppDatabase.id: event.eventId,
+        AppDatabase.creatorId: owner.userId,
+        AppDatabase.payload: event.event.toJson(),
+      });
+      return event;
+    }
+
+    Future<void> activate(EventFixtureData event) => userClient.rpc(
+      'activate_event_registration',
+      params: {
+        'requested_event_id': event.eventId,
+        'event_payload': event.event.toJson(),
+      },
     );
+
+    final event = await createEvent();
+    final registration = RegistrationFixture(context)
+        .draft(testId: 'duplicate', actor: user.definition, event: event);
     registrationCleanup!.track(registration);
 
-    await _activate(event);
+    await activate(event);
     await expectLater(
-      _activate(event),
+      activate(event),
       throwsA(isA<supabase.PostgrestException>()),
     );
   });
 
   test('a user cannot delete a registration row directly', () async {
-    final event = await _createEvent();
-    final registration = RegistrationFixture(context).draft(
-      testId: 'direct-delete',
-      actor: user.definition,
-      event: event,
+    Future<EventFixtureData> createEvent() async {
+      final event = EventFixture(context).draft(
+        testId: 'registration-event',
+        title: '${context.runId} Registration Event',
+        creatorId: owner.userId,
+      );
+      eventCleanup!.track(event);
+      await ownerClient.from(AppDatabase.eventsTable).insert({
+        AppDatabase.id: event.eventId,
+        AppDatabase.creatorId: owner.userId,
+        AppDatabase.payload: event.event.toJson(),
+      });
+      return event;
+    }
+
+    Future<void> activate(EventFixtureData event) => userClient.rpc(
+      'activate_event_registration',
+      params: {
+        'requested_event_id': event.eventId,
+        'event_payload': event.event.toJson(),
+      },
     );
+
+    final event = await createEvent();
+    final registration = RegistrationFixture(context)
+        .draft(testId: 'direct-delete', actor: user.definition, event: event);
     registrationCleanup!.track(registration);
 
-    await _activate(event);
+    await activate(event);
     await userClient
         .from(AppDatabase.eventRegistrationsTable)
         .delete()
@@ -200,39 +267,6 @@ void main() {
       AppDatabase.activeRegistration,
     );
   });
-
-  Future<EventFixtureData> _createEvent() async {
-    final event = EventFixture(context).draft(
-      testId: 'registration-event',
-      title: '${context.runId} Registration Event',
-      creatorId: owner.userId,
-    );
-    eventCleanup!.track(event);
-    await ownerClient.from(AppDatabase.eventsTable).insert({
-      AppDatabase.id: event.eventId,
-      AppDatabase.creatorId: owner.userId,
-      AppDatabase.payload: event.event.toJson(),
-    });
-    return event;
-  }
-
-  Future<void> _activate(EventFixtureData event) => userClient.rpc(
-    'activate_event_registration',
-    params: {
-      'requested_event_id': event.eventId,
-      'event_payload': event.event.toJson(),
-    },
-  );
-
-  Future<String> _activeToken(EventFixtureData event) async {
-    final row = await userClient
-        .from(AppDatabase.eventRegistrationsTable)
-        .select(AppDatabase.registrationToken)
-        .eq(AppDatabase.eventId, event.eventId)
-        .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration)
-        .single();
-    return row[AppDatabase.registrationToken] as String;
-  }
 }
 
 Future<supabase.SupabaseClient> _signIn(

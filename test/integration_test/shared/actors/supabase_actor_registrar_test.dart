@@ -21,12 +21,11 @@ void main() {
     late Uri requestUri;
     late Map<String, String> requestHeaders;
     late Map<String, dynamic> requestBody;
-    final actor = TestActorFactory(
-      const TestRunContext('run-123'),
-    ).create(testId: 'event-rls', role: TestActorRole.admin);
+    final actor = TestActorFactory(const TestRunContext('run-123'))
+        .create(testId: 'event-rls', role: TestActorRole.admin);
     final registrar = SupabaseActorRegistrar(
       environment: environment,
-      request: ({uri, headers, body}) async {
+      request: ({required uri, required headers, required body}) async {
         requestUri = uri;
         requestHeaders = headers;
         requestBody = jsonDecode(body) as Map<String, dynamic>;
@@ -41,7 +40,9 @@ void main() {
     expect(requestBody['email'], actor.email);
     expect(requestBody['email_confirm'], isTrue);
     expect(requestBody['password'], registrar.passwordFor(actor));
-    expect(requestBody['app_metadata'], {'roles': ['admin']});
+    expect(requestBody['app_metadata'], {
+      'roles': ['admin'],
+    });
     expect(requestBody['user_metadata'], {'display_name': actor.displayName});
   });
 
@@ -49,15 +50,14 @@ void main() {
     var requestCount = 0;
     final registrar = SupabaseActorRegistrar(
       environment: environment,
-      request: ({uri, headers, body}) async {
+      request: ({required uri, required headers, required body}) async {
         requestCount++;
         return http.Response('{}', 201);
       },
     );
 
-    final actor = TestActorFactory(
-      const TestRunContext('run-123'),
-    ).create(testId: 'signed-out', role: TestActorRole.anonymous);
+    final actor = TestActorFactory(const TestRunContext('run-123'))
+        .create(testId: 'signed-out', role: TestActorRole.anonymous);
 
     expect(await registrar.register(actor), isNull);
     expect(requestCount, 0);
@@ -66,12 +66,11 @@ void main() {
   test('redacts the service credential when provisioning fails', () async {
     final registrar = SupabaseActorRegistrar(
       environment: environment,
-      request: ({uri, headers, body}) async =>
+      request: ({required uri, required headers, required body}) async =>
           http.Response('private server detail', 500),
     );
-    final actor = TestActorFactory(
-      const TestRunContext('run-123'),
-    ).create(testId: 'provisioning-failure', role: TestActorRole.user);
+    final actor = TestActorFactory(const TestRunContext('run-123'))
+        .create(testId: 'provisioning-failure', role: TestActorRole.user);
 
     await expectLater(
       registrar.register(actor),

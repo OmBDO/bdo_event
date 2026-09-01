@@ -38,7 +38,7 @@ class BottomEventRegisterSection extends StatelessWidget {
     final isEventFinished = EventSchedule.isFinished(event, now: now);
     final bool isPastRegistrationDeadline =
         event.registrationDeadline != null &&
-      !now.isBefore(event.registrationDeadline!);
+        !now.isBefore(event.registrationDeadline!);
 
     return BlocBuilder<EventDetailCubit, EventDetailState>(
       bloc: cubit,
@@ -69,7 +69,7 @@ class BottomEventRegisterSection extends StatelessWidget {
                   create: (_) => getIt<RegisteredEventCubit>(),
                   child: RegisteredEventPage(
                     event: event,
-                    clipboardAdapter: widget.widget.clipboardAdapter,
+                    clipboardAdapter: widget.clipboardAdapter,
                   ),
                 ),
               ),

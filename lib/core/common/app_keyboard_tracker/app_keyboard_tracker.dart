@@ -1,6 +1,5 @@
 // Location: lib/core/utils/keyboard_tracker.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 
 class AppKeyboardTracker with WidgetsBindingObserver {
   // A global broadcaster monitoring whether the keyboard is active

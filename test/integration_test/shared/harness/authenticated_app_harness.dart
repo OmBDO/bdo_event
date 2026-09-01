@@ -3,6 +3,7 @@ import 'package:bdo_event/core/deep_link/deep_link_source.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart' as di;
 import 'package:bdo_event/dotenv.dart';
 import 'package:bdo_event/main.dart' as app;
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,7 +26,9 @@ class ApplicationAppHarness {
 
   final SupabaseEnvironment environment;
   final Session? session;
+
   static bool _supabaseInitialized = false;
+
   WidgetTester? _tester;
   bool _startedSupabase = false;
   bool _dependenciesConfigured = false;
@@ -37,43 +40,43 @@ class ApplicationAppHarness {
     bool resetPreferences = true,
   }) async {
     _tester = tester;
+
     if (resetPreferences) {
       SharedPreferences.setMockInitialValues(const {});
     }
+
     final bootstrap = ApplicationBootstrap(
       loadEnvironment: () async => DotEnvInitialization.fromValues(
         url: environment.url,
         anonKey: environment.anonKey,
       ),
+
       initializeSupabase: ({required url, required publishableKey}) async {
-        if (!AuthenticatedAppHarness._supabaseInitialized) {
-          await Supabase.initialize(
-            url: url,
-            publishableKey: publishableKey,
-          );
-          AuthenticatedAppHarness._supabaseInitialized = true;
+        if (!ApplicationAppHarness._supabaseInitialized) {
+          await Supabase.initialize(url: url, publishableKey: publishableKey);
+
+          ApplicationAppHarness._supabaseInitialized = true;
         }
+
         _startedSupabase = true;
-        final session = this.session;
-        if (session == null) {
-          await Supabase.instance.client.auth.signOut();
+
+        final currentSession = session;
+        final refreshToken = currentSession?.refreshToken;
+
+        if (refreshToken == null) {
+          // No session to restore.
         } else {
-          await Supabase.instance.client.auth.setSession(session.refreshToken);
+          await Supabase.instance.client.auth.setSession(refreshToken);
         }
       },
-      configureDependencies: ({preferences}) {
-        di.configureDependencies(
-          preferences: preferences,
-          registerNativeServices: false,
-        );
-        _dependenciesConfigured = true;
-      },
+
       initializeNotifications: () async {},
     );
 
     if (!await bootstrap.initialize()) {
       throw StateError('The authenticated app failed to initialize.');
     }
+
     await tester.pumpWidget(
       app.MyApp(
         deepLinkSource: deepLinkSource ?? const _NoopDeepLinkSource(),
@@ -118,6 +121,7 @@ Future<void> pumpUntil(
   final stopwatch = Stopwatch()..start();
   while (finder.evaluate().isEmpty) {
     if (stopwatch.elapsed >= timeout) {
+      // ignore: deprecated_member_use
       throw TestFailure('Timed out waiting for ${finder.description}.');
     }
     await tester.pump(const Duration(milliseconds: 100));

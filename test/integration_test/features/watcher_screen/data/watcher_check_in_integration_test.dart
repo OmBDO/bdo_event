@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -109,7 +109,32 @@ void main() {
   });
 
   test('checks in a valid token exactly once and keeps count stable', () async {
-    final event = await _createEvent();
+    Future<EventFixtureData> createEvent() async {
+      final event = EventFixture(context).draft(
+        testId: 'watcher-event',
+        title: '${context.runId} Watcher Event',
+        creatorId: owner.userId,
+      );
+      eventCleanup!.track(event);
+      await ownerClient.from(AppDatabase.eventsTable).insert({
+        AppDatabase.id: event.eventId,
+        AppDatabase.creatorId: owner.userId,
+        AppDatabase.payload: event.event.toJson(),
+      });
+      return event;
+    }
+
+    Future<String> loadToken(EventFixtureData event) async {
+      final row = await userClient
+          .from(AppDatabase.eventRegistrationsTable)
+          .select(AppDatabase.registrationToken)
+          .eq(AppDatabase.eventId, event.eventId)
+          .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration)
+          .single();
+      return row[AppDatabase.registrationToken] as String;
+    }
+
+    final event = await createEvent();
     final registration = RegistrationFixture(context).draft(
       testId: 'watcher-registration',
       actor: user.definition,
@@ -123,34 +148,25 @@ void main() {
         'event_payload': event.event.toJson(),
       },
     );
-    final token = await _loadToken(event);
+    final token = await loadToken(event);
 
     final validation = await watcherClient.rpc(
       'validate_event_registration',
-      params: {
-        'requested_token': token,
-        'requested_event_id': event.eventId,
-      },
+      params: {'requested_token': token, 'requested_event_id': event.eventId},
     );
     expect(validation, hasLength(1));
     expect((validation as List).single['event_id'], event.eventId);
     expect(
       await watcherClient.rpc(
         'check_in_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': event.eventId,
-        },
+        params: {'requested_token': token, 'requested_event_id': event.eventId},
       ),
       'checked_in',
     );
     expect(
       await watcherClient.rpc(
         'check_in_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': event.eventId,
-        },
+        params: {'requested_token': token, 'requested_event_id': event.eventId},
       ),
       'already_checked_in',
     );
@@ -162,31 +178,6 @@ void main() {
       1,
     );
   });
-
-  Future<EventFixtureData> _createEvent() async {
-    final event = EventFixture(context).draft(
-      testId: 'watcher-event',
-      title: '${context.runId} Watcher Event',
-      creatorId: owner.userId,
-    );
-    eventCleanup!.track(event);
-    await ownerClient.from(AppDatabase.eventsTable).insert({
-      AppDatabase.id: event.eventId,
-      AppDatabase.creatorId: owner.userId,
-      AppDatabase.payload: event.event.toJson(),
-    });
-    return event;
-  }
-
-  Future<String> _loadToken(EventFixtureData event) async {
-    final row = await userClient
-        .from(AppDatabase.eventRegistrationsTable)
-        .select(AppDatabase.registrationToken)
-        .eq(AppDatabase.eventId, event.eventId)
-        .eq(AppDatabase.registrationStatus, AppDatabase.activeRegistration)
-        .single();
-    return row[AppDatabase.registrationToken] as String;
-  }
 }
 
 Future<supabase.SupabaseClient> _signIn(

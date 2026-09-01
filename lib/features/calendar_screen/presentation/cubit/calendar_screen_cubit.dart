@@ -1,3 +1,4 @@
+import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/features/auth_screen/domain/repositories/auth_repository.dart';
 import 'package:bdo_event/features/calendar_screen/presentation/cubit/calendar_screen_state.dart';
 import 'package:bdo_event/features/calendar_screen/domain/usecases/load_registered_events.dart';
@@ -7,15 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarScreenCubit extends Cubit<CalendarScreenState> {
   CalendarScreenCubit({
-    required LoadRegisteredEvents loadRegisteredEvents,
-    required AuthRepositoryContract authRepository,
-    EventReminderNotificationService? reminderNotifications,
-    SharedPreferences? preferences,
-  }) : _loadRegisteredEvents = loadRegisteredEvents,
-       _authRepository = authRepository,
-       _reminderNotifications = reminderNotifications,
-       _preferences = preferences,
-       super(const CalendarScreenState());
+    required this._loadRegisteredEvents,
+    required this._authRepository,
+    this._reminderNotifications,
+    this._preferences,
+  }) : super(const CalendarScreenState());
 
   final LoadRegisteredEvents _loadRegisteredEvents;
   final AuthRepositoryContract _authRepository;

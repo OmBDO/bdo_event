@@ -35,10 +35,10 @@ class CreateEventPage extends StatefulWidget {
     this.event,
     this.catagory,
     this.popParentOnCreateSuccess = false,
-    EventImagePicker? imagePicker,
-    StoreEventImage? storeImage,
-    DeleteEventImage? deleteImage,
     this.locationSearchAdapter,
+    this.imagePicker,
+    this.storeImage,
+    this.deleteImage,
   });
 
   @override
@@ -47,11 +47,11 @@ class CreateEventPage extends StatefulWidget {
 
 class _CreateEventPageState extends State<CreateEventPage> {
   late final EventImagePicker _imagePicker =
-    widget.imagePicker ?? GalleryEventImagePicker();
+      widget.imagePicker ?? GalleryEventImagePicker();
   late final StoreEventImage _storeImage =
-    widget.storeImage ?? storePickedImage;
+      widget.storeImage ?? storePickedImage;
   late final DeleteEventImage _deleteImage =
-    widget.deleteImage ?? deleteStoredImage;
+      widget.deleteImage ?? deleteStoredImage;
   late final LocationSearchAdapter _locationSearch =
       widget.locationSearchAdapter ?? NominatimLocationSearchAdapter();
   final _formKey = GlobalKey<FormState>();

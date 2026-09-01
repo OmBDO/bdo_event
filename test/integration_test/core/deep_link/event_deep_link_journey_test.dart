@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:bdo_event/core/deep_link/deep_link_source.dart';
-import 'package:bdo_event/core/deep_link/event_deep_link_service.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -77,7 +77,7 @@ void main() {
       title: '${context.runId} Deep Link Event',
       date: '31/12/2029',
       location: 'Integration Hall',
-      description: 'Deep-link event detail destination.',
+
       creatorId: ownerId,
       capacity: 10,
     );
@@ -105,8 +105,9 @@ void main() {
     cleanupScope = null;
   });
 
-  testWidgets('holds a custom link until sign-in, then opens the event',
-      (tester) async {
+  testWidgets('holds a custom link until sign-in, then opens the event', (
+    tester,
+  ) async {
     deepLinkSource = _TestDeepLinkSource(
       Uri.parse('bdoevent://events/${event.eventId}'),
     );
@@ -119,10 +120,7 @@ void main() {
     if (email == null) {
       throw StateError('Deep-link attendee has no email address.');
     }
-    await tester.enterText(
-      find.bySemanticsLabel(AppText.emailAddress),
-      email,
-    );
+    await tester.enterText(find.bySemanticsLabel(AppText.emailAddress), email);
     await tester.enterText(
       find.bySemanticsLabel(AppText.password),
       registrar.passwordFor(attendee.definition),

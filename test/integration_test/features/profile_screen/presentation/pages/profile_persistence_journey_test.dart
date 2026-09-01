@@ -1,21 +1,22 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/profile_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../shared/actors/actor_cleanup.dart';
-import '../../../shared/actors/actor_factory.dart';
-import '../../../shared/actors/supabase_actor_cleanup.dart';
-import '../../../shared/actors/supabase_actor_registrar.dart';
-import '../../../shared/actors/test_actor.dart';
-import '../../../shared/cleanup/cleanup_scope.dart';
-import '../../../shared/harness/authenticated_app_harness.dart';
-import '../../../shared/harness/bounded_waiter.dart';
-import '../../../shared/harness/supabase_client_factory.dart';
-import '../../../shared/harness/supabase_environment.dart';
-import '../../../shared/harness/test_run_context.dart';
+import '../../../../shared/actors/actor_cleanup.dart';
+import '../../../../shared/actors/actor_factory.dart';
+import '../../../../shared/actors/supabase_actor_cleanup.dart';
+import '../../../../shared/actors/supabase_actor_registrar.dart';
+import '../../../../shared/actors/test_actor.dart';
+import '../../../../shared/cleanup/cleanup_scope.dart';
+import '../../../../shared/harness/authenticated_app_harness.dart';
+import '../../../../shared/harness/bounded_waiter.dart';
+import '../../../../shared/harness/supabase_client_factory.dart';
+import '../../../../shared/harness/supabase_environment.dart';
+import '../../../../shared/harness/test_run_context.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -63,8 +64,9 @@ void main() {
     cleanupScope = null;
   });
 
-  testWidgets('persists profile settings across an app restart',
-      (tester) async {
+  testWidgets('persists profile settings across an app restart', (
+    tester,
+  ) async {
     final client = userClient;
     expect(client, isNotNull);
     if (client == null) {
@@ -118,10 +120,10 @@ void main() {
           .select('profile_visibility, registration_visibility')
           .eq('user_id', userId)
           .single();
-        return row['profile_visibility'] ==
-            ProfileVisibility.public.storageValue &&
+      return row['profile_visibility'] ==
+              ProfileVisibility.public.storageValue &&
           row['registration_visibility'] ==
-            RegistrationVisibility.public.storageValue;
+              RegistrationVisibility.public.storageValue;
     }, description: 'profile visibility settings');
 
     await appHarness!.dispose();
@@ -146,8 +148,9 @@ void main() {
     expect(find.text(RegistrationVisibility.public.label), findsOneWidget);
   });
 
-  testWidgets('persists editable profile details across an app restart',
-      (tester) async {
+  testWidgets('persists editable profile details across an app restart', (
+    tester,
+  ) async {
     final client = userClient;
     expect(client, isNotNull);
     if (client == null) {

@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_buckets.dart';
 
 String? profileImageStoragePathFromPublicUrl(String imageUrl) {
   final uri = Uri.tryParse(imageUrl);

@@ -31,10 +31,28 @@ void main() {
     cleanupScope = null;
   });
 
+  Future<_SignUpResult> signUp(String testId, String requestedRole) async {
+    final email = '${context.namespace(testId)}@example.invalid';
+    final password = '${context.namespace(testId)}-Auth!42';
+    final client = clientFactory.createAppClient();
+    final response = await client.auth.signUp(
+      email: email,
+      password: password,
+      data: {
+        'display_name': 'Requested $requestedRole',
+        'requested_role': requestedRole,
+      },
+    );
+    final user = response.user;
+    expect(user, isNotNull);
+    cleanupScope!.add(() => actorCleanup.delete(user!.id));
+    return _SignUpResult(user: user!, client: client);
+  }
+
   test('requested privileged roles require trusted approval', () async {
-    final adminRequest = await _signUp('requested-admin', 'admin');
-    final watcherRequest = await _signUp('requested-watcher', 'watcher');
-    final userRequest = await _signUp('requested-user', 'user');
+    final adminRequest = await signUp('requested-admin', 'admin');
+    final watcherRequest = await signUp('requested-watcher', 'watcher');
+    final userRequest = await signUp('requested-user', 'user');
     final refreshedAdmin = await adminRequest.client.auth.refreshSession();
     final refreshedUser = refreshedAdmin.user;
 
@@ -68,24 +86,6 @@ void main() {
     expect(byRole['watcher']?['status'], 'pending');
     expect(byRole['user']?['status'], 'pending');
   });
-
-  Future<_SignUpResult> _signUp(String testId, String requestedRole) async {
-    final email = '${context.namespace(testId)}@example.invalid';
-    final password = '${context.namespace(testId)}-Auth!42';
-    final client = clientFactory.createAppClient();
-    final response = await client.auth.signUp(
-      email: email,
-      password: password,
-      data: {
-        'display_name': 'Requested $requestedRole',
-        'requested_role': requestedRole,
-      },
-    );
-    final user = response.user;
-    expect(user, isNotNull);
-    cleanupScope!.add(() => actorCleanup.delete(user!.id));
-    return _SignUpResult(user: user!, client: client);
-  }
 }
 
 class _SignUpResult {

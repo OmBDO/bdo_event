@@ -53,7 +53,7 @@ void main() {
       },
     );
     final cubit = createCubit(
-      authRepository: const FakeAuthRepository(testUser),
+      authRepository: FakeAuthRepository(testUser),
       repository: repository,
       reminderNotifications: null,
     );
@@ -74,14 +74,13 @@ CalendarScreenCubit createCubit({
   AuthRepositoryContract? authRepository,
   CalendarRepositoryContract? repository,
   EventReminderNotificationService? reminderNotifications,
-}) =>
-    CalendarScreenCubit(
-      loadRegisteredEvents: LoadRegisteredEvents(
-        repository ?? const FakeCalendarRepository(),
-      ),
-      authRepository: authRepository ?? const FakeAuthRepository(null),
-      reminderNotifications: reminderNotifications,
-    );
+}) => CalendarScreenCubit(
+  loadRegisteredEvents: LoadRegisteredEvents(
+    repository ?? const FakeCalendarRepository(),
+  ),
+  authRepository: authRepository ?? const FakeAuthRepository(null),
+  reminderNotifications: reminderNotifications,
+);
 
 class FakeCalendarRepository implements CalendarRepositoryContract {
   const FakeCalendarRepository({this.loadOverride});
@@ -122,13 +121,28 @@ class FakeAuthRepository implements AuthRepositoryContract {
   @override
   Future<void> initialize() async {}
   @override
-  Future<String?> register({required String name, required String email, required String password, required UserRole requestedRole}) async => null;
+  Future<String?> register({
+    required String name,
+    required String email,
+    required String password,
+    required UserRole requestedRole,
+  }) async => null;
   @override
-  Future<String?> login({required String email, required String password}) async => null;
+  Future<String?> login({
+    required String email,
+    required String password,
+  }) async => null;
   @override
   Future<String?> updatePassword(String password) async => null;
   @override
-  Future<String?> updateProfile({required String displayName, required String email, String? photoUrl, String? phoneNumber, String? bio, String? locale}) async => null;
+  Future<String?> updateProfile({
+    required String displayName,
+    required String email,
+    String? photoUrl,
+    String? phoneNumber,
+    String? bio,
+    String? locale,
+  }) async => null;
   @override
   Future<void> logout() async {}
   @override

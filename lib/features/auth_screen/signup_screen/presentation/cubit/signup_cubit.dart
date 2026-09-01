@@ -5,9 +5,7 @@ import 'package:bdo_event/features/auth_screen/signup_screen/presentation/cubit/
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpCubit extends Cubit<SignUpState> {
-  SignUpCubit({required AuthRepositoryContract authRepository})
-    : _authRepository = authRepository,
-      super(const SignUpState());
+  SignUpCubit({required this._authRepository}) : super(const SignUpState());
 
   final AuthRepositoryContract _authRepository;
 

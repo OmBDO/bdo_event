@@ -3,7 +3,7 @@ import 'package:bdo_event/core/common/footer_element/element/footer_element.dart
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/prefs/supabase_store.dart';
 import 'package:bdo_event/core/theme/app_theme.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/main_screen/domain/entities/main_tab.dart';
 import 'package:bdo_event/features/main_screen/presentation/cubit/main_screen_cubit.dart';
 import 'package:bdo_event/features/main_screen/presentation/widgets/main_screen_destination.dart';
@@ -23,8 +23,9 @@ void main() {
     await getIt.reset();
   });
 
-  testWidgets('keeps shell controls usable at narrow width with large text',
-      (tester) async {
+  testWidgets('keeps shell controls usable at narrow width with large text', (
+    tester,
+  ) async {
     final mainCubit = MainScreenCubit();
     final profileCubit = profile_fixtures.createCubit();
     await pumpResponsiveShell(
@@ -65,8 +66,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('keeps dark-theme controls available at narrow width',
-      (tester) async {
+  testWidgets('keeps dark-theme controls available at narrow width', (
+    tester,
+  ) async {
     final mainCubit = MainScreenCubit();
     final profileCubit = profile_fixtures.createCubit();
     await pumpResponsiveShell(

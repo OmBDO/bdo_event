@@ -10,6 +10,7 @@ class EventFixture {
   EventFixtureData draft({
     required String testId,
     String title = 'Integration test event',
+    String description = "Draft",
     String date = '31/12/2099',
     String location = 'Pune',
     String imageUrl = '',

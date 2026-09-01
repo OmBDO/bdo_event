@@ -187,8 +187,8 @@ void configureDependencies({
       authRepository: getIt(),
       reminderNotifications:
           getIt.isRegistered<EventReminderNotificationService>()
-              ? getIt<EventReminderNotificationService>()
-              : null,
+          ? getIt<EventReminderNotificationService>()
+          : null,
       preferences: getIt.isRegistered<SharedPreferences>()
           ? getIt<SharedPreferences>()
           : null,
@@ -227,8 +227,8 @@ void configureDependencies({
       saveProfilePreferences: getIt(),
       reminderNotifications:
           getIt.isRegistered<EventReminderNotificationService>()
-              ? getIt<EventReminderNotificationService>()
-              : null,
+          ? getIt<EventReminderNotificationService>()
+          : null,
       biometricLockService: getIt.isRegistered<BiometricLockService>()
           ? getIt<BiometricLockService>()
           : null,
@@ -243,10 +243,9 @@ void configureDependencies({
       eventStore: getIt(),
       reminderNotifications:
           getIt.isRegistered<EventReminderNotificationService>()
-              ? getIt<EventReminderNotificationService>()
-              : null,
+          ? getIt<EventReminderNotificationService>()
+          : null,
     ),
-    dispose: (cubit) => cubit.close(),
   );
 
   getIt.registerSingleton<WatcherScanCubit>(

@@ -25,7 +25,7 @@ class ApplicationBootstrap {
     this.loadEnvironment = DotEnvInitialization.initialize,
     this.initializeSupabase = _initializeSupabase,
     this.loadPreferences = SharedPreferences.getInstance,
-    this.configureDependencies = _configureDependencies,
+    this.configureDependenciesIN = _configureDependencies,
     this.initializeNotifications = _initializeNotifications,
     this.restoreSession = _restoreSession,
     this.refreshProfile = _refreshProfile,
@@ -36,7 +36,7 @@ class ApplicationBootstrap {
   final Future<DotEnvInitialization?> Function() loadEnvironment;
   final SupabaseInitializer initializeSupabase;
   final PreferencesLoader loadPreferences;
-  final DependencyConfigurator configureDependencies;
+  final DependencyConfigurator configureDependenciesIN;
   final AsyncInitializer initializeNotifications;
   final AsyncInitializer restoreSession;
   final SyncInitializer refreshProfile;
@@ -65,10 +65,7 @@ class ApplicationBootstrap {
     required String url,
     required String publishableKey,
   }) async {
-    await Supabase.initialize(
-      url: url,
-      publishableKey: publishableKey,
-    );
+    await Supabase.initialize(url: url, publishableKey: publishableKey);
   }
 
   static void _configureDependencies({SharedPreferences? preferences}) {

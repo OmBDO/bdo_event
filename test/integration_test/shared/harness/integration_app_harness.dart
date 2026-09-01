@@ -4,22 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class IntegrationAppHarness {
   const IntegrationAppHarness({
     required this.home,
-    this.providers = const <SingleChildWidget>[],
+    this.providers = const [],
     this.theme,
     this.darkTheme,
   });
 
   final Widget home;
-  final List<SingleChildWidget> providers;
+  final List<BlocProvider> providers;
   final ThemeData? theme;
   final ThemeData? darkTheme;
 
   Widget build() {
-    final configuredHome = providers.isEmpty
-        ? home
-        : MultiBlocProvider(providers: providers, child: home);
     return MaterialApp(
-      home: configuredHome,
+      home: MultiBlocProvider(providers: providers, child: home),
       theme: theme,
       darkTheme: darkTheme,
     );

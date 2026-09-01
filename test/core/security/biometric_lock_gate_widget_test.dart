@@ -4,7 +4,7 @@ import 'package:bdo_event/core/security/biometric_adapter.dart';
 import 'package:bdo_event/core/di/app_dependencies.dart';
 import 'package:bdo_event/core/security/biometric_lock_gate.dart';
 import 'package:bdo_event/core/security/biometric_lock_service.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/auth_screen/presentation/cubit/auth_screen_cubit.dart';
 import 'package:bdo_event/features/auth_screen/presentation/pages/auth_screen.dart';
 import 'package:bdo_event/features/profile_screen/domain/entities/profile_preferences.dart';
@@ -36,8 +36,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('keeps the lock when the biometric service is unavailable',
-      (tester) async {
+  testWidgets('keeps the lock when the biometric service is unavailable', (
+    tester,
+  ) async {
     final profileCubit = profileFixturesWithLock();
 
     await pumpGate(tester, profileCubit);
@@ -49,8 +50,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('mounts the gate from the authenticated auth path',
-      (tester) async {
+  testWidgets('mounts the gate from the authenticated auth path', (
+    tester,
+  ) async {
     final authCubit = AuthScreenCubit(
       authRepository: profile_fixtures.FakeAuthRepository(),
     )..authenticationSucceeded();
@@ -79,8 +81,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('authenticates on resume and removes the lock on success',
-      (tester) async {
+  testWidgets('authenticates on resume and removes the lock on success', (
+    tester,
+  ) async {
     final adapter = RecordingBiometricAdapter();
     final profileCubit = profileFixturesWithLock();
     registerBiometricService(adapter);
@@ -101,8 +104,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('keeps the lock visible when authentication fails',
-      (tester) async {
+  testWidgets('keeps the lock visible when authentication fails', (
+    tester,
+  ) async {
     final adapter = RecordingBiometricAdapter(authenticated: false);
     final profileCubit = profileFixturesWithLock();
     registerBiometricService(adapter);
@@ -116,8 +120,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('removes the lock when the preference is disabled',
-      (tester) async {
+  testWidgets('removes the lock when the preference is disabled', (
+    tester,
+  ) async {
     final profileCubit = profileFixturesWithLock();
     registerBiometricService(RecordingBiometricAdapter());
 
@@ -129,8 +134,9 @@ void main() {
     await profileCubit.close();
   });
 
-  testWidgets('does not start duplicate authentication while it is pending',
-      (tester) async {
+  testWidgets('does not start duplicate authentication while it is pending', (
+    tester,
+  ) async {
     final adapter = BlockingBiometricAdapter();
     final profileCubit = profileFixturesWithLock();
     registerBiometricService(adapter);

@@ -12,7 +12,6 @@ import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/core/util/ui/app_ui.dart';
 import 'package:bdo_event/features/event_detail_screen/domain/usecases/build_attendee_csv.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:gap/gap.dart';
 
@@ -108,7 +107,7 @@ class EventAttendeesPage extends StatelessWidget {
       attendees: attendees,
     );
     final fileName =
-      '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
+        '${_safeFileName(event.title)}_attendees${AppFileFormats.attendeeCsvExtension}';
     await tryShareContent(
       shareAdapter ?? const SharePlusAdapter(),
       ShareParams(
@@ -139,9 +138,8 @@ class EventAttendeesPage extends StatelessWidget {
       csv,
     );
     if (!copied || !context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppText.attendeeCsvCopied)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text(AppText.attendeeCsvCopied)));
   }
 
   String _safeFileName(String title) {

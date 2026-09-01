@@ -48,7 +48,7 @@ class CleanupScope {
 
       if (firstError != null) {
         completer.completeError(
-          firstError!,
+          firstError,
           firstStackTrace ?? StackTrace.current,
         );
       } else {

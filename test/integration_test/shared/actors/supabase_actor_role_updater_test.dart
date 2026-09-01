@@ -18,48 +18,50 @@ void main() {
   test(
     'updates effective roles through the host-only admin endpoint',
     () async {
-    late Uri requestUri;
-    late Map<String, String> requestHeaders;
-    late Map<String, dynamic> requestBody;
-    final updater = SupabaseActorRoleUpdater(
-      environment: environment,
-      update: ({uri, headers, body}) async {
-        requestUri = uri;
-        requestHeaders = headers;
-        requestBody = jsonDecode(body) as Map<String, dynamic>;
-        return http.Response('{}', 200);
-      },
-    );
+      late Uri requestUri;
+      late Map<String, String> requestHeaders;
+      late Map<String, dynamic> requestBody;
+      final updater = SupabaseActorRoleUpdater(
+        environment: environment,
+        update: ({required uri, required headers, required body}) async {
+          requestUri = uri;
+          requestHeaders = headers;
+          requestBody = jsonDecode(body) as Map<String, dynamic>;
+          return http.Response('{}', 200);
+        },
+      );
 
-    await updater.setRoles(' user-123 ', const ['user']);
+      await updater.setRoles(' user-123 ', const ['user']);
 
-    expect(requestUri.path, '/auth/v1/admin/users/user-123');
-    expect(requestHeaders['apikey'], 'service-key');
-    expect(requestHeaders['Authorization'], 'Bearer service-key');
-    expect(requestBody, {'app_metadata': {'roles': ['user']}});
-  });
+      expect(requestUri.path, '/auth/v1/admin/users/user-123');
+      expect(requestHeaders['apikey'], 'service-key');
+      expect(requestHeaders['Authorization'], 'Bearer service-key');
+      expect(requestBody, {
+        'app_metadata': {
+          'roles': ['user'],
+        },
+      });
+    },
+  );
 
   test('rejects an empty user identifier before contacting Supabase', () async {
     var requestCount = 0;
     final updater = SupabaseActorRoleUpdater(
       environment: environment,
-      update: ({uri, headers, body}) async {
+      update: ({required uri, required headers, required body}) async {
         requestCount++;
         return http.Response('{}', 200);
       },
     );
 
-    await expectLater(
-      updater.setRoles(' ', const []),
-      throwsArgumentError,
-    );
+    await expectLater(updater.setRoles(' ', const []), throwsArgumentError);
     expect(requestCount, 0);
   });
 
   test('redacts the service credential when role update fails', () async {
     final updater = SupabaseActorRoleUpdater(
       environment: environment,
-      update: ({uri, headers, body}) async =>
+      update: ({required uri, required headers, required body}) async =>
           http.Response('private detail', 500),
     );
 

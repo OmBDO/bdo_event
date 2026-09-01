@@ -1,6 +1,6 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/notifications/reminders.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_notification.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -53,23 +53,28 @@ void main() {
     );
   });
 
-  test('does not schedule when the platform or permission is unavailable',
-      () async {
-    final unsupported = RecordingLocalNotificationAdapter(supported: false);
-    final unsupportedService = EventReminderNotificationService(
-      adapter: unsupported,
-    );
-    expect(
-      await unsupportedService.scheduleEventReminder(_futureEvent()),
-      isFalse,
-    );
+  test(
+    'does not schedule when the platform or permission is unavailable',
+    () async {
+      final unsupported = RecordingLocalNotificationAdapter(supported: false);
+      final unsupportedService = EventReminderNotificationService(
+        adapter: unsupported,
+      );
+      expect(
+        await unsupportedService.scheduleEventReminder(_futureEvent()),
+        isFalse,
+      );
 
-    final denied = RecordingLocalNotificationAdapter();
-    denied.permissionGranted = false;
-    final deniedService = EventReminderNotificationService(adapter: denied);
-    expect(await deniedService.scheduleEventReminder(_futureEvent()), isFalse);
-    expect(denied.scheduled, isEmpty);
-  });
+      final denied = RecordingLocalNotificationAdapter();
+      denied.permissionGranted = false;
+      final deniedService = EventReminderNotificationService(adapter: denied);
+      expect(
+        await deniedService.scheduleEventReminder(_futureEvent()),
+        isFalse,
+      );
+      expect(denied.scheduled, isEmpty);
+    },
+  );
 
   test('returns false when native scheduling fails', () async {
     final adapter = RecordingLocalNotificationAdapter(
@@ -112,7 +117,7 @@ void main() {
 
   test('contains pending-request and cancellation failures', () async {
     final pendingFailure = EventReminderNotificationService(
-      adapter: RecordingLocalNotificationAdapter(pendingError: StateError()),
+      adapter: RecordingLocalNotificationAdapter(pendingError: StateError("")),
     );
     await expectLater(
       pendingFailure.reconcileEventReminders([_futureEvent()]),

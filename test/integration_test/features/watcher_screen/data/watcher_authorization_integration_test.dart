@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -102,7 +102,22 @@ void main() {
     cleanupScope = null;
   });
   test('rejects invalid and revoked watcher access', () async {
-    final event = await _createEvent();
+    Future<EventFixtureData> createEvent() async {
+      final event = EventFixture(context).draft(
+        testId: 'watcher-event',
+        title: '${context.runId} Watcher Event',
+        creatorId: owner.userId,
+      );
+      eventCleanup!.track(event);
+      await cleanupClient.from(AppDatabase.eventsTable).insert({
+        AppDatabase.id: event.eventId,
+        AppDatabase.creatorId: owner.userId,
+        AppDatabase.payload: event.event.toJson(),
+      });
+      return event;
+    }
+
+    final event = await createEvent();
     final registration = RegistrationFixture(context).draft(
       testId: 'watcher-registration',
       actor: user.definition,
@@ -127,10 +142,7 @@ void main() {
     await expectLater(
       userClient.rpc(
         'validate_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': event.eventId,
-        },
+        params: {'requested_token': token, 'requested_event_id': event.eventId},
       ),
       throwsA(isA<supabase.PostgrestException>()),
     );
@@ -172,39 +184,18 @@ void main() {
     expect(
       await watcherClient.rpc(
         'validate_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': event.eventId,
-        },
+        params: {'requested_token': token, 'requested_event_id': event.eventId},
       ),
       isEmpty,
     );
     expect(
       await watcherClient.rpc(
         'check_in_event_registration',
-        params: {
-          'requested_token': token,
-          'requested_event_id': event.eventId,
-        },
+        params: {'requested_token': token, 'requested_event_id': event.eventId},
       ),
       'invalid',
     );
   });
-
-  Future<EventFixtureData> _createEvent() async {
-    final event = EventFixture(context).draft(
-      testId: 'watcher-event',
-      title: '${context.runId} Watcher Event',
-      creatorId: owner.userId,
-    );
-    eventCleanup!.track(event);
-    await cleanupClient.from(AppDatabase.eventsTable).insert({
-      AppDatabase.id: event.eventId,
-      AppDatabase.creatorId: owner.userId,
-      AppDatabase.payload: event.event.toJson(),
-    });
-    return event;
-  }
 }
 
 Future<supabase.SupabaseClient> _signIn(

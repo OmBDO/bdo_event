@@ -18,7 +18,7 @@ void main() {
     late Map<String, String> requestHeaders;
     final cleanup = SupabaseActorCleanup(
       environment: environment,
-      delete: ({uri, headers}) async {
+      delete: ({required uri, required headers}) async {
         requestUri = uri;
         requestHeaders = headers;
         return http.Response('', 204);
@@ -35,7 +35,8 @@ void main() {
   test('treats an already deleted actor as clean', () async {
     final cleanup = SupabaseActorCleanup(
       environment: environment,
-      delete: ({uri, headers}) async => http.Response('', 404),
+      delete: ({required uri, required headers}) async =>
+          http.Response('', 404),
     );
 
     await expectLater(cleanup.delete('user-123'), completes);
@@ -44,23 +45,25 @@ void main() {
   test(
     'rejects an empty actor identifier before contacting Supabase',
     () async {
-    var requestCount = 0;
-    final cleanup = SupabaseActorCleanup(
-      environment: environment,
-      delete: ({uri, headers}) async {
-        requestCount++;
-        return http.Response('', 204);
-      },
-    );
+      var requestCount = 0;
+      final cleanup = SupabaseActorCleanup(
+        environment: environment,
+        delete: ({required uri, required headers}) async {
+          requestCount++;
+          return http.Response('', 204);
+        },
+      );
 
-    await expectLater(cleanup.delete(' '), throwsArgumentError);
-    expect(requestCount, 0);
-  });
+      await expectLater(cleanup.delete(' '), throwsArgumentError);
+      expect(requestCount, 0);
+    },
+  );
 
   test('redacts the service credential when cleanup fails', () async {
     final cleanup = SupabaseActorCleanup(
       environment: environment,
-      delete: ({uri, headers}) async => http.Response('private detail', 500),
+      delete: ({required uri, required headers}) async =>
+          http.Response('private detail', 500),
     );
 
     await expectLater(

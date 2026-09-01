@@ -3,7 +3,9 @@ import 'package:bdo_event/core/util/resource/app_other.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
 import 'package:bdo_event/core/util/event_date_formatter.dart';
+
 import 'event_reminder_permission_service.dart';
+
 import 'package:bdo_event/core/notifications/local_notification_adapter.dart';
 import 'package:bdo_event/core/notifications/event_reminder_policy.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -21,7 +23,8 @@ class EventReminderNotificationService {
     return EventReminderNotificationService._(
       FlutterLocalNotificationAdapter(
         plugin: resolvedPlugin,
-        permissionService: permissionService ??
+        permissionService:
+            permissionService ??
             EventReminderPermissionService(plugin: resolvedPlugin),
       ),
     );
@@ -38,6 +41,7 @@ class EventReminderNotificationService {
   Future<void> initialize() async {
     try {
       await _adapter.initialize();
+      // ignore: empty_catches
     } on Object {}
   }
 
@@ -71,6 +75,7 @@ class EventReminderNotificationService {
           iOS: DarwinNotificationDetails(),
         ),
       );
+      // ignore: empty_catches
     } on Object {}
   }
 
@@ -87,7 +92,8 @@ class EventReminderNotificationService {
     if (!reminderTime.isAfter(DateTime.now())) return false;
     if (!await requestPermission()) return false;
 
-    final body = 'Your event is scheduled for '
+    final body =
+        'Your event is scheduled for '
         '${formatEventDate(event.date, AppDateFormats.dayMonthYear)} '
         'at ${formatEventTime(event.startTime)}.';
     try {
@@ -189,6 +195,7 @@ class EventReminderNotificationService {
   Future<void> _cancel(int id) async {
     try {
       await _adapter.cancel(id);
+      // ignore: empty_catches
     } on Object {}
   }
 }

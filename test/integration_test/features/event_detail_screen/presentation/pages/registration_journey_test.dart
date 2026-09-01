@@ -1,21 +1,22 @@
-import 'package:bdo_event/core/util/event_resource.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../shared/actors/actor_cleanup.dart';
-import '../../../shared/actors/actor_factory.dart';
-import '../../../shared/actors/supabase_actor_cleanup.dart';
-import '../../../shared/actors/supabase_actor_registrar.dart';
-import '../../../shared/actors/test_actor.dart';
-import '../../../shared/cleanup/cleanup_scope.dart';
-import '../../../shared/cleanup/event_cleanup.dart';
-import '../../../shared/fixtures/event_fixture.dart';
-import '../../../shared/harness/authenticated_app_harness.dart';
-import '../../../shared/harness/supabase_client_factory.dart';
-import '../../../shared/harness/supabase_environment.dart';
-import '../../../shared/harness/test_run_context.dart';
+import '../../../../shared/actors/actor_cleanup.dart';
+import '../../../../shared/actors/actor_factory.dart';
+import '../../../../shared/actors/supabase_actor_cleanup.dart';
+import '../../../../shared/actors/supabase_actor_registrar.dart';
+import '../../../../shared/actors/test_actor.dart';
+import '../../../../shared/cleanup/cleanup_scope.dart';
+import '../../../../shared/cleanup/event_cleanup.dart';
+import '../../../../shared/fixtures/event_fixture.dart';
+import '../../../../shared/harness/authenticated_app_harness.dart';
+import '../../../../shared/harness/supabase_client_factory.dart';
+import '../../../../shared/harness/supabase_environment.dart';
+import '../../../../shared/harness/test_run_context.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -80,7 +81,6 @@ void main() {
       title: '${context.runId} Registration Journey',
       date: '31/12/2029',
       location: 'Integration Hall',
-      description: 'Event registration integration journey.',
       creatorId: ownerId,
       capacity: 10,
     );
@@ -109,8 +109,9 @@ void main() {
     cleanupScope = null;
   });
 
-  testWidgets('registers, opens a ticket, and appears in the calendar',
-      (tester) async {
+  testWidgets('registers, opens a ticket, and appears in the calendar', (
+    tester,
+  ) async {
     final client = appClient;
     expect(client, isNotNull);
     if (client == null) {
@@ -127,10 +128,7 @@ void main() {
       session: session,
     );
     await appHarness!.start(tester);
-    await pumpUntil(
-      tester,
-      find.byIcon(Icons.north_east).hitTestable(),
-    );
+    await pumpUntil(tester, find.byIcon(Icons.north_east).hitTestable());
 
     await tester.tap(find.byIcon(Icons.north_east).hitTestable());
     await tester.pumpAndSettle();
@@ -173,4 +171,3 @@ Future<SupabaseClient> _signIn(
   );
   return client;
 }
-

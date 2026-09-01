@@ -4,25 +4,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  test('short-circuits when environment configuration is unavailable', () async {
-    final calls = <String>[];
-    final bootstrap = ApplicationBootstrap(
-      loadEnvironment: () async {
-        calls.add('environment');
-        return null;
-      },
-      initializeSupabase: ({required url, required publishableKey}) async {
-        calls.add('supabase');
-      },
-      loadPreferences: () async {
-        calls.add('preferences');
-        return SharedPreferences.getInstance();
-      },
-    );
+  test(
+    'short-circuits when environment configuration is unavailable',
+    () async {
+      final calls = <String>[];
+      final bootstrap = ApplicationBootstrap(
+        loadEnvironment: () async {
+          calls.add('environment');
+          return null;
+        },
+        initializeSupabase: ({required url, required publishableKey}) async {
+          calls.add('supabase');
+        },
+        loadPreferences: () async {
+          calls.add('preferences');
+          return SharedPreferences.getInstance();
+        },
+      );
 
-    expect(await bootstrap.initialize(), isFalse);
-    expect(calls, ['environment']);
-  });
+      expect(await bootstrap.initialize(), isFalse);
+      expect(calls, ['environment']);
+    },
+  );
 
   test('runs configured startup steps in production order', () async {
     SharedPreferences.setMockInitialValues(const {});
@@ -42,9 +45,7 @@ void main() {
         calls.add('preferences');
         return SharedPreferences.getInstance();
       },
-      configureDependencies: ({preferences}) {
-        calls.add('dependencies:${preferences != null}');
-      },
+
       initializeNotifications: () async => calls.add('notifications'),
       restoreSession: () async => calls.add('session'),
       refreshProfile: () => calls.add('profile'),

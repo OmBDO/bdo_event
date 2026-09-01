@@ -42,7 +42,9 @@ void main() {
     'sign-in renders repository errors and toggles password visibility',
     (tester) async {
       final repository = FakeAuthRepository(loginResult: 'Invalid credentials');
+
       final cubit = SignInCubit(authRepository: repository);
+
       await tester.pumpWidget(
         MaterialApp(
           home: BlocProvider.value(
@@ -56,23 +58,31 @@ void main() {
         find.byType(TextFormField).first,
         'person@example.com',
       );
+
       await tester.enterText(find.byType(TextFormField).last, 'secret');
+
       await tester.tap(find.widgetWithText(AppButton, AppText.signIn));
+
       await tester.pumpAndSettle();
 
       expect(find.text('Invalid credentials'), findsOneWidget);
-      final passwordField = tester.widget<TextFormField>(
-        find.byType(TextFormField).last,
-      );
-      expect(passwordField.obscureText, isTrue);
-      await tester.tap(find.byTooltip(AppText.showPassword));
-      await tester.pump();
+
+      // Check password is initially hidden.
       expect(
-        tester
-            .widget<TextFormField>(find.byType(TextFormField).last)
-            .obscureText,
+        tester.widget<EditableText>(find.byType(EditableText).last).obscureText,
+        isTrue,
+      );
+
+      await tester.tap(find.byTooltip(AppText.showPassword));
+
+      await tester.pump();
+
+      // Check password is now visible.
+      expect(
+        tester.widget<EditableText>(find.byType(EditableText).last).obscureText,
         isFalse,
       );
+
       await cubit.close();
     },
   );

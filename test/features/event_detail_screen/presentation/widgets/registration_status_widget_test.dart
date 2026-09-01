@@ -1,5 +1,4 @@
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_cubit.dart';
 import 'package:bdo_event/features/event_detail_screen/presentation/cubit/event_detail_state.dart';

@@ -1,4 +1,4 @@
-import 'package:bdo_event/core/util/event_resource.dart' show AppDatabase;
+import 'package:bdo_event/core/util/resource/app_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
@@ -99,9 +99,44 @@ void main() {
   });
 
   test('capacity one admits exactly one synchronized registration', () async {
-    final event = await _createCapacityEvent();
-    _trackRegistration(firstUser, event, 'capacity-first-registration');
-    _trackRegistration(secondUser, event, 'capacity-second-registration');
+    Future<EventFixtureData> createCapacityEvent() async {
+      final event = EventFixture(context).draft(
+        testId: 'capacity-event',
+        title: '${context.runId} Capacity Event',
+        creatorId: owner.userId,
+        capacity: 1,
+      );
+      eventCleanup!.track(event);
+      await ownerClient.from(AppDatabase.eventsTable).insert({
+        AppDatabase.id: event.eventId,
+        AppDatabase.creatorId: owner.userId,
+        AppDatabase.payload: event.event.toJson(),
+      });
+      return event;
+    }
+
+    void trackRegistration(
+      ProvisionedTestActor actor,
+      EventFixtureData event,
+      String testId,
+    ) {
+      final registration = RegistrationFixture(context)
+          .draft(testId: testId, actor: actor.definition, event: event);
+      RegistrationCleanup(
+        scope: cleanupScope!,
+        delete: (_) async {
+          await cleanupClient
+              .from(AppDatabase.eventRegistrationsTable)
+              .delete()
+              .eq(AppDatabase.eventId, event.eventId)
+              .eq(AppDatabase.userId, actor.userId!);
+        },
+      ).track(registration);
+    }
+
+    final event = await createCapacityEvent();
+    trackRegistration(firstUser, event, 'capacity-first-registration');
+    trackRegistration(secondUser, event, 'capacity-second-registration');
     final barrier = ConcurrentStartBarrier(2);
 
     final outcomes = await Future.wait([
@@ -120,44 +155,6 @@ void main() {
     expect(failures.single.message, contains('capacity'));
     expect(activeRows, hasLength(1));
   });
-
-  Future<EventFixtureData> _createCapacityEvent() async {
-    final event = EventFixture(context).draft(
-      testId: 'capacity-event',
-      title: '${context.runId} Capacity Event',
-      creatorId: owner.userId,
-      capacity: 1,
-    );
-    eventCleanup!.track(event);
-    await ownerClient.from(AppDatabase.eventsTable).insert({
-      AppDatabase.id: event.eventId,
-      AppDatabase.creatorId: owner.userId,
-      AppDatabase.payload: event.event.toJson(),
-    });
-    return event;
-  }
-
-  void _trackRegistration(
-    ProvisionedTestActor actor,
-    EventFixtureData event,
-    String testId,
-  ) {
-    final registration = RegistrationFixture(context).draft(
-      testId: testId,
-      actor: actor.definition,
-      event: event,
-    );
-    RegistrationCleanup(
-      scope: cleanupScope!,
-      delete: (_) async {
-        await cleanupClient
-            .from(AppDatabase.eventRegistrationsTable)
-            .delete()
-            .eq(AppDatabase.eventId, event.eventId)
-            .eq(AppDatabase.userId, actor.userId!);
-      },
-    ).track(registration);
-  }
 }
 
 Future<Object?> _activateAtBarrier(

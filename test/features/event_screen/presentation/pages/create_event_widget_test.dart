@@ -1,7 +1,6 @@
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
+import 'package:bdo_event/core/model/event_model/event_catagory.dart';
 import 'package:bdo_event/core/model/event_model/event_model.dart';
-import 'package:bdo_event/core/common/location_search.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/presentation/cubit/event_screen_cubit.dart';
 import 'package:bdo_event/features/event_screen/presentation/pages/create_event_page.dart';
@@ -168,8 +167,7 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (widget) =>
-            widget is TextFormField &&
-            widget.controller?.text == 'Found place',
+            widget is TextFormField && widget.controller?.text == 'Found place',
       ),
       findsOneWidget,
     );

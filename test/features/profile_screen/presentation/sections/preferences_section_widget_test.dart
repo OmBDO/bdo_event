@@ -1,4 +1,3 @@
-import 'package:bdo_event/core/util/event_resource.dart';
 import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/profile_screen/presentation/cubit/profile_screen_cubit.dart';
 import 'package:bdo_event/features/profile_screen/presentation/sections/preferences_section.dart';

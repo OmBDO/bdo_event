@@ -1,25 +1,31 @@
 import 'package:bdo_event/core/model/event_model/event_catagory.dart';
-import 'package:bdo_event/core/util/event_resource.dart';
+
 import 'package:bdo_event/core/common/form_elements/auth_button.dart';
+import 'package:bdo_event/core/model/event_model/event_model.dart';
+import 'package:bdo_event/core/util/resource/app_buckets.dart';
+import 'package:bdo_event/core/util/resource/app_database.dart';
+import 'package:bdo_event/core/util/resource/app_other.dart';
+import 'package:bdo_event/core/util/resource/app_text.dart';
 import 'package:bdo_event/features/event_screen/create_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../shared/actors/actor_cleanup.dart';
-import '../../../shared/actors/actor_factory.dart';
-import '../../../shared/actors/supabase_actor_cleanup.dart';
-import '../../../shared/actors/supabase_actor_registrar.dart';
-import '../../../shared/actors/test_actor.dart';
-import '../../../shared/cleanup/cleanup_scope.dart';
-import '../../../shared/cleanup/event_cleanup.dart';
-import '../../../shared/cleanup/storage_cleanup.dart';
-import '../../../shared/harness/authenticated_app_harness.dart';
-import '../../../shared/harness/event_image_test_adapters.dart';
-import '../../../shared/harness/supabase_client_factory.dart';
-import '../../../shared/harness/supabase_environment.dart';
-import '../../../shared/harness/test_run_context.dart';
+import '../../../../shared/actors/actor_cleanup.dart';
+import '../../../../shared/actors/actor_factory.dart';
+import '../../../../shared/actors/supabase_actor_cleanup.dart';
+import '../../../../shared/actors/supabase_actor_registrar.dart';
+import '../../../../shared/actors/test_actor.dart';
+import '../../../../shared/cleanup/cleanup_scope.dart';
+import '../../../../shared/cleanup/event_cleanup.dart' show EventCleanup;
+import '../../../../shared/cleanup/storage_cleanup.dart';
+import '../../../../shared/fixtures/event_fixture.dart';
+import '../../../../shared/harness/authenticated_app_harness.dart';
+import '../../../../shared/harness/event_image_test_adapters.dart';
+import '../../../../shared/harness/supabase_client_factory.dart';
+import '../../../../shared/harness/supabase_environment.dart';
+import '../../../../shared/harness/test_run_context.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -101,16 +107,17 @@ void main() {
         catagory: EventCategory.defaults.first,
         imagePicker: const TestEventImagePicker(),
         storeImage: (image) async {
-          final path =
-              '$ownerId/${context.namespace('created-image')}.jpg';
-          await client.storage.from(AppStorageBuckets.eventImages).uploadBinary(
-            path,
-            await image.readAsBytes(),
-            fileOptions: const FileOptions(
-              contentType: AppMimeTypes.jpeg,
-              upsert: false,
-            ),
-          );
+          final path = '$ownerId/${context.namespace('created-image')}.jpg';
+          await client.storage
+              .from(AppStorageBuckets.eventImages)
+              .uploadBinary(
+                path,
+                await image.readAsBytes(),
+                fileOptions: const FileOptions(
+                  contentType: AppMimeTypes.jpeg,
+                  upsert: false,
+                ),
+              );
           uploadedImagePath = path;
           storageCleanup!.track(
             bucket: AppStorageBuckets.eventImages,
@@ -119,9 +126,9 @@ void main() {
           return path;
         },
         deleteImage: (path) async {
-          await client.storage
-              .from(AppStorageBuckets.eventImages)
-              .remove([path]);
+          await client.storage.from(AppStorageBuckets.eventImages).remove([
+            path,
+          ]);
         },
       ),
     );
@@ -132,11 +139,7 @@ void main() {
     _setField(tester, AppText.eventDate, '31/12/2029');
     _setField(tester, AppText.startTime, '10:00');
     _setField(tester, AppText.endTime, '11:00');
-    _setField(
-      tester,
-      AppText.description,
-      'Created through the UI journey.',
-    );
+    _setField(tester, AppText.description, 'Created through the UI journey.');
     await tester.tap(find.bySemanticsLabel(AppText.location));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Mumbai, India').last);
@@ -184,9 +187,7 @@ void main() {
 }
 
 void _setField(WidgetTester tester, String label, String value) {
-  final field = tester.widget<TextFormField>(
-    find.bySemanticsLabel(label),
-  );
+  final field = tester.widget<TextFormField>(find.bySemanticsLabel(label));
   field.controller!.text = value;
 }
 
